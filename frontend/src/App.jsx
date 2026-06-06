@@ -23,7 +23,8 @@ function Navbar() {
 
   useEffect(() => {
     // Connect to WebSocket
-    const socket = io('/', { path: '/socket.io' }); // React proxy will handle it if properly configured
+    const socketUrl = import.meta.env.VITE_API_URL || '/';
+    const socket = io(socketUrl, { path: '/socket.io' });
     socket.on('visitor_count', (data) => {
       setVisitors(data.count);
     });

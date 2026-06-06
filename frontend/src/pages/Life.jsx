@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
+import { API_BASE } from '../config';
 
 export default function Life() {
   const [grandpa, setGrandpa] = useState(null);
@@ -44,7 +45,7 @@ export default function Life() {
                 <div className="life-photos-grid">
                   {lifePhotos.map((photo, idx) => (
                     <div className="life-photo-item" key={idx}>
-                      <img src={`/api/static/images/life_photos/${photo}`} alt="Grandpa" loading="lazy" />
+                      <img src={`${API_BASE}/api/static/images/life_photos/${photo}`} alt="Grandpa" loading="lazy" />
                     </div>
                   ))}
                 </div>

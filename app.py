@@ -13,7 +13,7 @@ app.secret_key = 'your-secret-key-here-change-this'
 app.config['JWT_SECRET'] = 'admin-secret-key-change-this'
 socketio = SocketIO(app, cors_allowed_origins="*")
 
-active_visitors = 0
+active_visitors_data = {}
 
 # ============================================
 # DATA (Edit this to add/change family info)
@@ -26,7 +26,7 @@ GRANDPA_INFO = {
     "birth_year": "1940",
     "death_year": "2026",
     "birth_place": "[Fill in: Village/Town, Kenya]",
-    "wife_name": "Joys Owino",
+    "wife_name": "Joyce Owino",
     "final_words": "God was good to me.",
     "life_story": """
         APOLLO J. FIZVALENTINE OWINO. was born in [FILL IN] to [FILL IN PARENTS' NAMES]. 
@@ -61,13 +61,18 @@ FAMILY_DATA = [
             {
                 "name": "Peter Odhiambo",
                 "photo": "peter_odhiambo/portrait.jpg",
-                "tribute": "[FILL IN: Peter's tribute to Grandpa]"
+                "tribute": "[FILL IN: Peter's tribute to Dad]"
             },
             {
                 "name": "Elly Opiyo",
                 "photo": "elly_opiyo/portrait.jpg",
                 "note": "Twin to Peter",
-                "tribute": "[FILL IN: Elly's tribute to Grandpa]"
+                "tribute": "[FILL IN: Elly's tribute to Dad]"
+            },
+            {
+                "name": "Felix Otieno",
+                "photo": "felix_otieno/portrait.jpg",
+                "tribute": "[FILL IN: Felix's tribute to Dad]"
             }
         ]
     },
@@ -76,15 +81,7 @@ FAMILY_DATA = [
         "spouse": "",
         "note": "",
         "portrait": "joy_odhiambo/portrait.jpg",
-        "tribute": "[FILL IN: Joy's tribute to Grandpa]",
-        "grandchildren": []
-    },
-    {
-        "name": "Felix Otieno",
-        "spouse": "",
-        "note": "",
-        "portrait": "felix_otieno/portrait.jpg",
-        "tribute": "[FILL IN: Felix's tribute to Grandpa]",
+        "tribute": "[FILL IN: Joy's tribute to Dad]",
         "grandchildren": []
     },
     {
@@ -92,7 +89,7 @@ FAMILY_DATA = [
         "spouse": "Roseline Jeff",
         "note": "",
         "portrait": "jeff_apollo/portrait.jpg",
-        "tribute": "[FILL IN: Jeff's tribute to Grandpa]",
+        "tribute": "[FILL IN: Jeff's tribute to Dad]",
         "grandchildren": [
             {"name": "Dean Revs Ochieng", "photo": "jeff_apollo/grandchildren/dean.jpg"},
             {"name": "Jimmy Adams", "photo": "jeff_apollo/grandchildren/jimmy.jpg"},
@@ -116,7 +113,7 @@ FAMILY_DATA = [
         "spouse": "Nancy Otieno",
         "note": "",
         "portrait": "timothy_owino/portrait.jpg",
-        "tribute": "[FILL IN: Timothy's tribute to Grandpa]",
+        "tribute": "[FILL IN: Timothy's tribute to Dad]",
         "grandchildren": [
             {"name": "Wayne Travis", "photo": "timothy_owino/grandchildren/wayne.jpg"},
             {"name": "Natasha Pinkette", "photo": "timothy_owino/grandchildren/natasha.jpg"},
@@ -129,7 +126,7 @@ FAMILY_DATA = [
         "spouse": "",
         "note": "",
         "portrait": "hellon_owino/portrait.jpg",
-        "tribute": "[FILL IN: Hellon's tribute to Grandpa]",
+        "tribute": "[FILL IN: Hellon's tribute to Dad]",
         "grandchildren": [
             {"name": "Jerald Okello", "photo": "hellon_owino/grandchildren/jerald.jpg"},
             {"name": "Bevaline Okello", "photo": "hellon_owino/grandchildren/bevaline.jpg"},
@@ -143,21 +140,23 @@ FAMILY_DATA = [
         "spouse": "",
         "note": "",
         "portrait": "beryl_mercy/portrait.jpg",
-        "tribute": "[FILL IN: Beryl's tribute to Grandpa]",
+        "tribute": "[FILL IN: Beryl's tribute to Dad]",
         "grandchildren": [
             {"name": "Peter", "photo": "beryl_mercy/grandchildren/peter.jpg"}
         ]
     },
     {
-        "name": "Maddy",
+        "name": "Joan Apollo",
         "spouse": "",
         "note": "",
-        "portrait": "maddy/portrait.jpg",
-        "tribute": "[FILL IN: Maddy's tribute to Grandpa]",
+        "portrait": "joan_apollo/portrait.jpg",
+        "tribute": "[FILL IN: Joan's tribute to Dad]",
         "grandchildren": [
-            {"name": "Richard Leakey", "photo": "maddy/grandchildren/richard.jpg"},
-            {"name": "Macreen", "photo": "maddy/grandchildren/macreen.jpg"},
-            {"name": "Bonney", "photo": "maddy/grandchildren/bonney.jpg"}
+            {"name": "Richard Leakey", "photo": "joan_apollo/grandchildren/richard.jpg"},
+            {"name": "Macreen", "photo": "joan_apollo/grandchildren/macreen.jpg"},
+            {"name": "Bonney", "photo": "joan_apollo/grandchildren/bonney.jpg"},
+            {"name": "Siste", "photo": "joan_apollo/grandchildren/siste.jpg"},
+            {"name": "Boss", "photo": "joan_apollo/grandchildren/boss.jpg"}
         ]
     }
 ]
@@ -303,15 +302,17 @@ def serve_static(filename):
 # ============================================
 @socketio.on('connect')
 def handle_connect():
-    global active_visitors
-    active_visitors += 1
-    emit('visitor_count', {'count': active_visitors}, broadcast=True)
+    active_visitors_data[request.sid] = {
+        "ip": request.remote_addr,
+        "time": datetime.now().strftime("%H:%M:%S")
+    }
+    emit('visitor_count', {'count': len(active_visitors_data)}, broadcast=True)
 
 @socketio.on('disconnect')
 def handle_disconnect():
-    global active_visitors
-    active_visitors = max(0, active_visitors - 1)
-    emit('visitor_count', {'count': active_visitors}, broadcast=True)
+    if request.sid in active_visitors_data:
+        del active_visitors_data[request.sid]
+    emit('visitor_count', {'count': len(active_visitors_data)}, broadcast=True)
 
 # ============================================
 # ADMIN ROUTES (JWT Protected)
@@ -334,7 +335,7 @@ def token_required(f):
 def login():
     auth = request.json
     # Default admin credentials
-    if auth and auth.get('username') == 'admin' and auth.get('password') == 'admin123':
+    if auth and auth.get('username') == 'admin' and auth.get('password') == 'apolloowino':
         token = jwt.encode({'user': 'admin', 'exp': datetime.now().timestamp() + 3600}, app.config['JWT_SECRET'], algorithm="HS256")
         return jsonify({'token': token})
     return jsonify({'message': 'Invalid credentials'}), 401
@@ -346,7 +347,8 @@ def get_admin_data():
         "grandpa": GRANDPA_INFO,
         "family": FAMILY_DATA,
         "tributes": load_tributes(),
-        "live_visitors": active_visitors
+        "live_visitors": len(active_visitors_data),
+        "visitor_details": list(active_visitors_data.values())
     })
 
 if __name__ == '__main__':

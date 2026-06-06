@@ -1,2 +1,6 @@
 Flask>=2.3.0
 flask-cors
+flask-socketio
+PyJWT
+gunicorn
+eventlet

@@ -66,9 +66,16 @@ export default function Admin() {
       </div>
 
       <div style={{display: 'flex', gap: '20px', marginBottom: '40px'}}>
-        <div style={{background: '#f4f4f4', padding: '20px', borderRadius: '10px', flex: 1, textAlign: 'center'}}>
-          <h3>Live Visitors</h3>
-          <p style={{fontSize: '2rem', fontWeight: 'bold', color: '#4ade80'}}>{data.live_visitors}</p>
+        <div style={{background: '#f4f4f4', padding: '20px', borderRadius: '10px', flex: 1}}>
+          <h3 style={{textAlign: 'center'}}>Live Visitors</h3>
+          <p style={{fontSize: '2rem', fontWeight: 'bold', color: '#4ade80', textAlign: 'center'}}>{data.live_visitors}</p>
+          {data.visitor_details && data.visitor_details.length > 0 && (
+            <ul style={{marginTop: '15px', fontSize: '0.9rem', color: '#555', paddingLeft: '20px'}}>
+              {data.visitor_details.map((v, i) => (
+                <li key={i}>IP: {v.ip} (Connected at {v.time})</li>
+              ))}
+            </ul>
+          )}
         </div>
         <div style={{background: '#f4f4f4', padding: '20px', borderRadius: '10px', flex: 1, textAlign: 'center'}}>
           <h3>Tributes Received</h3>

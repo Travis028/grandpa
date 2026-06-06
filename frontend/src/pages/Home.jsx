@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 import { motion } from 'framer-motion';
+import { API_BASE } from '../config';
 
 function Reveal({ children }) {
   return (
@@ -65,7 +66,7 @@ export default function Home() {
   return (
     <>
       <section className="hero">
-        <div className="hero-bg" style={{backgroundImage: "url('/api/static/images/grandpa/main_photo.jpg')"}}>
+        <div className="hero-bg" style={{backgroundImage: `url('${API_BASE}/api/static/images/grandpa/main_photo.jpg')`}}>
           <div className="hero-overlay"></div>
         </div>
         <div className="hero-top-bar"></div>
@@ -177,7 +178,7 @@ export default function Home() {
                   transition={{ duration: 0.3 }}
                 >
                   <div className="family-photo-wrap">
-                    <img src={`/api/static/images/children/${child.portrait}`} alt={child.name} loading="lazy" onError={(e) => { e.target.style.display = 'none'; e.target.nextElementSibling.style.display = 'flex'; }} />
+                    <img src={`${API_BASE}/api/static/images/children/${child.portrait}`} alt={child.name} loading="lazy" onError={(e) => { e.target.style.display = 'none'; e.target.nextElementSibling.style.display = 'flex'; }} />
                     <div className="family-photo-placeholder" style={{display: 'none'}}>
                       <span>{child.name[0]}</span>
                     </div>
@@ -189,7 +190,7 @@ export default function Home() {
                     {child.spouse && <p className="family-spouse">❧ {child.spouse}</p>}
 
                     <div className="child-tribute">
-                      <span className="child-tribute-label">Their tribute to Grandpa</span>
+                      <span className="child-tribute-label">Their tribute to Dad</span>
                       <p className="child-tribute-text">"{child.tribute}"</p>
                     </div>
 
@@ -203,7 +204,7 @@ export default function Home() {
                               key={gIdx}
                               whileHover={{ scale: 1.1 }}
                             >
-                              <img className="grandchild-photo" src={`/api/static/images/children/${grand.photo}`} alt={grand.name} loading="lazy" onError={(e) => { e.target.style.display = 'none'; e.target.nextElementSibling.style.display = 'flex'; }} />
+                              <img className="grandchild-photo" src={`${API_BASE}/api/static/images/children/${grand.photo}`} alt={grand.name} loading="lazy" onError={(e) => { e.target.style.display = 'none'; e.target.nextElementSibling.style.display = 'flex'; }} />
                               <div className="grandchild-photo-placeholder" style={{display: 'none'}}>{grand.name[0]}</div>
                               <span className="grandchild-name">{grand.name}</span>
                             </motion.div>
@@ -239,7 +240,7 @@ export default function Home() {
               {memories.map((mem, idx) => (
                 <Reveal key={idx}>
                   <div className="memory-item">
-                    <img src={`/api/static/images/memories/${mem.file}`} alt={mem.caption} loading="lazy" />
+                    <img src={`${API_BASE}/api/static/images/memories/${mem.file}`} alt={mem.caption} loading="lazy" />
                     <div className="memory-caption">
                       <p>"{mem.caption}"</p>
                       <small>Shared by {mem.submitted_by}</small>
