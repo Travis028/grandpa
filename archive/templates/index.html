@@ -1,0 +1,284 @@
+{% extends "base.html" %}
+
+{% block title %}Home | APOLLO J. FIZVALENTINE OWINO.{% endblock %}
+
+{% block content %}
+
+<!-- Hero Section -->
+<section class="hero">
+    <div class="hero-bg" style="background-image: url('{{ url_for('static', filename='images/grandpa/main_photo.jpg') if image_exists('images/grandpa/main_photo.jpg') else '' }}');">
+        <div class="hero-overlay"></div>
+    </div>
+    <div class="hero-top-bar"></div>
+    <div class="hero-content">
+        <p class="hero-eyebrow">In Loving Memory</p>
+        <h1 class="hero-name">{{ grandpa.name }}</h1>
+        <p class="hero-dates">{{ grandpa.birth_year }} — {{ grandpa.death_year }}</p>
+        <div class="hero-divider">
+            <span class="hero-divider-line"></span>
+            <span class="hero-divider-ornament">✦</span>
+            <span class="hero-divider-line"></span>
+        </div>
+        <blockquote class="hero-quote">
+            "{{ grandpa.final_words }}"
+            <cite class="hero-quote-attr">— {{ grandpa.name }}, final words</cite>
+        </blockquote>
+    </div>
+    <div class="hero-scroll">
+        <span>Scroll</span>
+        <div class="hero-scroll-line"></div>
+    </div>
+</section>
+
+<!-- Flash Messages -->
+{% with messages = get_flashed_messages() %}
+    {% if messages %}
+        <div class="flash-container">
+            {% for msg in messages %}
+                <div class="flash-message">{{ msg }}</div>
+            {% endfor %}
+        </div>
+    {% endif %}
+{% endwith %}
+
+<!-- Quick Navigation Buttons -->
+<div class="quick-nav">
+    <div class="container">
+        <div class="quick-nav-buttons">
+            <a href="/life" class="quick-nav-btn">📖 His Life Story</a>
+            <a href="/program" class="quick-nav-btn">📋 Funeral Program</a>
+            <a href="#family" class="quick-nav-btn">👨👩👧👦 Our Family</a>
+            <a href="#tributes" class="quick-nav-btn">💝 Leave a Tribute</a>
+        </div>
+    </div>
+</div>
+
+<!-- Life Story Preview -->
+<section class="section preview-section" id="life-preview">
+    <div class="container-narrow">
+        <div class="section-header reveal">
+            <span class="section-tag">His Story</span>
+            <h2 class="section-title">A Life Well Lived</h2>
+            <div class="section-rule">
+                <span class="section-rule-line"></span>
+                <span class="section-rule-dot"></span>
+                <span class="section-rule-line"></span>
+            </div>
+        </div>
+        <div class="preview-content reveal">
+            <p class="preview-text">{{ grandpa.life_story[:500] }}...</p>
+            <a href="/life" class="btn-readmore">Read Full Story →</a>
+        </div>
+        <div class="life-stats reveal">
+            <div class="life-stat">
+                <span class="life-stat-number">{{ family|length }}</span>
+                <span class="life-stat-label">Living Children</span>
+            </div>
+            <div class="life-stat">
+                <span class="life-stat-number">{{ family|map(attribute='grandchildren')|map('length')|sum }}+</span>
+                <span class="life-stat-label">Grandchildren</span>
+            </div>
+            <div class="life-stat">
+                <span class="life-stat-number">{{ grandpa.death_year|int - grandpa.birth_year|int }}</span>
+                <span class="life-stat-label">Years of Grace</span>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Family Section -->
+<section class="section family-section" id="family">
+    <div class="container">
+        <div class="section-header reveal">
+            <span class="section-tag">His Greatest Gift</span>
+            <h2 class="section-title">Owino's Family</h2>
+            <div class="section-rule">
+                <span class="section-rule-line"></span>
+                <span class="section-rule-dot"></span>
+                <span class="section-rule-line"></span>
+            </div>
+            <p class="section-sub">Each child, a chapter. Each grandchild, a verse.</p>
+        </div>
+
+        <!-- Firstborn Note -->
+        <div class="firstborn-note reveal">
+            <span class="firstborn-ornament">✦</span>
+            <p class="firstborn-text">
+                <strong>{{ firstborn.name }}</strong> — {{ firstborn.note }}
+            </p>
+        </div>
+
+        <!-- Family Cards -->
+        <div class="family-grid">
+            {% for child in family %}
+            <div class="family-card reveal">
+                <div class="family-photo-wrap">
+                    {% set img_path = 'images/children/' + child.portrait %}
+                    {% if image_exists(img_path) %}
+                        <img src="{{ url_for('static', filename=img_path) }}" alt="{{ child.name }}" loading="lazy">
+                    {% else %}
+                        <div class="family-photo-placeholder">
+                            <span>{{ child.name[0] }}</span>
+                        </div>
+                    {% endif %}
+                    <div class="family-photo-overlay"></div>
+                </div>
+                <div class="family-body">
+                    <h3 class="family-name">{{ child.name }}</h3>
+                    {% if child.note %}
+                        <p class="family-note">{{ child.note }}</p>
+                    {% endif %}
+                    {% if child.spouse %}
+                        <p class="family-spouse">❧ {{ child.spouse }}</p>
+                    {% endif %}
+
+                    <!-- Child's Tribute to Grandpa -->
+                    <div class="child-tribute">
+                        <span class="child-tribute-label">Their tribute to Grandpa</span>
+                        <p class="child-tribute-text">"{{ child.tribute }}"</p>
+                    </div>
+
+                    <!-- Grandchildren -->
+                    {% if child.grandchildren %}
+                        <span class="grandchildren-label">Grandchildren</span>
+                        <div class="grandchildren-row">
+                            {% for grand in child.grandchildren %}
+                            <div class="grandchild">
+                                {% set grand_img_path = 'images/children/' + grand.photo %}
+                                {% if image_exists(grand_img_path) %}
+                                    <img class="grandchild-photo" src="{{ url_for('static', filename=grand_img_path) }}" alt="{{ grand.name }}" loading="lazy">
+                                {% else %}
+                                    <div class="grandchild-photo-placeholder">{{ grand.name[0] }}</div>
+                                {% endif %}
+                                <span class="grandchild-name">{{ grand.name }}</span>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- Memories Gallery -->
+<section class="section memories-section" id="memories">
+    <div class="container">
+        <div class="section-header reveal">
+            <span class="section-tag" style="color: var(--gold2);">Snapshots in Time</span>
+            <h2 class="section-title section-title-light">Memories</h2>
+            <div class="section-rule">
+                <span class="section-rule-line"></span>
+                <span class="section-rule-dot"></span>
+                <span class="section-rule-line"></span>
+            </div>
+            <p class="section-sub section-sub-light">Moments that live on in all of us</p>
+        </div>
+
+        {% if memories %}
+        <div class="memories-masonry">
+            {% for mem in memories %}
+            <div class="memory-item reveal">
+                <img src="{{ url_for('static', filename='images/memories/' + mem.file) }}" alt="{{ mem.caption }}" loading="lazy">
+                <div class="memory-caption">
+                    <p>"{{ mem.caption }}"</p>
+                    <small>Shared by {{ mem.submitted_by }}</small>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="memories-placeholder">
+            <p>✨ Family photos will appear here ✨</p>
+            <p class="small">To add photos, drop .jpg or .png files into: <br><code>static/images/memories/</code></p>
+        </div>
+        {% endif %}
+    </div>
+</section>
+
+<!-- Tributes Section -->
+<section class="section tributes-section" id="tributes">
+    <div class="container-narrow">
+        <div class="section-header reveal">
+            <span class="section-tag">Words from the Heart</span>
+            <h2 class="section-title">Tributes</h2>
+            <div class="section-rule">
+                <span class="section-rule-line"></span>
+                <span class="section-rule-dot"></span>
+                <span class="section-rule-line"></span>
+            </div>
+        </div>
+
+        <!-- Existing Tributes -->
+        <div class="tributes-list">
+            {% if tributes %}
+                {% for tribute in tributes|reverse %}
+                <div class="tribute-card reveal">
+                    <div class="tribute-quote-mark">"</div>
+                    <p class="tribute-message">{{ tribute.message }}</p>
+                    <div class="tribute-meta">
+                        <span class="tribute-name">{{ tribute.name }}</span>
+                        <span>·</span>
+                        <span class="tribute-relation">{{ tribute.relation }}</span>
+                        <span>·</span>
+                        <span class="tribute-date">{{ tribute.date }}</span>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="tribute-card reveal">
+                    <div class="tribute-quote-mark">"</div>
+                    <p class="tribute-message">Be the first to leave a tribute for Grandpa.</p>
+                    <div class="tribute-meta">
+                        <span class="tribute-name">Family</span>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+
+        <div class="ornament reveal">✦ &nbsp;&nbsp; ✦ &nbsp;&nbsp; ✦</div>
+
+        <!-- Tribute Form -->
+        <div class="tribute-form-wrap reveal" id="tribute-form">
+            <h3 class="form-title">Leave a Tribute</h3>
+            <p class="form-sub">Share a memory, a word of love, or a prayer for the family.</p>
+
+            <form action="/tribute" method="POST">
+                <div class="form-grid">
+                    <div class="form-field">
+                        <label class="form-label" for="name">Your Name</label>
+                        <input class="form-input" type="text" id="name" name="name" required placeholder="e.g. Auntie Jane">
+                    </div>
+                    <div class="form-field">
+                        <label class="form-label" for="relation">Your Relation</label>
+                        <input class="form-input" type="text" id="relation" name="relation" placeholder="e.g. Grandchild, Friend, Neighbor">
+                    </div>
+                    <div class="form-field full">
+                        <label class="form-label" for="message">Your Message</label>
+                        <textarea class="form-textarea" id="message" name="message" required placeholder="Write your tribute here…"></textarea>
+                    </div>
+                </div>
+                <button class="btn-submit" type="submit">Share Your Tribute →</button>
+            </form>
+        </div>
+    </div>
+</section>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Reveal animations
+    const reveals = document.querySelectorAll('.reveal');
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('visible');
+                observer.unobserve(entry.target);
+            }
+        });
+    }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+    reveals.forEach(el => observer.observe(el));
+</script>
+{% endblock %}

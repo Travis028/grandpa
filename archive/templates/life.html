@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% block title %}His Life | APOLLO J. FIZVALENTINE OWINO.{% endblock %}
+
+{% block content %}
+
+<section class="page-hero">
+    <div class="page-hero-content">
+        <h1>His Life</h1>
+        <p>A journey of faith, family, and love</p>
+    </div>
+</section>
+
+<section class="section life-full-section">
+    <div class="container-narrow">
+        <div class="life-full-content reveal">
+            <div class="life-basic-info">
+                <p><strong>Born:</strong> {{ grandpa.birth_year }} in {{ grandpa.birth_place }}</p>
+                <p><strong>Married:</strong> {{ grandpa.wife_name }}</p>
+                <p><strong>Departed:</strong> {{ grandpa.death_year }}</p>
+            </div>
+
+            <div class="life-story-full">
+                {{ grandpa.life_story|safe }}
+            </div>
+
+            <!-- Photos from Grandpa's life -->
+            {% if life_photos %}
+            <div class="life-photos">
+                <h3 class="life-photos-title">Photographs Through the Years</h3>
+                <div class="life-photos-grid">
+                    {% for photo in life_photos %}
+                    <div class="life-photo-item">
+                        <img src="{{ url_for('static', filename='images/life_photos/' + photo) }}" alt="Grandpa" loading="lazy">
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            <div class="pullquote life-pullquote">
+                <p>"{{ grandpa.final_words }}"</p>
+                <cite>— {{ grandpa.name }}, final words to his family</cite>
+            </div>
+        </div>
+
+        <div class="back-link">
+            <a href="/" class="btn-back">← Back to Home</a>
+        </div>
+    </div>
+</section>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+    const reveals = document.querySelectorAll('.reveal');
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('visible');
+                observer.unobserve(entry.target);
+            }
+        });
+    }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+    reveals.forEach(el => observer.observe(el));
+</script>
+{% endblock %}

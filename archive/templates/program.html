@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+
+{% block title %}Funeral Program | APOLLO J. FIZVALENTINE OWINO.{% endblock %}
+
+{% block content %}
+
+<section class="page-hero" style="background: linear-gradient(135deg, var(--charcoal), #1a1a1a);">
+    <div class="page-hero-content">
+        <h1>Funeral Program</h1>
+        <p>A celebration of life and legacy</p>
+    </div>
+</section>
+
+<section class="section program-section">
+    <div class="container-narrow">
+        <div class="program-details reveal">
+            <h2 class="program-event-name">{{ program.event_name }}</h2>
+            <div class="program-meta">
+                <div class="meta-item">
+                    <span class="meta-icon">📅</span>
+                    <div class="meta-text">
+                        <strong>Date & Time</strong>
+                        <span>{{ program.date }}</span>
+                        <span>{{ program.time_start }} - {{ program.time_end }}</span>
+                    </div>
+                </div>
+                <div class="meta-item">
+                    <span class="meta-icon">📍</span>
+                    <div class="meta-text">
+                        <strong>Venue</strong>
+                        <span>{{ program.venue }}</span>
+                        <span>{{ program.venue_address }}</span>
+                    </div>
+                </div>
+                <div class="meta-item">
+                    <span class="meta-icon">👔</span>
+                    <div class="meta-text">
+                        <strong>Dress Code</strong>
+                        <span>{{ program.dress_code }}</span>
+                    </div>
+                </div>
+                <div class="meta-item">
+                    <span class="meta-icon">🕊️</span>
+                    <div class="meta-text">
+                        <strong>Interment</strong>
+                        <span>{{ program.burial_location }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="program-order reveal">
+            <h3 class="order-title">Order of Service</h3>
+            <div class="order-timeline">
+                {% for item in program.order %}
+                <div class="timeline-item">
+                    <div class="timeline-time">{{ item.time }}</div>
+                    <div class="timeline-content">
+                        <h4 class="timeline-activity">{{ item.item }}</h4>
+                        <span class="timeline-leader">{{ item.leader }}</span>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="back-link reveal">
+            <a href="/" class="btn-back">← Back to Home</a>
+        </div>
+    </div>
+</section>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+    const reveals = document.querySelectorAll('.reveal');
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('visible');
+                observer.unobserve(entry.target);
+            }
+        });
+    }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+    reveals.forEach(el => observer.observe(el));
+</script>
+{% endblock %}
