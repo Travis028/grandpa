@@ -1,8 +1,10 @@
 import { BrowserRouter as Router, Routes, Route, Link, useLocation } from 'react-router-dom';
 import { useEffect, useState } from 'react';
+import { io } from 'socket.io-client';
 import Home from './pages/Home';
 import Life from './pages/Life';
 import Program from './pages/Program';
+import Admin from './pages/Admin';
 
 function ScrollToTop() {
   const { pathname } = useLocation();
@@ -17,22 +19,38 @@ function ScrollToTop() {
 function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [visitors, setVisitors] = useState(1);
 
   useEffect(() => {
+    // Connect to WebSocket
+    const socket = io('/', { path: '/socket.io' }); // React proxy will handle it if properly configured
+    socket.on('visitor_count', (data) => {
+      setVisitors(data.count);
+    });
+
     const handleScroll = () => {
       setScrolled(window.scrollY > 50);
     };
     window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      socket.disconnect();
+    };
   }, []);
 
   return (
     <nav className={`navbar ${scrolled ? 'scrolled' : ''}`}>
       <div className="nav-container">
         <Link to="/" className="nav-logo">APOLLO J. FIZVALENTINE OWINO.</Link>
-        <button className="nav-toggle" onClick={() => setMenuOpen(!menuOpen)}>
-          ☰
-        </button>
+        <div className="nav-right" style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+          <div className="live-visitors">
+            <span className="live-dot"></span>
+            {visitors} Live
+          </div>
+          <button className="nav-toggle" onClick={() => setMenuOpen(!menuOpen)}>
+            ☰
+          </button>
+        </div>
         <ul className={`nav-links ${menuOpen ? 'active' : ''}`}>
           <li><Link to="/">Home</Link></li>
           <li><Link to="/life">His Life</Link></li>
@@ -65,6 +83,7 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/life" element={<Life />} />
         <Route path="/program" element={<Program />} />
+        <Route path="/admin" element={<Admin />} />
       </Routes>
       <Footer />
     </Router>

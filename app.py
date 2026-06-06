@@ -1,5 +1,8 @@
 from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
+from flask_socketio import SocketIO, emit
+import jwt
+from functools import wraps
 import os
 import json
 from datetime import datetime
@@ -7,6 +10,10 @@ from datetime import datetime
 app = Flask(__name__, static_folder='static')
 CORS(app) # Enable CORS for React frontend
 app.secret_key = 'your-secret-key-here-change-this'
+app.config['JWT_SECRET'] = 'admin-secret-key-change-this'
+socketio = SocketIO(app, cors_allowed_origins="*")
+
+active_visitors = 0
 
 # ============================================
 # DATA (Edit this to add/change family info)
@@ -50,24 +57,19 @@ FAMILY_DATA = [
         "tribute": "[FILL IN: Evans' tribute to Grandpa]",
         "grandchildren": [
             {"name": "Kevins Ochieng", "photo": "evans_odhiambo/grandchildren/kevins.jpg"},
-            {"name": "Awuor", "photo": "evans_odhiambo/grandchildren/awuor.jpg"}
+            {"name": "Awuor", "photo": "evans_odhiambo/grandchildren/awuor.jpg"},
+            {
+                "name": "Peter Odhiambo",
+                "photo": "peter_odhiambo/portrait.jpg",
+                "tribute": "[FILL IN: Peter's tribute to Grandpa]"
+            },
+            {
+                "name": "Elly Opiyo",
+                "photo": "elly_opiyo/portrait.jpg",
+                "note": "Twin to Peter",
+                "tribute": "[FILL IN: Elly's tribute to Grandpa]"
+            }
         ]
-    },
-    {
-        "name": "Peter Odhiambo",
-        "spouse": "",
-        "note": "",
-        "portrait": "peter_odhiambo/portrait.jpg",
-        "tribute": "[FILL IN: Peter's tribute to Grandpa]",
-        "grandchildren": []
-    },
-    {
-        "name": "Elly Opiyo",
-        "spouse": "",
-        "note": "Twin to Peter",
-        "portrait": "elly_opiyo/portrait.jpg",
-        "tribute": "[FILL IN: Elly's tribute to Grandpa]",
-        "grandchildren": []
     },
     {
         "name": "Joy Odhiambo",
@@ -296,6 +298,57 @@ def api_tributes():
 def serve_static(filename):
     return send_from_directory(app.static_folder, filename)
 
+# ============================================
+# WEBSOCKETS (Live Visitors)
+# ============================================
+@socketio.on('connect')
+def handle_connect():
+    global active_visitors
+    active_visitors += 1
+    emit('visitor_count', {'count': active_visitors}, broadcast=True)
+
+@socketio.on('disconnect')
+def handle_disconnect():
+    global active_visitors
+    active_visitors = max(0, active_visitors - 1)
+    emit('visitor_count', {'count': active_visitors}, broadcast=True)
+
+# ============================================
+# ADMIN ROUTES (JWT Protected)
+# ============================================
+def token_required(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        token = request.headers.get('Authorization')
+        if not token:
+            return jsonify({'message': 'Token is missing!'}), 401
+        try:
+            token = token.split(" ")[1] # Bearer <token>
+            data = jwt.decode(token, app.config['JWT_SECRET'], algorithms=["HS256"])
+        except:
+            return jsonify({'message': 'Token is invalid!'}), 401
+        return f(*args, **kwargs)
+    return decorated
+
+@app.route('/api/admin/login', methods=['POST'])
+def login():
+    auth = request.json
+    # Default admin credentials
+    if auth and auth.get('username') == 'admin' and auth.get('password') == 'admin123':
+        token = jwt.encode({'user': 'admin', 'exp': datetime.now().timestamp() + 3600}, app.config['JWT_SECRET'], algorithm="HS256")
+        return jsonify({'token': token})
+    return jsonify({'message': 'Invalid credentials'}), 401
+
+@app.route('/api/admin/data', methods=['GET'])
+@token_required
+def get_admin_data():
+    return jsonify({
+        "grandpa": GRANDPA_INFO,
+        "family": FAMILY_DATA,
+        "tributes": load_tributes(),
+        "live_visitors": active_visitors
+    })
+
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=5000)
+    socketio.run(app, debug=True, host='0.0.0.0', port=5000, allow_unsafe_werkzeug=True)
 

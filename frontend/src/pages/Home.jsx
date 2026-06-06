@@ -1,10 +1,19 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
+import { motion } from 'framer-motion';
 
 function Reveal({ children }) {
-  // Simple reveal simulation. A real implementation might use IntersectionObserver in React.
-  return <div className="reveal visible">{children}</div>;
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 50, scale: 0.95 }}
+      whileInView={{ opacity: 1, y: 0, scale: 1 }}
+      viewport={{ once: true, margin: "-50px" }}
+      transition={{ duration: 0.6, type: "spring", bounce: 0.4 }}
+    >
+      {children}
+    </motion.div>
+  );
 }
 
 export default function Home() {
@@ -162,7 +171,11 @@ export default function Home() {
           <div className="family-grid">
             {family.map((child, idx) => (
               <Reveal key={idx}>
-                <div className="family-card">
+                <motion.div 
+                  className="family-card"
+                  whileHover={{ scale: 1.05, boxShadow: "0 20px 40px rgba(0,0,0,0.15)" }}
+                  transition={{ duration: 0.3 }}
+                >
                   <div className="family-photo-wrap">
                     <img src={`/api/static/images/children/${child.portrait}`} alt={child.name} loading="lazy" onError={(e) => { e.target.style.display = 'none'; e.target.nextElementSibling.style.display = 'flex'; }} />
                     <div className="family-photo-placeholder" style={{display: 'none'}}>
@@ -185,17 +198,21 @@ export default function Home() {
                         <span className="grandchildren-label">Grandchildren</span>
                         <div className="grandchildren-row">
                           {child.grandchildren.map((grand, gIdx) => (
-                            <div className="grandchild" key={gIdx}>
+                            <motion.div 
+                              className="grandchild" 
+                              key={gIdx}
+                              whileHover={{ scale: 1.1 }}
+                            >
                               <img className="grandchild-photo" src={`/api/static/images/children/${grand.photo}`} alt={grand.name} loading="lazy" onError={(e) => { e.target.style.display = 'none'; e.target.nextElementSibling.style.display = 'flex'; }} />
                               <div className="grandchild-photo-placeholder" style={{display: 'none'}}>{grand.name[0]}</div>
                               <span className="grandchild-name">{grand.name}</span>
-                            </div>
+                            </motion.div>
                           ))}
                         </div>
                       </>
                     )}
                   </div>
-                </div>
+                </motion.div>
               </Reveal>
             ))}
           </div>
