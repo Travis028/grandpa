@@ -56,6 +56,7 @@ function Navbar() {
           <li><Link to="/">Home</Link></li>
           <li><Link to="/life">His Life</Link></li>
           <li><Link to="/program">Program</Link></li>
+          <li><Link to="/admin" className="admin-nav-btn">Admin</Link></li>
         </ul>
       </div>
     </nav>

@@ -300,6 +300,10 @@ def serve_static(filename):
 # ============================================
 # WEBSOCKETS (Live Visitors)
 # ============================================
+@app.route('/')
+def index():
+    return jsonify({"status": "Memorial API is running successfully!"})
+
 @socketio.on('connect')
 def handle_connect():
     active_visitors_data[request.sid] = {
