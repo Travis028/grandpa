@@ -137,6 +137,59 @@ function FeedbackTab({ feedback, token, onSaved }) {
   );
 }
 
+// ── Life Photos Manager ───────────────────────────────────────────────────────
+function LifePhotosManager({ token }) {
+  const [photos, setPhotos] = useState([]);
+  const [file, setFile] = useState(null);
+  const [msg, setMsg] = useState('');
+  const flash = (m) => { setMsg(m); setTimeout(() => setMsg(''), 3000); };
+
+  const loadPhotos = () => api.get('/api/life_photos').then(r => setPhotos(r.data)).catch(() => {});
+  useEffect(() => { loadPhotos(); }, []);
+
+  const upload = async () => {
+    if (!file) return;
+    const fd = new FormData(); fd.append('photo', file);
+    try {
+      await api.post(`/api/admin/life_photos`, fd, { headers: authHeader(token) });
+      flash('Photo added!'); setFile(null); loadPhotos();
+    } catch { flash('Upload failed.'); }
+  };
+
+  const remove = async (filename) => {
+    if (!window.confirm('Remove this photo?')) return;
+    try {
+      await api.delete(`/api/admin/life_photos/${filename}`, { headers: authHeader(token) });
+      flash('Removed.'); loadPhotos();
+    } catch { flash('Error.'); }
+  };
+
+  return (
+    <div style={{ marginTop: '20px', borderTop: '1px solid #eee', paddingTop: '16px' }}>
+      <h5 style={{ marginBottom: '10px', color: '#555' }}>Life Story & Joyce Owino Gallery ({photos.length} photos)</h5>
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginBottom: '12px' }}>
+        {photos.map((ph, idx) => (
+          <div key={idx} style={{ position: 'relative' }}>
+            <img src={`${API_BASE}/api/static/images/life_photos/${ph}`} alt=""
+              style={{ width: '80px', height: '80px', objectFit: 'cover', borderRadius: '6px', border: '1px solid #ddd' }}
+              onError={e => e.target.style.display = 'none'} />
+            <button onClick={() => remove(ph)}
+              style={{ position: 'absolute', top: '-6px', right: '-6px', background: '#e53e3e', color: '#fff', border: 'none', borderRadius: '50%', width: '20px', height: '20px', cursor: 'pointer', fontSize: '0.7rem', lineHeight: '20px', padding: 0 }}>
+              x
+            </button>
+          </div>
+        ))}
+        {photos.length === 0 && <p style={{ color: '#aaa', fontSize: '0.85rem' }}>No photos yet.</p>}
+      </div>
+      <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+        <input type="file" accept="image/*" onChange={e => setFile(e.target.files[0])} style={{ fontSize: '0.82rem', flex: 1 }} />
+        <button style={{ ...S.btn, ...S.btnBlack }} onClick={upload}>Add Photo</button>
+      </div>
+      {msg && <p style={{ color: '#276749', fontSize: '0.82rem', marginTop: '6px' }}>{msg}</p>}
+    </div>
+  );
+}
+
 // ── Grandpa Editor ───────────────────────────────────────────────────────────
 function GrandpaEditor({ grandpa, token, onSaved }) {
   const [form, setForm] = useState({ ...grandpa });
@@ -160,12 +213,17 @@ function GrandpaEditor({ grandpa, token, onSaved }) {
           </div>
         ))}
       </div>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginBottom: '10px', borderTop: '1px solid #eee', paddingTop: '10px' }}>
+        <div><label style={S.label}>Firstborn Name</label><input style={S.input} value={form.firstborn_name || ''} onChange={e => setForm({ ...form, firstborn_name: e.target.value })} /></div>
+        <div><label style={S.label}>Firstborn Note</label><input style={S.input} value={form.firstborn_note || ''} onChange={e => setForm({ ...form, firstborn_note: e.target.value })} /></div>
+      </div>
       <div style={{ marginBottom: '12px' }}>
         <label style={S.label}>Life Story</label>
         <textarea style={{ ...S.input, minHeight: '140px', resize: 'vertical' }} value={form.life_story || ''} onChange={e => setForm({ ...form, life_story: e.target.value })} />
       </div>
       <button style={{ ...S.btn, ...S.btnBlack }} onClick={save} disabled={saving}>{saving ? 'Saving...' : 'Save Changes'}</button>
       {msg && <span style={{ marginLeft: '10px', color: '#276749', fontSize: '0.85rem' }}>{msg}</span>}
+      <LifePhotosManager token={token} />
     </div>
   );
 }
@@ -296,21 +354,30 @@ function GalleryManager({ idx, gallery, token, onSaved }) {
     } catch { flash('Error.'); }
   };
 
+  const updateComment = async (gidx, comment) => {
+    try {
+      await api.put(`/api/admin/family/${idx}/gallery/${gidx}`, { comment }, { headers: authHeader(token) });
+      flash('Comment updated!'); onSaved();
+    } catch { flash('Error updating comment.'); }
+  };
+
   return (
     <div style={{ marginTop: '16px', borderTop: '1px solid #eee', paddingTop: '14px' }}>
       <h5 style={{ marginBottom: '10px', color: '#555' }}>Gallery ({gallery.length} photos)</h5>
-      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginBottom: '12px' }}>
-        {gallery.map((ph, gidx) => (
-          <div key={gidx} style={{ position: 'relative' }}>
-            <img src={`${API_BASE}/api/static/images/children/${ph}`} alt=""
-              style={{ width: '80px', height: '80px', objectFit: 'cover', borderRadius: '6px', border: '1px solid #ddd' }}
-              onError={e => e.target.style.display = 'none'} />
-            <button onClick={() => remove(gidx)}
-              style={{ position: 'absolute', top: '-6px', right: '-6px', background: '#e53e3e', color: '#fff', border: 'none', borderRadius: '50%', width: '20px', height: '20px', cursor: 'pointer', fontSize: '0.7rem', lineHeight: '20px', padding: 0 }}>
-              x
-            </button>
-          </div>
-        ))}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '12px' }}>
+        {gallery.map((item, gidx) => {
+          const ph = typeof item === 'string' ? item : item.path;
+          const comment = typeof item === 'string' ? '' : (item.comment || '');
+          return (
+            <div key={gidx} style={{ display: 'flex', gap: '10px', alignItems: 'center', background: '#f9f9f9', padding: '8px', borderRadius: '6px' }}>
+              <img src={`${API_BASE}/api/static/images/children/${ph}`} alt=""
+                style={{ width: '60px', height: '60px', objectFit: 'cover', borderRadius: '4px', border: '1px solid #ddd', flexShrink: 0 }}
+                onError={e => e.target.style.display = 'none'} />
+              <input style={{ ...S.input, flex: 1 }} defaultValue={comment} placeholder="Add a comment or caption..." onBlur={e => { if(e.target.value !== comment) updateComment(gidx, e.target.value); }} />
+              <button onClick={() => remove(gidx)} style={{ ...S.btn, ...S.btnRed, padding: '6px 10px' }}>x</button>
+            </div>
+          );
+        })}
         {gallery.length === 0 && <p style={{ color: '#aaa', fontSize: '0.85rem' }}>No gallery photos yet.</p>}
       </div>
       <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
@@ -351,6 +418,17 @@ function FamilyEditor({ member, idx, token, onSaved }) {
     const fd = new FormData(); fd.append('photo', file);
     try { await api.post(`/api/admin/family/${idx}/grandchild/${gidx}/photo`, fd, { headers: authHeader(token) }); flash('Grandchild photo uploaded!'); onSaved(); }
     catch { flash('Upload failed.'); }
+  };
+
+  const updateGcName = async (gidx, name) => {
+    try { await api.put(`/api/admin/family/${idx}/grandchild/${gidx}`, { name }, { headers: authHeader(token) }); flash('Name updated!'); onSaved(); }
+    catch { flash('Error updating name.'); }
+  };
+
+  const deleteGc = async (gidx) => {
+    if (!window.confirm('Delete this grandchild?')) return;
+    try { await api.delete(`/api/admin/family/${idx}/grandchild/${gidx}`, { headers: authHeader(token) }); flash('Grandchild deleted.'); onSaved(); }
+    catch { flash('Error.'); }
   };
 
   return (
@@ -399,9 +477,10 @@ function FamilyEditor({ member, idx, token, onSaved }) {
                   <img src={`${API_BASE}/api/static/images/children/${gc.photo}`} alt={gc.name}
                     style={{ width: '40px', height: '40px', objectFit: 'cover', borderRadius: '50%', border: '2px solid #ddd', flexShrink: 0 }}
                     onError={e => e.target.style.display = 'none'} />
-                  <span style={{ fontWeight: 600, fontSize: '0.85rem', minWidth: '120px' }}>{gc.name}</span>
-                  <input type="file" accept="image/*" style={{ fontSize: '0.78rem', flex: 1 }} onChange={e => setGcPhotos({ ...gcPhotos, [gidx]: e.target.files[0] })} />
+                  <input style={{ ...S.input, flex: 1, minWidth: '120px' }} defaultValue={gc.name} onBlur={e => { if(e.target.value !== gc.name) updateGcName(gidx, e.target.value); }} />
+                  <input type="file" accept="image/*" style={{ fontSize: '0.78rem', width: '150px' }} onChange={e => setGcPhotos({ ...gcPhotos, [gidx]: e.target.files[0] })} />
                   <button style={{ ...S.btn, ...S.btnBlack, fontSize: '0.78rem' }} onClick={() => uploadGcPhoto(gidx)}>Upload</button>
+                  <button style={{ ...S.btn, ...S.btnRed, fontSize: '0.78rem' }} onClick={() => deleteGc(gidx)}>x</button>
                 </div>
               ))}
             </div>

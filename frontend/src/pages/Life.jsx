@@ -62,7 +62,7 @@ export default function Life() {
 
             {lifePhotos && lifePhotos.length > 0 && (
               <div className="life-photos">
-                <h3 className="life-photos-title">Photographs Through the Years</h3>
+                <h3 className="life-photos-title">Life Story & Joyce Owino Gallery</h3>
                 <div className="life-photos-grid">
                   {lifePhotos.map((photo, idx) => (
                     <div className="life-photo-item" key={idx}>

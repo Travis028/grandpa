@@ -15,7 +15,7 @@ if (RENDER_URL) {
   setInterval(ping, 14 * 60 * 1000);
 }
 
-// ── Error Boundary ────────────────────────────────────────────────────────────
+// ── Error Boundary ─────────────────────────────────────────────────────────────
 class ErrorBoundary extends Component {
   constructor(props) { super(props); this.state = { hasError: false }; }
   static getDerivedStateFromError() { return { hasError: true }; }
@@ -30,7 +30,7 @@ class ErrorBoundary extends Component {
   }
 }
 
-// ── Visitor Name Modal ────────────────────────────────────────────────────────
+// ── Visitor Name Modal ─────────────────────────────────────────────────────────
 function VisitorModal({ onDone }) {
   const [name, setName] = useState('');
   const submit = (e) => {
@@ -40,8 +40,8 @@ function VisitorModal({ onDone }) {
     onDone(n);
   };
   return (
-    <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.7)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-      <div style={{ background: '#fff', borderRadius: '12px', padding: '40px 32px', maxWidth: '400px', width: '90%', textAlign: 'center' }}>
+    <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.75)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <div style={{ background: '#fff', borderRadius: '12px', padding: '40px 32px', maxWidth: '400px', width: '90%', textAlign: 'center', boxShadow: '0 20px 60px rgba(0,0,0,0.3)' }}>
         <h3 style={{ marginBottom: '8px', fontSize: '1.4rem' }}>Welcome</h3>
         <p style={{ color: '#666', marginBottom: '24px', fontSize: '0.95rem' }}>
           Please enter your name so the family knows you visited this memorial.
@@ -64,10 +64,10 @@ function VisitorModal({ onDone }) {
   );
 }
 
-// ── Share Button ──────────────────────────────────────────────────────────────
+// ── Share Button ───────────────────────────────────────────────────────────────
 function ShareButton() {
   const [open, setOpen] = useState(false);
-  const url = window.location.origin;
+  const url = 'https://tiny-ganache-32bfab.netlify.app';
   const text = 'Join us in honouring the life of APOLLO J. FIZVALENTINE OWINO.';
   const visitorName = localStorage.getItem('visitorName') || 'Guest';
 
@@ -76,18 +76,17 @@ function ShareButton() {
     setOpen(false);
   };
 
+  const copyLink = () => {
+    navigator.clipboard.writeText(url).catch(() => {});
+    track('Copy Link');
+    alert('Link copied!');
+  };
+
   const platforms = [
     { name: 'WhatsApp', color: '#25D366', href: `https://wa.me/?text=${encodeURIComponent(text + ' ' + url)}` },
     { name: 'Facebook', color: '#1877F2', href: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}` },
     { name: 'Twitter/X', color: '#000', href: `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}` },
-    { name: 'Copy Link', color: '#555', href: null },
   ];
-
-  const copyLink = () => {
-    navigator.clipboard.writeText(url);
-    track('copy_link');
-    alert('Link copied!');
-  };
 
   return (
     <div style={{ position: 'relative', display: 'inline-block' }}>
@@ -96,39 +95,36 @@ function ShareButton() {
         Share This Memorial
       </button>
       {open && (
-        <div style={{ position: 'absolute', bottom: '110%', left: '50%', transform: 'translateX(-50%)', background: '#fff', border: '1px solid #ddd', borderRadius: '8px', padding: '12px', boxShadow: '0 8px 24px rgba(0,0,0,0.15)', zIndex: 100, minWidth: '200px' }}>
+        <div style={{ position: 'absolute', bottom: '110%', left: '50%', transform: 'translateX(-50%)', background: '#fff', border: '1px solid #ddd', borderRadius: '8px', padding: '12px', boxShadow: '0 8px 24px rgba(0,0,0,0.15)', zIndex: 100, minWidth: '180px' }}>
           {platforms.map(p => (
-            p.href ? (
-              <a key={p.name} href={p.href} target="_blank" rel="noreferrer" onClick={() => track(p.name)}
-                style={{ display: 'block', padding: '10px 14px', marginBottom: '6px', background: p.color, color: '#fff', borderRadius: '6px', textDecoration: 'none', fontSize: '0.9rem', textAlign: 'center' }}>
-                {p.name}
-              </a>
-            ) : (
-              <button key={p.name} onClick={copyLink}
-                style={{ display: 'block', width: '100%', padding: '10px 14px', background: p.color, color: '#fff', border: 'none', borderRadius: '6px', fontSize: '0.9rem', cursor: 'pointer' }}>
-                {p.name}
-              </button>
-            )
+            <a key={p.name} href={p.href} target="_blank" rel="noreferrer" onClick={() => track(p.name)}
+              style={{ display: 'block', padding: '10px 14px', marginBottom: '6px', background: p.color, color: '#fff', borderRadius: '6px', textDecoration: 'none', fontSize: '0.9rem', textAlign: 'center' }}>
+              {p.name}
+            </a>
           ))}
+          <button onClick={copyLink}
+            style={{ display: 'block', width: '100%', padding: '10px 14px', background: '#555', color: '#fff', border: 'none', borderRadius: '6px', fontSize: '0.9rem', cursor: 'pointer' }}>
+            Copy Link
+          </button>
         </div>
       )}
     </div>
   );
 }
 
-// ── Page Tracker ──────────────────────────────────────────────────────────────
-function PageTracker({ socket }) {
+// ── Page Tracker ───────────────────────────────────────────────────────────────
+function PageTracker({ socketRef }) {
   const { pathname } = useLocation();
   useEffect(() => {
     window.scrollTo(0, 0);
     const name = localStorage.getItem('visitorName') || 'Guest';
-    const sid = socket?.id || '';
+    const sid = socketRef.current?.id || '';
     api.post('/api/track_page', { name, page: pathname, sid }).catch(() => {});
   }, [pathname]);
   return null;
 }
 
-// ── Navbar ────────────────────────────────────────────────────────────────────
+// ── Navbar ─────────────────────────────────────────────────────────────────────
 function Navbar({ visitors }) {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -161,7 +157,7 @@ function Navbar({ visitors }) {
   );
 }
 
-// ── Footer ────────────────────────────────────────────────────────────────────
+// ── Footer ─────────────────────────────────────────────────────────────────────
 function Footer() {
   return (
     <footer className="footer">
@@ -178,33 +174,51 @@ function Footer() {
   );
 }
 
-// ── App ───────────────────────────────────────────────────────────────────────
+// ── App ────────────────────────────────────────────────────────────────────────
 function App() {
-  const [visitors, setVisitors] = useState(1);
+  const [visitors, setVisitors] = useState(0);
   const [visitorName, setVisitorName] = useState(localStorage.getItem('visitorName'));
   const socketRef = useRef(null);
+  const nameRef = useRef(localStorage.getItem('visitorName'));
 
   useEffect(() => {
-    let socket;
-    try {
-      const socketUrl = import.meta.env.VITE_API_URL || window.location.origin;
-      socket = io(socketUrl, {
-        path: '/socket.io',
-        transports: ['websocket', 'polling'],
-        reconnectionAttempts: 5,
-        timeout: 8000,
-      });
-      socketRef.current = socket;
-      socket.on('visitor_count', (data) => setVisitors(data.count));
-      socket.on('connect_error', () => {});
-    } catch (e) {}
-    return () => { if (socket) socket.disconnect(); };
+    const socketUrl = import.meta.env.VITE_API_URL || window.location.origin;
+    const socket = io(socketUrl, {
+      path: '/socket.io',
+      // polling first — most reliable through proxies/firewalls, upgrades to websocket if possible
+      transports: ['polling', 'websocket'],
+      reconnection: true,
+      reconnectionAttempts: 10,
+      reconnectionDelay: 2000,
+      timeout: 10000,
+    });
+
+    socketRef.current = socket;
+
+    socket.on('connect', () => {
+      // As soon as connected, send the visitor's name so server knows who this is
+      const name = nameRef.current;
+      if (name) socket.emit('set_name', { name });
+    });
+
+    socket.on('visitor_count', (data) => {
+      setVisitors(data.count);
+    });
+
+    socket.on('connect_error', () => {
+      // fail silently — page still works without socket
+    });
+
+    return () => socket.disconnect();
   }, []);
 
   const handleNameSet = (name) => {
+    nameRef.current = name;
     setVisitorName(name);
+    // Register visitor in DB
     api.post('/api/register_visitor', { name }).catch(() => {});
-    if (socketRef.current) {
+    // Tell socket server this visitor's name
+    if (socketRef.current?.connected) {
       socketRef.current.emit('set_name', { name });
     }
   };
@@ -213,7 +227,7 @@ function App() {
     <ErrorBoundary>
       {!visitorName && <VisitorModal onDone={handleNameSet} />}
       <Router>
-        <PageTracker socket={socketRef.current} />
+        <PageTracker socketRef={socketRef} />
         <Navbar visitors={visitors} />
         <Routes>
           <Route path="/" element={<ErrorBoundary><Home /></ErrorBoundary>} />

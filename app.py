@@ -10,6 +10,39 @@ import jwt
 from functools import wraps
 import os, json, threading
 from datetime import datetime, timezone, timedelta
+import urllib.request, urllib.error, base64
+
+GITHUB_TOKEN = os.environ.get('GITHUB_TOKEN', '')
+GITHUB_REPO = 'Travis028/grandpa'
+GITHUB_BRANCH = 'main'
+
+def sync_to_github(filepath, commit_msg):
+    if not GITHUB_TOKEN: return
+    try:
+        github_path = filepath.replace('\\', '/')
+        url = f"https://api.github.com/repos/{GITHUB_REPO}/contents/{github_path}"
+        req = urllib.request.Request(url, headers={'Authorization': f'token {GITHUB_TOKEN}'})
+        sha = None
+        try:
+            with urllib.request.urlopen(req) as response:
+                sha = json.loads(response.read().decode()).get('sha')
+        except urllib.error.HTTPError as e:
+            if e.code != 404: pass
+
+        with open(filepath, 'rb') as f:
+            content = base64.b64encode(f.read()).decode('utf-8')
+
+        payload = {'message': commit_msg, 'content': content, 'branch': GITHUB_BRANCH}
+        if sha: payload['sha'] = sha
+        
+        req = urllib.request.Request(url, data=json.dumps(payload).encode('utf-8'), headers={'Authorization': f'token {GITHUB_TOKEN}', 'Content-Type': 'application/json', 'Accept': 'application/vnd.github.v3+json'}, method='PUT')
+        with urllib.request.urlopen(req) as response:
+            pass
+    except Exception as e:
+        print("GitHub Sync Error:", str(e))
+
+def sync_file_bg(filepath):
+    threading.Thread(target=sync_to_github, args=(filepath, f"Auto-sync {filepath}")).start()
 
 ALLOWED_ORIGINS = [
     "https://flourishing-platypus-5c2766.netlify.app",
@@ -45,7 +78,9 @@ DEFAULT_GRANDPA = {
     "birth_place": "[Fill in: Village/Town, Kenya]",
     "wife_name": "Joyce Owino",
     "final_words": "God was good to me.",
-    "life_story": "APOLLO J. FIZVALENTINE OWINO. was born in [FILL IN] to [FILL IN PARENTS' NAMES]. He grew up knowing the value of hard work and faith. Throughout his life, he was known for his quiet strength, his generous spirit, and his deep love for his family.\n\nHe worked as a [FILL IN OCCUPATION] and provided for his family with dignity and pride. Even in difficult times, he never complained. Instead, he taught his children that every challenge is an opportunity to grow stronger.\n\nHis faith was the foundation of his life. He believed in [FILL IN FAITH/CHURCH] and prayed for his family every single day.\n\nIn his final months, he faced [FILL IN ILLNESS] with remarkable courage. Even when his body grew weak, his spirit remained strong. His last words to his family were, \"God was good to me.\""
+    "life_story": "APOLLO J. FIZVALENTINE OWINO. was born in [FILL IN] to [FILL IN PARENTS' NAMES]. He grew up knowing the value of hard work and faith. Throughout his life, he was known for his quiet strength, his generous spirit, and his deep love for his family.\n\nHe worked as a [FILL IN OCCUPATION] and provided for his family with dignity and pride. Even in difficult times, he never complained. Instead, he taught his children that every challenge is an opportunity to grow stronger.\n\nHis faith was the foundation of his life. He believed in [FILL IN FAITH/CHURCH] and prayed for his family every single day.\n\nIn his final months, he faced [FILL IN ILLNESS] with remarkable courage. Even when his body grew weak, his spirit remained strong. His last words to his family were, \"God was good to me.\"",
+    "firstborn_name": "Bon Apollo",
+    "firstborn_note": "Firstborn of APOLLO J. FIZVALENTINE OWINO. Preceded his father in death. Forever remembered. Forever loved."
 }
 
 DEFAULT_FAMILY = [
@@ -92,7 +127,7 @@ DEFAULT_FAMILY = [
     ]}
 ]
 
-FIRSTBORN = {"name":"Bon Apollo","note":"Firstborn of APOLLO J. FIZVALENTINE OWINO. Preceded his father in death. Forever remembered. Forever loved."}
+
 
 DEFAULT_PROGRAM = {
     "event_name":"Memorial & Funeral Service","date":"[FILL IN DATE]",
@@ -131,6 +166,7 @@ def _save(path, data):
         with open(tmp, 'w', encoding='utf-8') as f:
             json.dump(data, f, indent=2, ensure_ascii=False)
         os.replace(tmp, path)   # atomic write — never corrupts file
+        sync_file_bg(path)
 
 def load_grandpa():
     return _load(GRANDPA_FILE, DEFAULT_GRANDPA.copy())
@@ -139,7 +175,17 @@ def save_grandpa(data):
     _save(GRANDPA_FILE, data)
 
 def load_family():
-    return _load(FAMILY_FILE, DEFAULT_FAMILY)
+    fam = _load(FAMILY_FILE, DEFAULT_FAMILY)
+    for f in fam:
+        if 'gallery' in f:
+            new_gal = []
+            for item in f['gallery']:
+                if isinstance(item, str):
+                    new_gal.append({'path': item, 'comment': ''})
+                else:
+                    new_gal.append(item)
+            f['gallery'] = new_gal
+    return fam
 
 def save_family(data):
     _save(FAMILY_FILE, data)
@@ -191,7 +237,9 @@ def get_grandpa():
 
 @app.route('/api/family')
 def get_family():
-    return jsonify({"family": load_family(), "firstborn": FIRSTBORN})
+    g = load_grandpa()
+    fb = {"name": g.get("firstborn_name", ""), "note": g.get("firstborn_note", "")}
+    return jsonify({"family": load_family(), "firstborn": fb})
 
 @app.route('/api/memories')
 def api_memories():
@@ -361,6 +409,7 @@ def upload_family_photo(idx):
     request.files['photo'].save(os.path.join(d, 'portrait.jpg'))
     family[idx]['portrait'] = f"{folder}/portrait.jpg"
     save_family(family)
+    sync_file_bg(os.path.join(d, 'portrait.jpg'))
     socketio.emit('family_updated', {'idx': idx})
     return jsonify({'success': True, 'portrait': family[idx]['portrait']})
 
@@ -381,24 +430,36 @@ def upload_gallery_photo(idx):
     filename = f"{ts}_{safe_name}"
     file.save(os.path.join(d, filename))
     path = f"{folder}/gallery/{filename}"
-    family[idx].setdefault('gallery', []).append(path)
+    family[idx].setdefault('gallery', []).append({'path': path, 'comment': ''})
     save_family(family)
+    sync_file_bg(os.path.join(d, filename))
     socketio.emit('family_updated', {'idx': idx})
     return jsonify({'success': True, 'path': path})
 
-@app.route('/api/admin/family/<int:idx>/gallery/<int:gidx>', methods=['DELETE'])
+@app.route('/api/admin/family/<int:idx>/gallery/<int:gidx>', methods=['PUT', 'DELETE'])
 @token_required
-def delete_gallery_photo(idx, gidx):
+def manage_gallery_photo(idx, gidx):
     family = load_family()
     if not (0 <= idx < len(family)):
         return jsonify({'error': 'Not found'}), 404
     gallery = family[idx].get('gallery', [])
     if not (0 <= gidx < len(gallery)):
         return jsonify({'error': 'Not found'}), 404
-    path = gallery.pop(gidx)
-    full = os.path.join('static', 'images', 'children', path)
-    if os.path.exists(full):
-        os.remove(full)
+    
+    if request.method == 'DELETE':
+        item = gallery.pop(gidx)
+        path = item['path'] if isinstance(item, dict) else item
+        full = os.path.join('static', 'images', 'children', path)
+        if os.path.exists(full):
+            os.remove(full)
+    else:
+        body = request.json or {}
+        if 'comment' in body:
+            if isinstance(gallery[gidx], str):
+                gallery[gidx] = {'path': gallery[gidx], 'comment': body['comment']}
+            else:
+                gallery[gidx]['comment'] = body['comment']
+
     save_family(family)
     socketio.emit('family_updated', {'idx': idx})
     return jsonify({'success': True})
@@ -421,6 +482,7 @@ def upload_grandchild_photo(idx, gidx):
     request.files['photo'].save(os.path.join(d, f"{gc_slug}.jpg"))
     family[idx]['grandchildren'][gidx]['photo'] = f"{folder}/grandchildren/{gc_slug}.jpg"
     save_family(family)
+    sync_file_bg(os.path.join(d, f"{gc_slug}.jpg"))
     socketio.emit('family_updated', {'idx': idx})
     return jsonify({'success': True})
 
@@ -430,7 +492,7 @@ def upload_grandchild_photo(idx, gidx):
 def update_grandpa():
     g = load_grandpa()
     body = request.json or {}
-    for f in ['name', 'birth_year', 'death_year', 'birth_place', 'wife_name', 'final_words', 'life_story']:
+    for f in ['name', 'birth_year', 'death_year', 'birth_place', 'wife_name', 'final_words', 'life_story', 'firstborn_name', 'firstborn_note']:
         if f in body:
             g[f] = body[f]
     save_grandpa(g)
@@ -504,6 +566,51 @@ def delete_feedback(idx):
         return jsonify({'error': 'Not found'}), 404
     items.pop(idx)
     _save(FEEDBACK_FILE, items)
+    return jsonify({'success': True})
+
+# ── ADMIN LIFE PHOTOS ─────────────────────────────────────────────────────────
+@app.route('/api/admin/life_photos', methods=['POST'])
+@token_required
+def upload_admin_life_photo():
+    if 'photo' not in request.files: return jsonify({'error': 'No file'}), 400
+    file = request.files['photo']
+    d = os.path.join('static', 'images', 'life_photos')
+    os.makedirs(d, exist_ok=True)
+    ts = datetime.now().strftime('%Y%m%d%H%M%S')
+    filename = f"{ts}_{file.filename.replace(' ', '_')}"
+    path = os.path.join(d, filename)
+    file.save(path)
+    sync_file_bg(path)
+    socketio.emit('grandpa_updated', {})
+    return jsonify({'success': True, 'file': filename})
+
+@app.route('/api/admin/life_photos/<filename>', methods=['DELETE'])
+@token_required
+def delete_admin_life_photo(filename):
+    path = os.path.join('static', 'images', 'life_photos', filename)
+    if os.path.exists(path):
+        os.remove(path)
+    socketio.emit('grandpa_updated', {})
+    return jsonify({'success': True})
+
+@app.route('/api/admin/family/<int:idx>/grandchild/<int:gidx>', methods=['PUT', 'DELETE'])
+@token_required
+def manage_grandchild(idx, gidx):
+    family = load_family()
+    if not (0 <= idx < len(family)): return jsonify({'error': 'Not found'}), 404
+    gc = family[idx].get('grandchildren', [])
+    if not (0 <= gidx < len(gc)): return jsonify({'error': 'Not found'}), 404
+    
+    if request.method == 'DELETE':
+        gc.pop(gidx)
+    else:
+        body = request.json or {}
+        if 'name' in body:
+            gc[gidx]['name'] = body['name']
+            
+    family[idx]['grandchildren'] = gc
+    save_family(family)
+    socketio.emit('family_updated', {'idx': idx})
     return jsonify({'success': True})
 
 # ── ADMIN REQUESTS ────────────────────────────────────────────────────────────

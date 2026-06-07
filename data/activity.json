@@ -166,5 +166,107 @@
     "action": "navigated",
     "detail": "/admin",
     "time": "2026-06-07 14:14:04"
+  },
+  {
+    "name": "Natasha otieno",
+    "action": "navigated",
+    "detail": "/admin",
+    "time": "2026-06-07 14:34:26"
+  },
+  {
+    "name": "Natasha otieno",
+    "action": "navigated",
+    "detail": "/admin",
+    "time": "2026-06-07 14:34:26"
+  },
+  {
+    "name": "wayne travis",
+    "action": "navigated",
+    "detail": "/admin",
+    "time": "2026-06-07 14:34:27"
+  },
+  {
+    "name": "Natasha otieno",
+    "action": "navigated",
+    "detail": "/",
+    "time": "2026-06-07 14:42:21"
+  },
+  {
+    "name": "Guest",
+    "action": "navigated",
+    "detail": "/",
+    "time": "2026-06-08 02:21:32"
+  },
+  {
+    "name": "Guest",
+    "action": "visited",
+    "detail": "Entered memorial",
+    "time": "2026-06-08 02:21:36"
+  },
+  {
+    "name": "Guest",
+    "action": "navigated",
+    "detail": "/",
+    "time": "2026-06-08 02:21:44"
+  },
+  {
+    "name": "Guest",
+    "action": "navigated",
+    "detail": "/",
+    "time": "2026-06-08 02:22:02"
+  },
+  {
+    "name": "Guest",
+    "action": "navigated",
+    "detail": "/",
+    "time": "2026-06-08 02:22:02"
+  },
+  {
+    "name": "Guest",
+    "action": "navigated",
+    "detail": "/admin",
+    "time": "2026-06-08 02:22:09"
+  },
+  {
+    "name": "Guest",
+    "action": "navigated",
+    "detail": "/",
+    "time": "2026-06-08 02:23:52"
+  },
+  {
+    "name": "Guest",
+    "action": "navigated",
+    "detail": "/admin",
+    "time": "2026-06-08 02:24:35"
+  },
+  {
+    "name": "Guest",
+    "action": "navigated",
+    "detail": "/",
+    "time": "2026-06-08 02:25:37"
+  },
+  {
+    "name": "Guest",
+    "action": "navigated",
+    "detail": "/life",
+    "time": "2026-06-08 02:28:43"
+  },
+  {
+    "name": "Guest",
+    "action": "navigated",
+    "detail": "/program",
+    "time": "2026-06-08 02:29:01"
+  },
+  {
+    "name": "Guest",
+    "action": "navigated",
+    "detail": "/admin",
+    "time": "2026-06-08 02:29:15"
+  },
+  {
+    "name": "Guest",
+    "action": "navigated",
+    "detail": "/admin",
+    "time": "2026-06-08 02:34:33"
   }
 ]

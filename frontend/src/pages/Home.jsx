@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { io } from 'socket.io-client';
 import api, { API_BASE } from '../config';
 
 function Reveal({ children }) {
@@ -23,6 +24,7 @@ export default function Home() {
   const [tributes, setTributes] = useState([]);
   const [loadError, setLoadError] = useState(false);
   const [dots, setDots] = useState('');
+  const [viewingPhoto, setViewingPhoto] = useState(null);
 
   const [tributeForm, setTributeForm] = useState({ name: '', relation: '', message: '' });
   const [tributeMsg, setTributeMsg] = useState('');
@@ -53,6 +55,22 @@ export default function Home() {
       });
     };
     fetchData();
+  }, []);
+
+  useEffect(() => {
+    const socketUrl = import.meta.env.VITE_API_URL || window.location.origin;
+    let socket;
+    try {
+      socket = io(socketUrl, { path: '/socket.io', transports: ['websocket', 'polling'] });
+      socket.on('new_tribute', (tribute) => {
+        setTributes(prev => {
+          // avoid duplicates if we just submitted it ourselves
+          if (prev.some(t => t.name === tribute.name && t.message === tribute.message)) return prev;
+          return [...prev, tribute];
+        });
+      });
+    } catch {}
+    return () => { if (socket) socket.disconnect(); };
   }, []);
 
   const handleTributeSubmit = async (e) => {
@@ -241,13 +259,18 @@ export default function Home() {
                       <>
                         <span className="grandchildren-label" style={{marginTop:'12px',display:'block'}}>Gallery</span>
                         <div style={{display:'flex',gap:'6px',flexWrap:'wrap',marginTop:'8px'}}>
-                          {child.gallery.map((photo, gIdx) => (
-                            <img key={gIdx} src={`${API_BASE}/api/static/images/children/${photo}`} alt="gallery"
-                              loading="lazy"
-                              style={{width:'64px',height:'64px',objectFit:'cover',borderRadius:'4px',cursor:'pointer'}}
-                              onClick={() => window.open(`${API_BASE}/api/static/images/children/${photo}`, '_blank')}
-                              onError={e => e.target.style.display='none'} />
-                          ))}
+                          {child.gallery.map((item, gIdx) => {
+                            const photo = typeof item === 'string' ? item : item.path;
+                            const comment = typeof item === 'string' ? '' : (item.comment || '');
+                            return (
+                              <div key={gIdx} style={{ cursor: 'pointer', overflow: 'hidden', borderRadius: '4px' }} onClick={() => setViewingPhoto({ photo, comment })}>
+                                <motion.img whileHover={{ scale: 1.1 }} src={`${API_BASE}/api/static/images/children/${photo}`} alt="gallery"
+                                  loading="lazy"
+                                  style={{width:'64px',height:'64px',objectFit:'cover',display:'block'}}
+                                  onError={e => e.target.parentElement.style.display='none'} />
+                              </div>
+                            );
+                          })}
                         </div>
                       </>
                     )}
@@ -371,6 +394,14 @@ export default function Home() {
           </Reveal>
         </div>
       </section>
+
+      {viewingPhoto && (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.9)', zIndex: 9999, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '20px' }} onClick={() => setViewingPhoto(null)}>
+          <button style={{ position: 'absolute', top: '20px', right: '30px', background: 'transparent', border: 'none', color: '#fff', fontSize: '3rem', cursor: 'pointer', lineHeight: 1 }} onClick={() => setViewingPhoto(null)}>&times;</button>
+          <img src={`${API_BASE}/api/static/images/children/${viewingPhoto.photo}`} style={{ maxHeight: '75vh', maxWidth: '100%', objectFit: 'contain', borderRadius: '8px', boxShadow: '0 20px 40px rgba(0,0,0,0.5)' }} onClick={e => e.stopPropagation()} />
+          {viewingPhoto.comment && <p style={{ color: '#fff', marginTop: '20px', fontSize: '1.2rem', maxWidth: '600px', textAlign: 'center', fontStyle: 'italic', letterSpacing: '0.5px' }}>"{viewingPhoto.comment}"</p>}
+        </div>
+      )}
     </>
   );
 }
