@@ -314,7 +314,9 @@ def get_admin_data():
     return jsonify({
         "grandpa": load_grandpa(),
         "family": load_family(),
+        "program": _load(os.path.join(DATA_DIR, 'program.json'), DEFAULT_PROGRAM),
         "tributes": _load(TRIBUTES_FILE),
+        "feedback": _load(os.path.join(DATA_DIR, 'feedback.json')),
         "live_visitors": len(active_visitors),
         "live_visitor_details": list(active_visitors.values()),
         "total_visitors": len(visitors),
@@ -446,6 +448,58 @@ def manage_tribute(idx):
     _save(TRIBUTES_FILE, tributes)
     return jsonify({'success': True})
 
+# ── ADMIN EDIT PROGRAM ───────────────────────────────────────────────────────
+PROGRAM_FILE = os.path.join(DATA_DIR, 'program.json')
+
+@app.route('/api/admin/program', methods=['PUT'])
+@token_required
+def update_program():
+    prog = _load(PROGRAM_FILE, DEFAULT_PROGRAM.copy())
+    body = request.json or {}
+    for f in ['event_name','date','venue','venue_address','time_start','time_end','dress_code','burial_location']:
+        if f in body:
+            prog[f] = body[f]
+    if 'order' in body:
+        prog['order'] = body['order']
+    _save(PROGRAM_FILE, prog)
+    socketio.emit('program_updated', {})
+    return jsonify({'success': True, 'program': prog})
+
+# ── FEEDBACK ──────────────────────────────────────────────────────────────────
+FEEDBACK_FILE = os.path.join(DATA_DIR, 'feedback.json')
+
+@app.route('/api/feedback', methods=['GET', 'POST'])
+def api_feedback():
+    if request.method == 'POST':
+        body = request.json or {}
+        msg = body.get('message', '').strip()
+        if not msg:
+            return jsonify({'error': 'Message required'}), 400
+        entry = {
+            'name': body.get('name', 'Anonymous'),
+            'rating': body.get('rating', 5),
+            'message': msg,
+            'date': datetime.now().strftime('%B %d, %Y'),
+            'time': now_str()
+        }
+        items = _load(FEEDBACK_FILE)
+        items.append(entry)
+        _save(FEEDBACK_FILE, items)
+        log_activity(entry['name'], 'feedback', msg[:80])
+        socketio.emit('new_feedback', entry)
+        return jsonify({'success': True, 'feedback': entry})
+    return jsonify(_load(FEEDBACK_FILE))
+
+@app.route('/api/admin/feedback/<int:idx>', methods=['DELETE'])
+@token_required
+def delete_feedback(idx):
+    items = _load(FEEDBACK_FILE)
+    if not (0 <= idx < len(items)):
+        return jsonify({'error': 'Not found'}), 404
+    items.pop(idx)
+    _save(FEEDBACK_FILE, items)
+    return jsonify({'success': True})
+
 # ── ADMIN REQUESTS ────────────────────────────────────────────────────────────
 @app.route('/api/admin/requests/<int:idx>', methods=['PUT'])
 @token_required
@@ -457,5 +511,6 @@ def handle_admin_request(idx):
     _save(REQUESTS_FILE, reqs)
     return jsonify({'success': True})
 
+# ── ADMIN DATA (updated to include feedback & program) ────────────────────────
 if __name__ == '__main__':
     socketio.run(app, debug=True, host='0.0.0.0', port=5000, allow_unsafe_werkzeug=True)
