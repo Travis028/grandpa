@@ -1,5 +1,8 @@
-import eventlet
-eventlet.monkey_patch()
+try:
+    import eventlet
+    eventlet.monkey_patch()
+except ImportError:
+    pass
 from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
 from flask_socketio import SocketIO, emit
@@ -356,6 +359,73 @@ def get_admin_data():
         "live_visitors": len(active_visitors_data),
         "visitor_details": list(active_visitors_data.values())
     })
+
+@app.route('/api/admin/family/<int:idx>', methods=['PUT'])
+@token_required
+def update_family_member(idx):
+    if idx < 0 or idx >= len(FAMILY_DATA):
+        return jsonify({'error': 'Not found'}), 404
+    body = request.json
+    for field in ['name', 'spouse', 'note', 'tribute']:
+        if field in body:
+            FAMILY_DATA[idx][field] = body[field]
+    return jsonify({'success': True, 'member': FAMILY_DATA[idx]})
+
+@app.route('/api/admin/family/<int:idx>/photo', methods=['POST'])
+@token_required
+def upload_family_photo(idx):
+    if idx < 0 or idx >= len(FAMILY_DATA):
+        return jsonify({'error': 'Not found'}), 404
+    if 'photo' not in request.files:
+        return jsonify({'error': 'No file'}), 400
+    file = request.files['photo']
+    member = FAMILY_DATA[idx]
+    folder_name = member['name'].lower().replace(' ', '_')
+    save_dir = os.path.join('static', 'images', 'children', folder_name)
+    os.makedirs(save_dir, exist_ok=True)
+    filename = 'portrait.jpg'
+    file.save(os.path.join(save_dir, filename))
+    FAMILY_DATA[idx]['portrait'] = f"{folder_name}/portrait.jpg"
+    return jsonify({'success': True, 'portrait': FAMILY_DATA[idx]['portrait']})
+
+@app.route('/api/admin/family/<int:idx>/grandchild/<int:gidx>/photo', methods=['POST'])
+@token_required
+def upload_grandchild_photo(idx, gidx):
+    if idx < 0 or idx >= len(FAMILY_DATA):
+        return jsonify({'error': 'Not found'}), 404
+    grandchildren = FAMILY_DATA[idx].get('grandchildren', [])
+    if gidx < 0 or gidx >= len(grandchildren):
+        return jsonify({'error': 'Not found'}), 404
+    if 'photo' not in request.files:
+        return jsonify({'error': 'No file'}), 400
+    file = request.files['photo']
+    member = FAMILY_DATA[idx]
+    folder_name = member['name'].lower().replace(' ', '_')
+    gc_name = grandchildren[gidx]['name'].lower().replace(' ', '_')
+    save_dir = os.path.join('static', 'images', 'children', folder_name, 'grandchildren')
+    os.makedirs(save_dir, exist_ok=True)
+    filename = f"{gc_name}.jpg"
+    file.save(os.path.join(save_dir, filename))
+    FAMILY_DATA[idx]['grandchildren'][gidx]['photo'] = f"{folder_name}/grandchildren/{filename}"
+    return jsonify({'success': True})
+
+@app.route('/api/admin/tributes/<int:idx>', methods=['PUT', 'DELETE'])
+@token_required
+def manage_tribute(idx):
+    tributes = load_tributes()
+    if idx < 0 or idx >= len(tributes):
+        return jsonify({'error': 'Not found'}), 404
+    if request.method == 'DELETE':
+        tributes.pop(idx)
+    else:
+        body = request.json
+        for field in ['name', 'relation', 'message']:
+            if field in body:
+                tributes[idx][field] = body[field]
+    os.makedirs('data', exist_ok=True)
+    with open(TRIBUTES_FILE, 'w') as f:
+        json.dump(tributes, f, indent=2)
+    return jsonify({'success': True})
 
 if __name__ == '__main__':
     socketio.run(app, debug=True, host='0.0.0.0', port=5000, allow_unsafe_werkzeug=True)

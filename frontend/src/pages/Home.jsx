@@ -21,23 +21,35 @@ export default function Home() {
   const [familyData, setFamilyData] = useState(null);
   const [memories, setMemories] = useState([]);
   const [tributes, setTributes] = useState([]);
-  
+  const [loadError, setLoadError] = useState(false);
+
   const [tributeForm, setTributeForm] = useState({ name: '', relation: '', message: '' });
   const [tributeMsg, setTributeMsg] = useState('');
 
   useEffect(() => {
-    // Fetch data
-    Promise.all([
-      api.get('/api/grandpa'),
-      api.get('/api/family'),
-      api.get('/api/memories'),
-      api.get('/api/tributes')
-    ]).then(([resGrandpa, resFamily, resMemories, resTributes]) => {
-      setGrandpa(resGrandpa.data);
-      setFamilyData(resFamily.data);
-      setMemories(resMemories.data);
-      setTributes(resTributes.data);
-    }).catch(err => console.error("Error fetching data:", err));
+    let retries = 0;
+    const fetchData = () => {
+      Promise.all([
+        api.get('/api/grandpa'),
+        api.get('/api/family'),
+        api.get('/api/memories'),
+        api.get('/api/tributes')
+      ]).then(([resGrandpa, resFamily, resMemories, resTributes]) => {
+        setGrandpa(resGrandpa.data);
+        setFamilyData(resFamily.data);
+        setMemories(resMemories.data);
+        setTributes(resTributes.data);
+        setLoadError(false);
+      }).catch(() => {
+        if (retries < 3) {
+          retries++;
+          setTimeout(fetchData, 4000);
+        } else {
+          setLoadError(true);
+        }
+      });
+    };
+    fetchData();
   }, []);
 
   const handleTributeSubmit = async (e) => {
@@ -56,7 +68,18 @@ export default function Home() {
     }
   };
 
-  if (!grandpa || !familyData || !Array.isArray(familyData.family)) return <div style={{padding: '5rem', textAlign: 'center'}}>Loading...</div>;
+  if (loadError) return (
+    <div style={{padding:'5rem',textAlign:'center'}}>
+      <p style={{fontSize:'1.2rem',marginBottom:'1rem'}}>The server is waking up, please wait a moment...</p>
+      <button onClick={() => { setLoadError(false); window.location.reload(); }} style={{padding:'10px 24px',cursor:'pointer',background:'#000',color:'#fff',border:'none',borderRadius:'4px'}}>Retry</button>
+    </div>
+  );
+
+  if (!grandpa || !familyData || !Array.isArray(familyData.family)) return (
+    <div style={{padding:'5rem',textAlign:'center'}}>
+      <p>Loading memorial... (server may be waking up, please wait)</p>
+    </div>
+  );
 
   const { family, firstborn } = familyData;
   const numGrandchildren = family.reduce((acc, child) => acc + (child.grandchildren ? child.grandchildren.length : 0), 0);

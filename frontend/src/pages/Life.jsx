@@ -5,18 +5,33 @@ import api, { API_BASE } from '../config';
 export default function Life() {
   const [grandpa, setGrandpa] = useState(null);
   const [lifePhotos, setLifePhotos] = useState([]);
+  const [loadError, setLoadError] = useState(false);
 
   useEffect(() => {
-    Promise.all([
-      api.get('/api/grandpa'),
-      api.get('/api/life_photos')
-    ]).then(([resGrandpa, resPhotos]) => {
-      setGrandpa(resGrandpa.data);
-      setLifePhotos(resPhotos.data);
-    }).catch(err => console.error("Error fetching data:", err));
+    let retries = 0;
+    const fetchData = () => {
+      Promise.all([
+        api.get('/api/grandpa'),
+        api.get('/api/life_photos')
+      ]).then(([resGrandpa, resPhotos]) => {
+        setGrandpa(resGrandpa.data);
+        setLifePhotos(resPhotos.data);
+      }).catch(() => {
+        if (retries < 3) { retries++; setTimeout(fetchData, 4000); }
+        else setLoadError(true);
+      });
+    };
+    fetchData();
   }, []);
 
-  if (!grandpa) return <div style={{padding: '5rem', textAlign: 'center'}}>Loading...</div>;
+  if (loadError) return (
+    <div style={{padding:'5rem',textAlign:'center'}}>
+      <p>The server is waking up, please wait a moment...</p>
+      <button onClick={() => window.location.reload()} style={{padding:'10px 24px',cursor:'pointer',background:'#000',color:'#fff',border:'none',borderRadius:'4px'}}>Retry</button>
+    </div>
+  );
+
+  if (!grandpa) return <div style={{padding: '5rem', textAlign: 'center'}}>Loading... (server may be waking up)</div>;
 
   return (
     <>

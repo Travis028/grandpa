@@ -4,14 +4,29 @@ import api from '../config';
 
 export default function Program() {
   const [program, setProgram] = useState(null);
+  const [loadError, setLoadError] = useState(false);
 
   useEffect(() => {
-    api.get('/api/program')
-      .then(res => setProgram(res.data))
-      .catch(err => console.error("Error fetching program:", err));
+    let retries = 0;
+    const fetchData = () => {
+      api.get('/api/program')
+        .then(res => setProgram(res.data))
+        .catch(() => {
+          if (retries < 3) { retries++; setTimeout(fetchData, 4000); }
+          else setLoadError(true);
+        });
+    };
+    fetchData();
   }, []);
 
-  if (!program) return <div style={{padding: '5rem', textAlign: 'center'}}>Loading...</div>;
+  if (loadError) return (
+    <div style={{padding:'5rem',textAlign:'center'}}>
+      <p>The server is waking up, please wait a moment...</p>
+      <button onClick={() => window.location.reload()} style={{padding:'10px 24px',cursor:'pointer',background:'#000',color:'#fff',border:'none',borderRadius:'4px'}}>Retry</button>
+    </div>
+  );
+
+  if (!program) return <div style={{padding:'5rem',textAlign:'center'}}>Loading... (server may be waking up)</div>;
 
   return (
     <>
