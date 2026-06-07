@@ -27,8 +27,6 @@ export default function Home() {
   const [tributeForm, setTributeForm] = useState({ name: '', relation: '', message: '' });
   const [tributeMsg, setTributeMsg] = useState('');
 
-  const [dots, setDots] = useState('');
-
   useEffect(() => {
     const dotTimer = setInterval(() => setDots(d => d.length >= 3 ? '' : d + '.'), 600);
     return () => clearInterval(dotTimer);
