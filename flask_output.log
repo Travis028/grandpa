@@ -950,3 +950,143 @@ AssertionError: write() before start_response
 127.0.0.1 - - [07/Jun/2026 14:07:18] "GET /api/feedback HTTP/1.1" 200 -
 127.0.0.1 - - [07/Jun/2026 14:07:18] "POST /api/track_page HTTP/1.1" 200 -
 127.0.0.1 - - [07/Jun/2026 14:07:18] "GET /api/program HTTP/1.1" 200 -
+127.0.0.1 - - [07/Jun/2026 14:09:13] "GET /socket.io/?EIO=4&transport=websocket HTTP/1.1" 500 -
+Error on request:
+Traceback (most recent call last):
+  File "C:\Users\wayne\AppData\Local\Programs\Python\Python312\Lib\site-packages\werkzeug\serving.py", line 371, in run_wsgi
+    execute(self.server.app)
+  File "C:\Users\wayne\AppData\Local\Programs\Python\Python312\Lib\site-packages\werkzeug\serving.py", line 337, in execute
+    write(b"")
+  File "C:\Users\wayne\AppData\Local\Programs\Python\Python312\Lib\site-packages\werkzeug\serving.py", line 262, in write
+    assert status_set is not None, "write() before start_response"
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: write() before start_response
+127.0.0.1 - - [07/Jun/2026 14:09:13] "GET /api/admin/data HTTP/1.1" 200 -
+127.0.0.1 - - [07/Jun/2026 14:09:13] "POST /api/track_page HTTP/1.1" 200 -
+127.0.0.1 - - [07/Jun/2026 14:09:13] "GET /api/admin/data HTTP/1.1" 200 -
+127.0.0.1 - - [07/Jun/2026 14:09:13] "GET /api/admin/data HTTP/1.1" 200 -
+127.0.0.1 - - [07/Jun/2026 14:09:13] "GET /api/admin/data HTTP/1.1" 200 -
+127.0.0.1 - - [07/Jun/2026 14:09:28] "GET /api/admin/data HTTP/1.1" 200 -
+127.0.0.1 - - [07/Jun/2026 14:09:43] "GET /api/admin/data HTTP/1.1" 200 -
+127.0.0.1 - - [07/Jun/2026 14:09:48] "GET /socket.io/?EIO=4&transport=websocket HTTP/1.1" 500 -
+Error on request:
+Traceback (most recent call last):
+  File "C:\Users\wayne\AppData\Local\Programs\Python\Python312\Lib\site-packages\werkzeug\serving.py", line 371, in run_wsgi
+    execute(self.server.app)
+  File "C:\Users\wayne\AppData\Local\Programs\Python\Python312\Lib\site-packages\werkzeug\serving.py", line 337, in execute
+    write(b"")
+  File "C:\Users\wayne\AppData\Local\Programs\Python\Python312\Lib\site-packages\werkzeug\serving.py", line 262, in write
+    assert status_set is not None, "write() before start_response"
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: write() before start_response
+127.0.0.1 - - [07/Jun/2026 14:09:48] "POST /api/track_page HTTP/1.1" 200 -
+127.0.0.1 - - [07/Jun/2026 14:09:48] "GET /api/memories HTTP/1.1" 200 -
+127.0.0.1 - - [07/Jun/2026 14:09:48] "GET /api/family HTTP/1.1" 200 -
+127.0.0.1 - - [07/Jun/2026 14:09:48] "GET /api/tributes HTTP/1.1" 200 -
+127.0.0.1 - - [07/Jun/2026 14:09:48] "GET /api/grandpa HTTP/1.1" 200 -
+127.0.0.1 - - [07/Jun/2026 14:09:48] "GET /api/memories HTTP/1.1" 200 -
+127.0.0.1 - - [07/Jun/2026 14:09:48] "GET /api/family HTTP/1.1" 200 -
+127.0.0.1 - - [07/Jun/2026 14:09:48] "GET /api/tributes HTTP/1.1" 200 -
+127.0.0.1 - - [07/Jun/2026 14:09:48] "GET /api/grandpa HTTP/1.1" 200 -
+127.0.0.1 - - [07/Jun/2026 14:09:48] "GET /api/static/images/grandpa/main_photo.jpg HTTP/1.1" 404 -
+127.0.0.1 - - [07/Jun/2026 14:09:48] "GET /api/static/images/children/evans_odhiambo/portrait.jpg HTTP/1.1" 404 -
+127.0.0.1 - - [07/Jun/2026 14:09:48] "GET /api/static/images/children/evans_odhiambo/grandchildren/kevins.jpg HTTP/1.1" 404 -
+127.0.0.1 - - [07/Jun/2026 14:09:48] "GET /api/static/images/children/evans_odhiambo/grandchildren/awuor.jpg HTTP/1.1" 404 -
+127.0.0.1 - - [07/Jun/2026 14:09:48] "GET /api/static/images/children/peter_odhiambo/portrait.jpg HTTP/1.1" 404 -
+127.0.0.1 - - [07/Jun/2026 14:09:48] "GET /api/static/images/children/elly_opiyo/portrait.jpg HTTP/1.1" 404 -
+127.0.0.1 - - [07/Jun/2026 14:09:48] "GET /api/static/images/children/felix_otieno/portrait.jpg HTTP/1.1" 404 -
+127.0.0.1 - - [07/Jun/2026 14:09:48] "GET /api/static/images/children/joy_odhiambo/portrait.jpg HTTP/1.1" 404 -
+127.0.0.1 - - [07/Jun/2026 14:09:48] "GET /api/static/images/children/jeff_apollo/portrait.jpg HTTP/1.1" 404 -
+127.0.0.1 - - [07/Jun/2026 14:09:48] "GET /api/static/images/children/jeff_apollo/grandchildren/dean.jpg HTTP/1.1" 404 -
+127.0.0.1 - - [07/Jun/2026 14:09:48] "GET /api/static/images/children/jeff_apollo/grandchildren/jimmy.jpg HTTP/1.1" 404 -
+127.0.0.1 - - [07/Jun/2026 14:09:48] "GET /api/static/images/children/jeff_apollo/grandchildren/mark.jpg HTTP/1.1" 404 -
+127.0.0.1 - - [07/Jun/2026 14:09:48] "GET /api/static/images/children/jeff_apollo/grandchildren/amaya.jpg HTTP/1.1" 404 -
+127.0.0.1 - - [07/Jun/2026 14:09:48] "GET /api/static/images/children/cherls_were/portrait.jpg HTTP/1.1" 404 -
+127.0.0.1 - - [07/Jun/2026 14:09:48] "GET /api/static/images/children/timothy_owino/portrait.jpg HTTP/1.1" 404 -
+127.0.0.1 - - [07/Jun/2026 14:09:48] "GET /api/static/images/children/hellon_owino/portrait.jpg HTTP/1.1" 404 -
+127.0.0.1 - - [07/Jun/2026 14:09:50] "GET /socket.io/?EIO=4&transport=websocket HTTP/1.1" 500 -
+Error on request:
+Traceback (most recent call last):
+  File "C:\Users\wayne\AppData\Local\Programs\Python\Python312\Lib\site-packages\werkzeug\serving.py", line 371, in run_wsgi
+    execute(self.server.app)
+  File "C:\Users\wayne\AppData\Local\Programs\Python\Python312\Lib\site-packages\werkzeug\serving.py", line 337, in execute
+    write(b"")
+  File "C:\Users\wayne\AppData\Local\Programs\Python\Python312\Lib\site-packages\werkzeug\serving.py", line 262, in write
+    assert status_set is not None, "write() before start_response"
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: write() before start_response
+127.0.0.1 - - [07/Jun/2026 14:09:51] "GET /api/admin/data HTTP/1.1" 200 -
+127.0.0.1 - - [07/Jun/2026 14:09:51] "POST /api/track_page HTTP/1.1" 200 -
+127.0.0.1 - - [07/Jun/2026 14:09:51] "GET /api/admin/data HTTP/1.1" 200 -
+127.0.0.1 - - [07/Jun/2026 14:09:51] "GET /api/admin/data HTTP/1.1" 200 -
+127.0.0.1 - - [07/Jun/2026 14:09:51] "GET /api/admin/data HTTP/1.1" 200 -
+127.0.0.1 - - [07/Jun/2026 14:10:05] "GET /api/admin/data HTTP/1.1" 200 -
+127.0.0.1 - - [07/Jun/2026 14:10:13] "GET /socket.io/?EIO=4&transport=websocket HTTP/1.1" 500 -
+127.0.0.1 - - [07/Jun/2026 14:10:13] "POST /api/track_page HTTP/1.1" 200 -
+Error on request:
+Traceback (most recent call last):
+  File "C:\Users\wayne\AppData\Local\Programs\Python\Python312\Lib\site-packages\werkzeug\serving.py", line 371, in run_wsgi
+    execute(self.server.app)
+  File "C:\Users\wayne\AppData\Local\Programs\Python\Python312\Lib\site-packages\werkzeug\serving.py", line 337, in execute
+    write(b"")
+  File "C:\Users\wayne\AppData\Local\Programs\Python\Python312\Lib\site-packages\werkzeug\serving.py", line 262, in write
+    assert status_set is not None, "write() before start_response"
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: write() before start_response
+127.0.0.1 - - [07/Jun/2026 14:10:13] "GET /api/memories HTTP/1.1" 200 -
+127.0.0.1 - - [07/Jun/2026 14:10:13] "GET /api/grandpa HTTP/1.1" 200 -
+127.0.0.1 - - [07/Jun/2026 14:10:13] "GET /api/family HTTP/1.1" 200 -
+127.0.0.1 - - [07/Jun/2026 14:10:13] "GET /api/memories HTTP/1.1" 200 -
+127.0.0.1 - - [07/Jun/2026 14:10:13] "GET /api/tributes HTTP/1.1" 200 -
+127.0.0.1 - - [07/Jun/2026 14:10:13] "GET /api/grandpa HTTP/1.1" 200 -
+127.0.0.1 - - [07/Jun/2026 14:10:13] "GET /api/family HTTP/1.1" 200 -
+127.0.0.1 - - [07/Jun/2026 14:10:13] "GET /api/tributes HTTP/1.1" 200 -
+127.0.0.1 - - [07/Jun/2026 14:10:13] "GET /api/static/images/grandpa/main_photo.jpg HTTP/1.1" 404 -
+127.0.0.1 - - [07/Jun/2026 14:10:13] "GET /api/static/images/children/evans_odhiambo/portrait.jpg HTTP/1.1" 404 -
+127.0.0.1 - - [07/Jun/2026 14:10:13] "GET /api/static/images/children/evans_odhiambo/grandchildren/awuor.jpg HTTP/1.1" 404 -
+127.0.0.1 - - [07/Jun/2026 14:10:13] "GET /api/static/images/children/evans_odhiambo/grandchildren/kevins.jpg HTTP/1.1" 404 -
+127.0.0.1 - - [07/Jun/2026 14:10:13] "GET /api/static/images/children/peter_odhiambo/portrait.jpg HTTP/1.1" 404 -
+127.0.0.1 - - [07/Jun/2026 14:10:13] "GET /api/static/images/children/elly_opiyo/portrait.jpg HTTP/1.1" 404 -
+127.0.0.1 - - [07/Jun/2026 14:10:13] "GET /api/static/images/children/felix_otieno/portrait.jpg HTTP/1.1" 404 -
+127.0.0.1 - - [07/Jun/2026 14:10:13] "GET /api/static/images/children/joy_odhiambo/portrait.jpg HTTP/1.1" 404 -
+127.0.0.1 - - [07/Jun/2026 14:10:13] "GET /api/static/images/children/jeff_apollo/portrait.jpg HTTP/1.1" 404 -
+127.0.0.1 - - [07/Jun/2026 14:10:13] "GET /api/static/images/children/jeff_apollo/grandchildren/dean.jpg HTTP/1.1" 404 -
+127.0.0.1 - - [07/Jun/2026 14:10:13] "GET /api/static/images/children/jeff_apollo/grandchildren/jimmy.jpg HTTP/1.1" 404 -
+127.0.0.1 - - [07/Jun/2026 14:10:13] "GET /api/static/images/children/jeff_apollo/grandchildren/mark.jpg HTTP/1.1" 404 -
+127.0.0.1 - - [07/Jun/2026 14:10:13] "GET /api/static/images/children/jeff_apollo/grandchildren/amaya.jpg HTTP/1.1" 404 -
+127.0.0.1 - - [07/Jun/2026 14:10:13] "GET /api/static/images/children/cherls_were/portrait.jpg HTTP/1.1" 404 -
+127.0.0.1 - - [07/Jun/2026 14:10:13] "GET /api/static/images/children/timothy_owino/portrait.jpg HTTP/1.1" 404 -
+127.0.0.1 - - [07/Jun/2026 14:10:13] "GET /api/static/images/children/hellon_owino/portrait.jpg HTTP/1.1" 404 -
+127.0.0.1 - - [07/Jun/2026 14:10:14] "GET /api/static/images/children/cherls_were/grandchildren/dashon.jpg HTTP/1.1" 404 -
+127.0.0.1 - - [07/Jun/2026 14:10:14] "GET /api/static/images/children/timothy_owino/grandchildren/wayne.jpg HTTP/1.1" 404 -
+127.0.0.1 - - [07/Jun/2026 14:10:14] "GET /api/static/images/children/hellon_owino/grandchildren/jerald.jpg HTTP/1.1" 404 -
+127.0.0.1 - - [07/Jun/2026 14:10:14] "GET /api/static/images/children/hellon_owino/grandchildren/bevaline.jpg HTTP/1.1" 404 -
+127.0.0.1 - - [07/Jun/2026 14:10:14] "GET /api/static/images/children/cherls_were/grandchildren/pendo.jpg HTTP/1.1" 404 -
+127.0.0.1 - - [07/Jun/2026 14:10:14] "GET /api/static/images/children/timothy_owino/grandchildren/natasha.jpg HTTP/1.1" 404 -
+127.0.0.1 - - [07/Jun/2026 14:10:15] "GET /api/static/images/children/hellon_owino/grandchildren/henry.jpg HTTP/1.1" 404 -
+127.0.0.1 - - [07/Jun/2026 14:10:15] "GET /api/static/images/children/timothy_owino/grandchildren/emmanuela.jpg HTTP/1.1" 404 -
+127.0.0.1 - - [07/Jun/2026 14:10:15] "GET /api/static/images/children/hellon_owino/grandchildren/antonette.jpg HTTP/1.1" 404 -
+127.0.0.1 - - [07/Jun/2026 14:10:15] "GET /api/static/images/children/hellon_owino/grandchildren/katindi.jpg HTTP/1.1" 404 -
+127.0.0.1 - - [07/Jun/2026 14:10:15] "GET /api/static/images/children/timothy_owino/grandchildren/zach.jpg HTTP/1.1" 404 -
+127.0.0.1 - - [07/Jun/2026 14:10:15] "GET /api/static/images/children/beryl_mercy/portrait.jpg HTTP/1.1" 404 -
+127.0.0.1 - - [07/Jun/2026 14:10:15] "GET /api/static/images/children/joan_apollo/portrait.jpg HTTP/1.1" 404 -
+127.0.0.1 - - [07/Jun/2026 14:10:15] "GET /api/static/images/children/beryl_mercy/grandchildren/peter.jpg HTTP/1.1" 404 -
+127.0.0.1 - - [07/Jun/2026 14:10:15] "GET /api/static/images/children/joan_apollo/grandchildren/richard.jpg HTTP/1.1" 404 -
+127.0.0.1 - - [07/Jun/2026 14:10:15] "GET /api/static/images/children/joan_apollo/grandchildren/macreen.jpg HTTP/1.1" 404 -
+127.0.0.1 - - [07/Jun/2026 14:10:15] "GET /api/static/images/children/joan_apollo/grandchildren/bonney.jpg HTTP/1.1" 404 -
+127.0.0.1 - - [07/Jun/2026 14:10:15] "GET /api/static/images/children/joan_apollo/grandchildren/siste.jpg HTTP/1.1" 404 -
+127.0.0.1 - - [07/Jun/2026 14:10:16] "GET /api/static/images/children/joan_apollo/grandchildren/boss.jpg HTTP/1.1" 404 -
+127.0.0.1 - - [07/Jun/2026 14:10:56] "GET /api/program HTTP/1.1" 200 -
+127.0.0.1 - - [07/Jun/2026 14:10:56] "GET /api/feedback HTTP/1.1" 200 -
+127.0.0.1 - - [07/Jun/2026 14:10:56] "GET /api/program HTTP/1.1" 200 -
+127.0.0.1 - - [07/Jun/2026 14:10:56] "GET /api/feedback HTTP/1.1" 200 -
+127.0.0.1 - - [07/Jun/2026 14:10:56] "POST /api/track_page HTTP/1.1" 200 -
+127.0.0.1 - - [07/Jun/2026 14:11:21] "GET /api/grandpa HTTP/1.1" 200 -
+127.0.0.1 - - [07/Jun/2026 14:11:21] "GET /api/memories HTTP/1.1" 200 -
+127.0.0.1 - - [07/Jun/2026 14:11:21] "GET /api/family HTTP/1.1" 200 -
+127.0.0.1 - - [07/Jun/2026 14:11:21] "GET /api/tributes HTTP/1.1" 200 -
+127.0.0.1 - - [07/Jun/2026 14:11:21] "GET /api/grandpa HTTP/1.1" 200 -
+127.0.0.1 - - [07/Jun/2026 14:11:21] "GET /api/memories HTTP/1.1" 200 -
+127.0.0.1 - - [07/Jun/2026 14:11:21] "GET /api/family HTTP/1.1" 200 -
+127.0.0.1 - - [07/Jun/2026 14:11:21] "GET /api/tributes HTTP/1.1" 200 -
+127.0.0.1 - - [07/Jun/2026 14:11:21] "POST /api/track_page HTTP/1.1" 200 -

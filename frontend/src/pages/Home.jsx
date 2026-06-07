@@ -125,6 +125,7 @@ export default function Home() {
             <Link to="/program" className="quick-nav-btn">Funeral Program</Link>
             <a href="#family" className="quick-nav-btn">Our Family</a>
             <a href="#tributes" className="quick-nav-btn">Leave a Tribute</a>
+            <Link to="/program#feedback" className="quick-nav-btn">Leave Feedback</Link>
           </div>
         </div>
       </div>

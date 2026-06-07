@@ -17,7 +17,16 @@ export default function Program() {
     let retries = 0;
     const load = () => {
       Promise.all([api.get('/api/program'), api.get('/api/feedback')])
-        .then(([rp, rf]) => { setProgram(rp.data); setFeedback(rf.data); })
+        .then(([rp, rf]) => {
+          setProgram(rp.data);
+          setFeedback(rf.data);
+          // scroll to feedback section if navigated via #feedback
+          if (window.location.hash === '#feedback') {
+            setTimeout(() => {
+              document.getElementById('feedback')?.scrollIntoView({ behavior: 'smooth' });
+            }, 300);
+          }
+        })
         .catch(() => {
           if (retries < 3) { retries++; setTimeout(load, 4000); }
           else setLoadError(true);
@@ -101,7 +110,7 @@ export default function Program() {
       </section>
 
       {/* ── Feedback Section ── */}
-      <section className="section" style={{ background: '#f9f9f9', paddingTop: '3rem', paddingBottom: '4rem' }}>
+      <section className="section" id="feedback" style={{ background: '#f9f9f9', paddingTop: '3rem', paddingBottom: '4rem' }}>
         <div className="container-narrow">
           <div className="section-header" style={{ textAlign: 'center', marginBottom: '2rem' }}>
             <span className="section-tag">Your Thoughts</span>
