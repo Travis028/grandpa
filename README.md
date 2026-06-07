@@ -8,7 +8,7 @@ A modern, responsive memorial web application built to honour and celebrate the 
 
 | Service | URL |
 |---------|-----|
-| Frontend (Netlify) | https://flourishing-platypus-5c2766.netlify.app |
+| Frontend (Netlify) | https://tiny-ganache-32bfab.netlify.app |
 | Backend API (Render) | https://grandpa-99ef.onrender.com |
 
 ---
@@ -75,7 +75,7 @@ grandpa/
 | Username | `apolloowino` |
 | Password | `apolloowino` |
 
-Admin panel is at: `https://flourishing-platypus-5c2766.netlify.app/admin`
+Admin panel is at: `https://tiny-ganache-32bfab.netlify.app/admin`
 
 ---
 
