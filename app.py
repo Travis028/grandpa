@@ -138,8 +138,7 @@ def save_family(data):
     _save(FAMILY_FILE, data)
 
 def load_program():
-    from data_program import DEFAULT_PROGRAM as P  # fallback handled below
-    return _load(os.path.join(DATA_DIR, 'program.json'), P)
+    return _load(os.path.join(DATA_DIR, 'program.json'), DEFAULT_PROGRAM)
 
 def now_str():
     return datetime.now().strftime('%Y-%m-%d %H:%M:%S')

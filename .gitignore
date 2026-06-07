@@ -7,3 +7,6 @@ venv/
 dist/
 build/
 .DS_Store
+flask_output.log
+*.log
+data/
