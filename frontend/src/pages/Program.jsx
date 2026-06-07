@@ -27,7 +27,7 @@ export default function Program() {
           }
         })
         .catch(() => {
-          if (retries < 10) { retries++; setTimeout(load, 8000); }
+          if (retries < 10) { retries++; setTimeout(load, 3000); }
           else setLoadError(true);
         });
     };

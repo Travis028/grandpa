@@ -50,7 +50,7 @@ export default function Home() {
         setTributes(resTributes.data);
         setLoadError(false);
       }).catch(() => {
-        if (retries < MAX) { retries++; setTimeout(fetchData, 8000); }
+        if (retries < MAX) { retries++; setTimeout(fetchData, 3000); }
         else setLoadError(true);
       });
     };

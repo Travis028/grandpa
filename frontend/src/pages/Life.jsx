@@ -23,7 +23,7 @@ export default function Life() {
         setGrandpa(resGrandpa.data);
         setLifePhotos(resPhotos.data);
       }).catch(() => {
-        if (retries < 10) { retries++; setTimeout(fetchData, 8000); }
+        if (retries < 10) { retries++; setTimeout(fetchData, 3000); }
         else setLoadError(true);
       });
     };
