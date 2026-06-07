@@ -11,11 +11,18 @@ from functools import wraps
 import os, json, threading
 from datetime import datetime, timezone, timedelta
 
+ALLOWED_ORIGINS = [
+    "https://flourishing-platypus-5c2766.netlify.app",
+    "https://tiny-ganache-32bfab.netlify.app",
+    "http://localhost:5173",
+    "http://localhost:5174",
+]
+
 app = Flask(__name__, static_folder='static')
-CORS(app, origins=["https://flourishing-platypus-5c2766.netlify.app", "http://localhost:5173"])
+CORS(app, origins=ALLOWED_ORIGINS)
 app.secret_key = 'owino-memorial-secret-2026'
 app.config['JWT_SECRET'] = 'owino-admin-jwt-2026'
-socketio = SocketIO(app, cors_allowed_origins=["https://flourishing-platypus-5c2766.netlify.app", "http://localhost:5173"])
+socketio = SocketIO(app, cors_allowed_origins=ALLOWED_ORIGINS)
 
 active_visitors = {}   # sid -> {name, ip, time, page}
 _lock = threading.Lock()
