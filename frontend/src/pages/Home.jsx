@@ -221,15 +221,26 @@ export default function Home() {
                         <span className="grandchildren-label">Grandchildren</span>
                         <div className="grandchildren-row">
                           {child.grandchildren.map((grand, gIdx) => (
-                            <motion.div 
-                              className="grandchild" 
-                              key={gIdx}
-                              whileHover={{ scale: 1.1 }}
-                            >
+                            <motion.div className="grandchild" key={gIdx} whileHover={{ scale: 1.1 }}>
                               <img className="grandchild-photo" src={`${API_BASE}/api/static/images/children/${grand.photo}`} alt={grand.name} loading="lazy" onError={(e) => { e.target.style.display = 'none'; e.target.nextElementSibling.style.display = 'flex'; }} />
                               <div className="grandchild-photo-placeholder" style={{display: 'none'}}>{grand.name[0]}</div>
                               <span className="grandchild-name">{grand.name}</span>
                             </motion.div>
+                          ))}
+                        </div>
+                      </>
+                    )}
+
+                    {child.gallery && child.gallery.length > 0 && (
+                      <>
+                        <span className="grandchildren-label" style={{marginTop:'12px',display:'block'}}>Gallery</span>
+                        <div style={{display:'flex',gap:'6px',flexWrap:'wrap',marginTop:'8px'}}>
+                          {child.gallery.map((photo, gIdx) => (
+                            <img key={gIdx} src={`${API_BASE}/api/static/images/children/${photo}`} alt="gallery"
+                              loading="lazy"
+                              style={{width:'64px',height:'64px',objectFit:'cover',borderRadius:'4px',cursor:'pointer'}}
+                              onClick={() => window.open(`${API_BASE}/api/static/images/children/${photo}`, '_blank')}
+                              onError={e => e.target.style.display='none'} />
                           ))}
                         </div>
                       </>

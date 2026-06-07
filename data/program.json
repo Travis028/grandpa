@@ -1,0 +1,62 @@
+{
+  "event_name": "Memorial & Funeral Service",
+  "date": "[FILL IN DATE]",
+  "venue": "[FILL IN CHURCH/HALL NAME AND LOCATION]",
+  "venue_address": "[FILL IN FULL ADDRESS]",
+  "time_start": "[FILL IN START TIME]",
+  "time_end": "[FILL IN END TIME]",
+  "dress_code": "[FILL IN DRESS CODE]",
+  "burial_location": "[FILL IN BURIAL LOCATION]",
+  "order": [
+    {
+      "time": "10:00 AM",
+      "item": "Opening Prayer",
+      "leader": "[FILL IN NAME]"
+    },
+    {
+      "time": "10:10 AM",
+      "item": "Hymn / Worship",
+      "leader": "Family"
+    },
+    {
+      "time": "10:20 AM",
+      "item": "Scripture Reading",
+      "leader": "[FILL IN NAME]"
+    },
+    {
+      "time": "10:30 AM",
+      "item": "Eulogy Reading",
+      "leader": "Family"
+    },
+    {
+      "time": "11:00 AM",
+      "item": "Tributes from Children",
+      "leader": "Each child speaks"
+    },
+    {
+      "time": "11:45 AM",
+      "item": "Special Song",
+      "leader": "[FILL IN NAME]"
+    },
+    {
+      "time": "12:00 PM",
+      "item": "Message / Sermon",
+      "leader": "[FILL IN PASTOR/MINISTER]"
+    },
+    {
+      "time": "12:30 PM",
+      "item": "Final Prayer & Blessing",
+      "leader": "[FILL IN NAME]"
+    },
+    {
+      "time": "1:00 PM",
+      "item": "Burial / Committal",
+      "leader": "At the graveside"
+    },
+    {
+      "time": "2:00 PM",
+      "item": "Lunch & Fellowship",
+      "leader": "All are invited"
+    }
+  ]
+}

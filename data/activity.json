@@ -1,0 +1,110 @@
+[
+  {
+    "name": "Guest",
+    "action": "navigated",
+    "detail": "/admin",
+    "time": "2026-06-07 13:44:11"
+  },
+  {
+    "name": "Guest",
+    "action": "navigated",
+    "detail": "/",
+    "time": "2026-06-07 13:44:11"
+  },
+  {
+    "name": "wayne travis",
+    "action": "visited",
+    "detail": "Registered on site",
+    "time": "2026-06-07 13:44:32"
+  },
+  {
+    "name": "wayne travis",
+    "action": "shared",
+    "detail": "via copy_link",
+    "time": "2026-06-07 13:44:56"
+  },
+  {
+    "name": "wayne travis",
+    "action": "shared",
+    "detail": "via WhatsApp",
+    "time": "2026-06-07 13:45:04"
+  },
+  {
+    "name": "wayne travis",
+    "action": "navigated",
+    "detail": "/",
+    "time": "2026-06-07 13:46:37"
+  },
+  {
+    "name": "wayne travis",
+    "action": "navigated",
+    "detail": "/admin",
+    "time": "2026-06-07 13:47:18"
+  },
+  {
+    "name": "Natasha otieno",
+    "action": "visited",
+    "detail": "Registered on site",
+    "time": "2026-06-07 13:51:32"
+  },
+  {
+    "name": "Natasha otieno",
+    "action": "navigated",
+    "detail": "/",
+    "time": "2026-06-07 13:52:32"
+  },
+  {
+    "name": "Natasha otieno",
+    "action": "navigated",
+    "detail": "/",
+    "time": "2026-06-07 13:52:32"
+  },
+  {
+    "name": "Natasha otieno ",
+    "action": "tribute",
+    "detail": "we loved you but God loved you more",
+    "time": "2026-06-07 13:54:58"
+  },
+  {
+    "name": "Natasha otieno",
+    "action": "navigated",
+    "detail": "/",
+    "time": "2026-06-07 13:55:48"
+  },
+  {
+    "name": "Natasha otieno",
+    "action": "navigated",
+    "detail": "/",
+    "time": "2026-06-07 13:55:48"
+  },
+  {
+    "name": "Natasha otieno ",
+    "action": "tribute",
+    "detail": "we loved you but God loved you more",
+    "time": "2026-06-07 13:57:06"
+  },
+  {
+    "name": "wayne travis",
+    "action": "navigated",
+    "detail": "/",
+    "time": "2026-06-07 13:57:46"
+  },
+  {
+    "name": "wayne travis",
+    "action": "navigated",
+    "detail": "/program",
+    "time": "2026-06-07 13:58:05"
+  },
+  {
+    "name": "wayne travis",
+    "action": "navigated",
+    "detail": "/admin",
+    "time": "2026-06-07 13:58:21"
+  },
+  {
+    "name": "Natasha otieno",
+    "action": "navigated",
+    "detail": "/admin",
+    "time": "2026-06-07 13:58:38"
+  }
+]
