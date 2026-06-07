@@ -4,27 +4,21 @@ import api from '../config';
 
 export default function Program() {
   const [program, setProgram] = useState(null);
-  const [feedback, setFeedback] = useState([]);
   const [loadError, setLoadError] = useState(false);
   const [form, setForm] = useState({ name: '', rating: 5, message: '' });
   const [submitMsg, setSubmitMsg] = useState('');
 
   useEffect(() => {
-    // pre-fill name from localStorage
     const saved = localStorage.getItem('visitorName');
     if (saved) setForm(f => ({ ...f, name: saved }));
 
     let retries = 0;
     const load = () => {
-      Promise.all([api.get('/api/program'), api.get('/api/feedback')])
-        .then(([rp, rf]) => {
-          setProgram(rp.data);
-          setFeedback(rf.data);
-          // scroll to feedback section if navigated via #feedback
+      api.get('/api/program')
+        .then(r => {
+          setProgram(r.data);
           if (window.location.hash === '#feedback') {
-            setTimeout(() => {
-              document.getElementById('feedback')?.scrollIntoView({ behavior: 'smooth' });
-            }, 300);
+            setTimeout(() => document.getElementById('feedback')?.scrollIntoView({ behavior: 'smooth' }), 300);
           }
         })
         .catch(() => {
@@ -41,10 +35,9 @@ export default function Program() {
     try {
       const res = await api.post('/api/feedback', form);
       if (res.data.success) {
-        setFeedback(prev => [...prev, res.data.feedback]);
         setForm(f => ({ ...f, message: '', rating: 5 }));
-        setSubmitMsg('Thank you for your feedback!');
-        setTimeout(() => setSubmitMsg(''), 5000);
+        setSubmitMsg('Thank you for your feedback! It has been received.');
+        setTimeout(() => setSubmitMsg(''), 6000);
       }
     } catch { setSubmitMsg('Could not submit. Please try again.'); }
   };
@@ -59,7 +52,7 @@ export default function Program() {
   if (!program) return <div style={{ padding: '5rem', textAlign: 'center' }}>Loading... (server may be waking up)</div>;
 
   const stars = (r) => Array.from({ length: 5 }, (_, i) => (
-    <span key={i} style={{ color: i < r ? '#d97706' : '#ddd', fontSize: '1.2rem', cursor: 'pointer' }}
+    <span key={i} style={{ color: i < r ? '#d97706' : '#ddd', fontSize: '1.4rem', cursor: 'pointer' }}
       onClick={() => setForm(f => ({ ...f, rating: i + 1 }))}>★</span>
   ));
 
@@ -109,7 +102,7 @@ export default function Program() {
         </div>
       </section>
 
-      {/* ── Feedback Section ── */}
+      {/* Feedback form — results visible to admin only */}
       <section className="section" id="feedback" style={{ background: '#f9f9f9', paddingTop: '3rem', paddingBottom: '4rem' }}>
         <div className="container-narrow">
           <div className="section-header" style={{ textAlign: 'center', marginBottom: '2rem' }}>
@@ -123,31 +116,10 @@ export default function Program() {
             <p className="section-sub">Help us know how this memorial touched you</p>
           </div>
 
-          {/* Existing feedback */}
-          {feedback.length > 0 && (
-            <div style={{ marginBottom: '2.5rem' }}>
-              {[...feedback].reverse().map((f, i) => (
-                <div key={i} className="tribute-card" style={{ marginBottom: '14px' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '8px' }}>
-                    <div>
-                      <p style={{ fontWeight: 600, marginBottom: '4px' }}>{f.name}
-                        <span style={{ color: '#d97706', marginLeft: '8px', letterSpacing: '2px' }}>
-                          {'★'.repeat(f.rating || 5)}{'☆'.repeat(5 - (f.rating || 5))}
-                        </span>
-                      </p>
-                      <p className="tribute-message" style={{ fontStyle: 'italic' }}>"{f.message}"</p>
-                      <p style={{ fontSize: '0.8rem', color: '#aaa', marginTop: '4px' }}>{f.date}</p>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-
-          {/* Feedback form */}
           <div className="tribute-form-wrap">
             <h3 className="form-title">Share Your Feedback</h3>
-            {submitMsg && <p style={{ color: '#276749', marginBottom: '12px' }}>{submitMsg}</p>}
+            <p className="form-sub">Your feedback is private and will only be seen by the family administrator.</p>
+            {submitMsg && <p style={{ color: '#276749', marginBottom: '12px', fontWeight: 600 }}>{submitMsg}</p>}
             <form onSubmit={handleSubmit}>
               <div className="form-grid">
                 <div className="form-field">

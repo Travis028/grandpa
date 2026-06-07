@@ -1,76 +1,175 @@
-# Grandpa Memorial Website
+# APOLLO J. FIZVALENTINE OWINO — Memorial Website
 
-A modern, responsive memorial application built with a React frontend and Python (Flask) backend to honor and celebrate the life of APOLLO J. FIZVALENTINE OWINO. 
+A modern, responsive memorial web application built to honour and celebrate the life of **APOLLO J. FIZVALENTINE OWINO**.
 
-## Architecture & Migration Details
+---
 
-Originally built as a server-side rendered application with Flask and Jinja templates, this project has been fully migrated to a modern Single Page Application (SPA) stack using **React** and **Vite**, powered by a **Python API**.
+## Live URLs
 
-### Key Changes During Migration:
-- **Separation of Concerns:** The backend now strictly serves JSON data via REST APIs, while the React frontend handles all routing, state, and UI.
-- **Emoji-Free Codebase:** As requested, all emojis have been strictly removed from both the data and the UI to ensure compatibility and a highly formal aesthetic.
-- **Dynamic Image Support for Admins:** The backend automatically scans the `static/images/memories/` and `static/images/life_photos/` directories. Admins can simply drop images directly into those folders post-deployment, and the frontend will fetch and display them automatically—no code changes required.
-- **Old Files Archived:** The legacy Jinja templates and CSS files have been safely archived in the `archive/` folder.
-- **Responsive UI & Premium Aesthetics:** The React components utilize modern CSS practices (imported from the legacy design) ensuring the site looks beautiful on desktop, tablet, and mobile browsers.
+| Service | URL |
+|---------|-----|
+| Frontend (Netlify) | https://flourishing-platypus-5c2766.netlify.app |
+| Backend API (Render) | https://grandpa-99ef.onrender.com |
+
+---
+
+## Tech Stack
+
+| Layer | Technology |
+|-------|-----------|
+| Frontend | React 19 + Vite |
+| Backend | Python 3.12 + Flask + Flask-SocketIO |
+| Hosting (Frontend) | Netlify |
+| Hosting (Backend) | Render (free tier) |
+| Real-time | Socket.IO (WebSockets) |
+| Auth | PyJWT |
+
+---
 
 ## Project Structure
 
 ```
 grandpa/
-├── app.py                  # Main Flask API backend
-├── requirements.txt        # Python dependencies
-├── data/
-│   └── tributes.json       # User-submitted tributes
+├── app.py                        # Flask API — all routes and logic
+├── requirements.txt              # Python dependencies
+├── Procfile                      # Render start command
+├── netlify.toml                  # Netlify build config
+├── data/                         # Persistent JSON data (all admin changes saved here)
+│   ├── grandpa.json              # Grandpa info (editable by admin)
+│   ├── family.json               # Family data with gallery (editable by admin)
+│   ├── program.json              # Funeral program (editable by admin)
+│   ├── tributes.json             # User-submitted tributes
+│   ├── feedback.json             # User feedback (admin-only view)
+│   ├── visitors.json             # All named visitors log
+│   ├── activity.json             # Full activity log
+│   ├── shares.json               # Share tracking log
+│   └── admin_requests.json       # Admin access requests
 ├── static/
-│   ├── images/             # Admin-managed photo directories
-│   │   ├── children/
-│   │   ├── grandpa/
-│   │   ├── life_photos/
-│   │   └── memories/
-├── frontend/               # React Application (Vite)
-│   ├── src/
-│   │   ├── pages/          # React route components
-│   │   ├── App.jsx         # Layout & Routing
-│   │   ├── main.jsx        # Entry point
-│   │   └── index.css       # Premium styles
-│   ├── package.json        # Node.js dependencies
-│   └── vite.config.js      # Vite proxy & build config
-└── archive/                # Legacy files
+│   └── images/
+│       ├── grandpa/              # Main hero photo
+│       ├── children/             # Family portraits + galleries + grandchildren
+│       ├── memories/             # Memory gallery photos (drop files here)
+│       └── life_photos/          # Life story photos (drop files here)
+└── frontend/                     # React SPA (Vite)
+    ├── src/
+    │   ├── pages/
+    │   │   ├── Home.jsx          # Main page — family, tributes, memories
+    │   │   ├── Life.jsx          # Life story page
+    │   │   ├── Program.jsx       # Funeral program + feedback form
+    │   │   └── Admin.jsx         # Full admin dashboard
+    │   ├── App.jsx               # Router, Navbar, Footer, visitor modal
+    │   ├── config.js             # Axios instance with API base URL
+    │   ├── main.jsx              # React entry point
+    │   └── index.css             # All styles
+    ├── .env.production           # VITE_API_URL=https://grandpa-99ef.onrender.com
+    ├── vite.config.js            # Vite config with dev proxy
+    └── package.json
 ```
 
-## How to Run the Project Locally
+---
 
-To run the full stack during development, you will need to run both the backend API and the frontend dev server.
+## Admin Credentials
 
-### 1. Start the Python (Flask) Backend API
-Open your terminal in the root directory (`grandpa/`) and run:
+| Field | Value |
+|-------|-------|
+| Username | `apolloowino` |
+| Password | `apolloowino` |
+
+Admin panel is at: `https://flourishing-platypus-5c2766.netlify.app/admin`
+
+---
+
+## Admin Dashboard Features
+
+The admin dashboard has the following tabs:
+
+- **Overview** — Live visitor count, total visitors, named visitors list, live activity table (who is on site, what page), tributes count, shares count, pending requests
+- **Grandpa Info** — Edit name, birth year, death year, birth place, wife name, final words, full life story
+- **Program** — Edit all funeral program details and order of service (add/remove/edit items)
+- **Activity** — Full activity log (last 100 actions) — who visited, navigated, shared, left a tribute or feedback. Share breakdown by platform
+- **Family** — Edit every child's name, spouse, note, tribute. Upload portrait. Add/remove gallery photos. Upload grandchild photos
+- **Tributes** — View, edit, delete all user-submitted tributes
+- **Feedback** — View all user feedback with star ratings (private — users cannot see each other's feedback). Delete entries
+- **Requests** — Approve or deny admin access requests submitted via the site
+
+All changes are saved permanently to JSON files in the `data/` folder and survive server restarts.
+
+---
+
+## Public Features
+
+- **Visitor name prompt** — every visitor must enter their name on first visit. Logged for admin
+- **Live visitor count** — shown in navbar via WebSocket
+- **Family section** — each child with portrait, tribute, grandchildren, and gallery
+- **Tributes** — visitors can leave tributes (name, relation, message)
+- **Feedback** — visitors can leave private star-rated feedback (admin-only view)
+- **Share button** — footer share button for WhatsApp, Facebook, Twitter/X, Copy Link. All shares tracked
+- **Retry on wake-up** — if Render is sleeping (free tier), the site retries automatically up to 3 times
+
+---
+
+## How to Run Locally
+
+### 1. Backend (Flask)
 ```bash
-# Install dependencies if you haven't already
+# From the grandpa/ root folder
 pip install -r requirements.txt
-
-# Run the server (starts on http://127.0.0.1:5000)
 python app.py
+# Runs on http://127.0.0.1:5000
 ```
 
-### 2. Start the React Frontend Dev Server
-Open a second terminal, navigate into the `frontend/` directory, and run:
+### 2. Frontend (React + Vite)
 ```bash
-# Move to frontend folder
 cd frontend
-
-# Install Node modules (if you haven't already)
 npm install
-
-# Run Vite dev server
 npm run dev
+# Runs on http://localhost:5173
+# All /api calls are proxied to localhost:5000
 ```
-Vite will proxy all `/api` requests to `localhost:5000`. You can now view the app at the URL provided by Vite (typically `http://localhost:5173`).
 
-## Managing Photos (Admin Post-Deployment)
+---
 
-You can add new photos at any time without rebuilding the application:
-1. **Memories Gallery:** Drop any `.jpg` or `.png` into `static/images/memories/`. The app auto-extracts the file name as the caption.
-2. **Life Story Photos:** Drop photos into `static/images/life_photos/`.
-3. **Family Member Photos:** Replace images in `static/images/children/` ensuring the file names match what is defined in `app.py`.
+## Deployment
 
-The React application will fetch these from the API seamlessly!
+### Backend — Render
+- **Build command:** `pip install -r requirements.txt`
+- **Start command:** `gunicorn --worker-class eventlet -w 1 app:app` (set in `Procfile`)
+- **Environment:** Python 3.12
+- No environment variables needed
+
+### Frontend — Netlify
+- **Base directory:** `frontend`
+- **Build command:** `npm install && npm run build`
+- **Publish directory:** `dist`
+- **Environment variable:** `VITE_API_URL=https://grandpa-99ef.onrender.com` (set in `frontend/.env.production` — committed to repo, no dashboard config needed)
+- SPA redirects handled by `netlify.toml` and `public/_redirects`
+
+### To deploy updates
+```bash
+git add .
+git commit -m "your message"
+git push
+```
+Both Render and Netlify auto-deploy on every push to the main branch.
+
+---
+
+## Managing Photos Without Redeploying
+
+| Photo Type | Folder | How |
+|-----------|--------|-----|
+| Memory gallery | `static/images/memories/` | Drop `.jpg`/`.png` files — auto-detected |
+| Life story photos | `static/images/life_photos/` | Drop `.jpg`/`.png` files — auto-detected |
+| Family portraits | Admin dashboard → Family tab | Upload via admin |
+| Family gallery | Admin dashboard → Family tab | Upload via admin |
+| Grandchild photos | Admin dashboard → Family tab | Upload via admin |
+
+> **Note:** On Render free tier, uploaded images are stored on the server's ephemeral disk and will be lost on restart. For permanent image storage, upgrade to a paid Render plan or integrate Cloudinary.
+
+---
+
+## Important Notes
+
+- Render free tier **sleeps after 15 minutes** of inactivity. First load after sleep takes ~30–60 seconds. The site retries automatically
+- All data in `data/*.json` files persists as long as the Render service is not redeployed from scratch
+- The `data/` folder is gitignored — production data lives only on the Render server
