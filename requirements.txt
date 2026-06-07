@@ -3,5 +3,4 @@ flask-cors
 flask-socketio
 PyJWT
 gunicorn
-gevent
-gevent-websocket
+eventlet

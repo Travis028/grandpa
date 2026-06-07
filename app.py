@@ -1,3 +1,5 @@
+import eventlet
+eventlet.monkey_patch()
 from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
 from flask_socketio import SocketIO, emit
@@ -5,13 +7,13 @@ import jwt
 from functools import wraps
 import os
 import json
-from datetime import datetime
+from datetime import datetime, timezone, timedelta
 
 app = Flask(__name__, static_folder='static')
-CORS(app) # Enable CORS for React frontend
+CORS(app, origins=["https://flourishing-platypus-5c2766.netlify.app", "http://localhost:5173"])
 app.secret_key = 'your-secret-key-here-change-this'
 app.config['JWT_SECRET'] = 'admin-secret-key-change-this'
-socketio = SocketIO(app, cors_allowed_origins="*")
+socketio = SocketIO(app, cors_allowed_origins=["https://flourishing-platypus-5c2766.netlify.app", "http://localhost:5173"])
 
 active_visitors_data = {}
 
@@ -339,8 +341,8 @@ def token_required(f):
 def login():
     auth = request.json
     # Default admin credentials
-    if auth and auth.get('username') == 'admin' and auth.get('password') == 'apolloowino':
-        token = jwt.encode({'user': 'admin', 'exp': datetime.now().timestamp() + 3600}, app.config['JWT_SECRET'], algorithm="HS256")
+    if auth and auth.get('username') == 'apolloowino' and auth.get('password') == 'apolloowino':
+        token = jwt.encode({'user': 'admin', 'exp': datetime.now(timezone.utc) + timedelta(hours=1)}, app.config['JWT_SECRET'], algorithm="HS256")
         return jsonify({'token': token})
     return jsonify({'message': 'Invalid credentials'}), 401
 

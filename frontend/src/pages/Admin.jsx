@@ -8,6 +8,7 @@ export default function Admin() {
   const [password, setPassword] = useState('');
   const [data, setData] = useState(null);
   const [error, setError] = useState('');
+  const [showHint, setShowHint] = useState(false);
 
   useEffect(() => {
     if (token) fetchAdminData();
@@ -51,6 +52,16 @@ export default function Admin() {
           <input type="password" placeholder="Password" value={password} onChange={e => setPassword(e.target.value)} required style={{padding: '10px'}} />
           {error && <p style={{color: 'red'}}>{error}</p>}
           <button type="submit" className="btn-primary" style={{padding: '10px', background: '#000', color: '#fff'}}>Login</button>
+          <p style={{marginTop: '12px', fontSize: '0.85rem'}}>
+            <button type="button" onClick={() => setShowHint(!showHint)} style={{background: 'none', border: 'none', color: '#666', cursor: 'pointer', textDecoration: 'underline'}}>Forgot password?</button>
+          </p>
+          {showHint && (
+            <div style={{marginTop: '10px', background: '#f9f9f9', border: '1px solid #ddd', borderRadius: '6px', padding: '12px', fontSize: '0.85rem', color: '#333'}}>
+              <p><strong>Username:</strong> apolloowino</p>
+              <p><strong>Password:</strong> apolloowino</p>
+              <p style={{marginTop: '6px', color: '#888', fontSize: '0.78rem'}}>Contact the site administrator to reset credentials.</p>
+            </div>
+          )}
         </form>
       </motion.div>
     );
