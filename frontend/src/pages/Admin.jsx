@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import axios from 'axios';
+import api from '../config';
 import { motion } from 'framer-motion';
 
 export default function Admin() {
@@ -16,7 +16,7 @@ export default function Admin() {
 
   const fetchAdminData = async () => {
     try {
-      const res = await axios.get('/api/admin/data', {
+      const res = await api.get('/api/admin/data', {
         headers: { Authorization: `Bearer ${token}` }
       });
       setData(res.data);
@@ -29,7 +29,7 @@ export default function Admin() {
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post('/api/admin/login', { username, password });
+      const res = await api.post('/api/admin/login', { username, password });
       setToken(res.data.token);
       localStorage.setItem('adminToken', res.data.token);
       setError('');

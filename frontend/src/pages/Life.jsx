@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import axios from 'axios';
-import { API_BASE } from '../config';
+import api, { API_BASE } from '../config';
 
 export default function Life() {
   const [grandpa, setGrandpa] = useState(null);
@@ -9,8 +8,8 @@ export default function Life() {
 
   useEffect(() => {
     Promise.all([
-      axios.get('/api/grandpa'),
-      axios.get('/api/life_photos')
+      api.get('/api/grandpa'),
+      api.get('/api/life_photos')
     ]).then(([resGrandpa, resPhotos]) => {
       setGrandpa(resGrandpa.data);
       setLifePhotos(resPhotos.data);

@@ -1,8 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import axios from 'axios';
 import { motion } from 'framer-motion';
-import { API_BASE } from '../config';
+import api, { API_BASE } from '../config';
 
 function Reveal({ children }) {
   return (
@@ -29,10 +28,10 @@ export default function Home() {
   useEffect(() => {
     // Fetch data
     Promise.all([
-      axios.get('/api/grandpa'),
-      axios.get('/api/family'),
-      axios.get('/api/memories'),
-      axios.get('/api/tributes')
+      api.get('/api/grandpa'),
+      api.get('/api/family'),
+      api.get('/api/memories'),
+      api.get('/api/tributes')
     ]).then(([resGrandpa, resFamily, resMemories, resTributes]) => {
       setGrandpa(resGrandpa.data);
       setFamilyData(resFamily.data);
@@ -45,7 +44,7 @@ export default function Home() {
     e.preventDefault();
     if (!tributeForm.message) return;
     try {
-      const res = await axios.post('/api/tributes', tributeForm);
+      const res = await api.post('/api/tributes', tributeForm);
       if (res.data.success) {
         setTributes([...tributes, res.data.tribute]);
         setTributeForm({ name: '', relation: '', message: '' });
@@ -57,7 +56,7 @@ export default function Home() {
     }
   };
 
-  if (!grandpa || !familyData) return <div style={{padding: '5rem', textAlign: 'center'}}>Loading...</div>;
+  if (!grandpa || !familyData || !Array.isArray(familyData.family)) return <div style={{padding: '5rem', textAlign: 'center'}}>Loading...</div>;
 
   const { family, firstborn } = familyData;
   const numGrandchildren = family.reduce((acc, child) => acc + (child.grandchildren ? child.grandchildren.length : 0), 0);

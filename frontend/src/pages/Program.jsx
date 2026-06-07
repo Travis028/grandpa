@@ -1,12 +1,12 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import axios from 'axios';
+import api from '../config';
 
 export default function Program() {
   const [program, setProgram] = useState(null);
 
   useEffect(() => {
-    axios.get('/api/program')
+    api.get('/api/program')
       .then(res => setProgram(res.data))
       .catch(err => console.error("Error fetching program:", err));
   }, []);
