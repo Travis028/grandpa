@@ -6,6 +6,12 @@ export default function Life() {
   const [grandpa, setGrandpa] = useState(null);
   const [lifePhotos, setLifePhotos] = useState([]);
   const [loadError, setLoadError] = useState(false);
+  const [dots, setDots] = useState('');
+
+  useEffect(() => {
+    const t = setInterval(() => setDots(d => d.length >= 3 ? '' : d + '.'), 600);
+    return () => clearInterval(t);
+  }, []);
 
   useEffect(() => {
     let retries = 0;
@@ -17,7 +23,7 @@ export default function Life() {
         setGrandpa(resGrandpa.data);
         setLifePhotos(resPhotos.data);
       }).catch(() => {
-        if (retries < 3) { retries++; setTimeout(fetchData, 4000); }
+        if (retries < 10) { retries++; setTimeout(fetchData, 8000); }
         else setLoadError(true);
       });
     };
@@ -26,12 +32,13 @@ export default function Life() {
 
   if (loadError) return (
     <div style={{padding:'5rem',textAlign:'center'}}>
-      <p>The server is waking up, please wait a moment...</p>
-      <button onClick={() => window.location.reload()} style={{padding:'10px 24px',cursor:'pointer',background:'#000',color:'#fff',border:'none',borderRadius:'4px'}}>Retry</button>
+      <p style={{fontSize:'1.1rem',marginBottom:'8px'}}>The server took too long to respond.</p>
+      <p style={{color:'#888',marginBottom:'1.5rem',fontSize:'0.9rem'}}>Please try again.</p>
+      <button onClick={() => window.location.reload()} style={{padding:'12px 28px',cursor:'pointer',background:'#000',color:'#fff',border:'none',borderRadius:'4px',fontSize:'1rem'}}>Try Again</button>
     </div>
   );
 
-  if (!grandpa) return <div style={{padding: '5rem', textAlign: 'center'}}>Loading... (server may be waking up)</div>;
+  if (!grandpa) return <div style={{padding:'5rem',textAlign:'center'}}><p style={{fontSize:'1.1rem',marginBottom:'6px'}}>Loading{dots}</p><p style={{color:'#888',fontSize:'0.85rem'}}>The server is starting up, please wait</p></div>;
 
   return (
     <>

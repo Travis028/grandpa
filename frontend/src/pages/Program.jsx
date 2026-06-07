@@ -7,11 +7,16 @@ export default function Program() {
   const [loadError, setLoadError] = useState(false);
   const [form, setForm] = useState({ name: '', rating: 5, message: '' });
   const [submitMsg, setSubmitMsg] = useState('');
+  const [dots, setDots] = useState('');
+
+  useEffect(() => {
+    const t = setInterval(() => setDots(d => d.length >= 3 ? '' : d + '.'), 600);
+    return () => clearInterval(t);
+  }, []);
 
   useEffect(() => {
     const saved = localStorage.getItem('visitorName');
     if (saved) setForm(f => ({ ...f, name: saved }));
-
     let retries = 0;
     const load = () => {
       api.get('/api/program')
@@ -22,7 +27,7 @@ export default function Program() {
           }
         })
         .catch(() => {
-          if (retries < 3) { retries++; setTimeout(load, 4000); }
+          if (retries < 10) { retries++; setTimeout(load, 8000); }
           else setLoadError(true);
         });
     };
@@ -44,12 +49,18 @@ export default function Program() {
 
   if (loadError) return (
     <div style={{ padding: '5rem', textAlign: 'center' }}>
-      <p>The server is waking up, please wait...</p>
-      <button onClick={() => window.location.reload()} style={{ padding: '10px 24px', cursor: 'pointer', background: '#000', color: '#fff', border: 'none', borderRadius: '4px', marginTop: '12px' }}>Retry</button>
+      <p style={{ fontSize: '1.1rem', marginBottom: '8px' }}>The server took too long to respond.</p>
+      <p style={{ color: '#888', marginBottom: '1.5rem', fontSize: '0.9rem' }}>Please try again.</p>
+      <button onClick={() => window.location.reload()} style={{ padding: '12px 28px', cursor: 'pointer', background: '#000', color: '#fff', border: 'none', borderRadius: '4px' }}>Try Again</button>
     </div>
   );
 
-  if (!program) return <div style={{ padding: '5rem', textAlign: 'center' }}>Loading... (server may be waking up)</div>;
+  if (!program) return (
+    <div style={{ padding: '5rem', textAlign: 'center' }}>
+      <p style={{ fontSize: '1.1rem', marginBottom: '6px' }}>Loading{dots}</p>
+      <p style={{ color: '#888', fontSize: '0.85rem' }}>The server is starting up, please wait</p>
+    </div>
+  );
 
   const stars = (r) => Array.from({ length: 5 }, (_, i) => (
     <span key={i} style={{ color: i < r ? '#d97706' : '#ddd', fontSize: '1.4rem', cursor: 'pointer' }}
@@ -102,7 +113,6 @@ export default function Program() {
         </div>
       </section>
 
-      {/* Feedback form — results visible to admin only */}
       <section className="section" id="feedback" style={{ background: '#f9f9f9', paddingTop: '3rem', paddingBottom: '4rem' }}>
         <div className="container-narrow">
           <div className="section-header" style={{ textAlign: 'center', marginBottom: '2rem' }}>

@@ -22,12 +22,21 @@ export default function Home() {
   const [memories, setMemories] = useState([]);
   const [tributes, setTributes] = useState([]);
   const [loadError, setLoadError] = useState(false);
+  const [dots, setDots] = useState('');
 
   const [tributeForm, setTributeForm] = useState({ name: '', relation: '', message: '' });
   const [tributeMsg, setTributeMsg] = useState('');
 
+  const [dots, setDots] = useState('');
+
+  useEffect(() => {
+    const dotTimer = setInterval(() => setDots(d => d.length >= 3 ? '' : d + '.'), 600);
+    return () => clearInterval(dotTimer);
+  }, []);
+
   useEffect(() => {
     let retries = 0;
+    const MAX = 10;
     const fetchData = () => {
       Promise.all([
         api.get('/api/grandpa'),
@@ -41,12 +50,8 @@ export default function Home() {
         setTributes(resTributes.data);
         setLoadError(false);
       }).catch(() => {
-        if (retries < 3) {
-          retries++;
-          setTimeout(fetchData, 4000);
-        } else {
-          setLoadError(true);
-        }
+        if (retries < MAX) { retries++; setTimeout(fetchData, 8000); }
+        else setLoadError(true);
       });
     };
     fetchData();
@@ -70,14 +75,16 @@ export default function Home() {
 
   if (loadError) return (
     <div style={{padding:'5rem',textAlign:'center'}}>
-      <p style={{fontSize:'1.2rem',marginBottom:'1rem'}}>The server is waking up, please wait a moment...</p>
-      <button onClick={() => { setLoadError(false); window.location.reload(); }} style={{padding:'10px 24px',cursor:'pointer',background:'#000',color:'#fff',border:'none',borderRadius:'4px'}}>Retry</button>
+      <p style={{fontSize:'1.1rem',marginBottom:'8px'}}>The server took too long to respond.</p>
+      <p style={{color:'#888',marginBottom:'1.5rem',fontSize:'0.9rem'}}>The server may still be waking up. Please try again.</p>
+      <button onClick={() => { setLoadError(false); window.location.reload(); }} style={{padding:'12px 28px',cursor:'pointer',background:'#000',color:'#fff',border:'none',borderRadius:'4px',fontSize:'1rem'}}>Try Again</button>
     </div>
   );
 
   if (!grandpa || !familyData || !Array.isArray(familyData.family)) return (
     <div style={{padding:'5rem',textAlign:'center'}}>
-      <p>Loading memorial... (server may be waking up, please wait)</p>
+      <p style={{fontSize:'1.1rem',marginBottom:'6px'}}>Loading memorial{dots}</p>
+      <p style={{color:'#888',fontSize:'0.85rem'}}>The server is starting up, please wait a moment</p>
     </div>
   );
 
