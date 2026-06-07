@@ -1,10 +1,25 @@
 import { BrowserRouter as Router, Routes, Route, Link, useLocation } from 'react-router-dom';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Component } from 'react';
 import { io } from 'socket.io-client';
 import Home from './pages/Home';
 import Life from './pages/Life';
 import Program from './pages/Program';
 import Admin from './pages/Admin';
+
+class ErrorBoundary extends Component {
+  constructor(props) { super(props); this.state = { hasError: false }; }
+  static getDerivedStateFromError() { return { hasError: true }; }
+  render() {
+    if (this.state.hasError) return (
+      <div style={{padding:'5rem',textAlign:'center'}}>
+        <h2>Something went wrong.</h2>
+        <p>Please refresh the page.</p>
+        <button onClick={() => window.location.reload()} style={{marginTop:'1rem',padding:'10px 20px',cursor:'pointer'}}>Refresh</button>
+      </div>
+    );
+    return this.props.children;
+  }
+}
 
 function ScrollToTop() {
   const { pathname } = useLocation();
@@ -22,12 +37,21 @@ function Navbar() {
   const [visitors, setVisitors] = useState(1);
 
   useEffect(() => {
-    // Connect to WebSocket
-    const socketUrl = import.meta.env.VITE_API_URL || '/';
-    const socket = io(socketUrl, { path: '/socket.io' });
-    socket.on('visitor_count', (data) => {
-      setVisitors(data.count);
-    });
+    // Connect to WebSocket with error handling
+    let socket;
+    try {
+      const socketUrl = import.meta.env.VITE_API_URL || window.location.origin;
+      socket = io(socketUrl, {
+        path: '/socket.io',
+        transports: ['websocket', 'polling'],
+        reconnectionAttempts: 3,
+        timeout: 5000,
+      });
+      socket.on('visitor_count', (data) => setVisitors(data.count));
+      socket.on('connect_error', () => socket.disconnect());
+    } catch (e) {
+      // socket failed silently, visitors stays at 1
+    }
 
     const handleScroll = () => {
       setScrolled(window.scrollY > 50);
@@ -35,7 +59,7 @@ function Navbar() {
     window.addEventListener('scroll', handleScroll);
     return () => {
       window.removeEventListener('scroll', handleScroll);
-      socket.disconnect();
+      if (socket) socket.disconnect();
     };
   }, []);
 
@@ -78,17 +102,19 @@ function Footer() {
 
 function App() {
   return (
-    <Router>
-      <ScrollToTop />
-      <Navbar />
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/life" element={<Life />} />
-        <Route path="/program" element={<Program />} />
-        <Route path="/admin" element={<Admin />} />
-      </Routes>
-      <Footer />
-    </Router>
+    <ErrorBoundary>
+      <Router>
+        <ScrollToTop />
+        <Navbar />
+        <Routes>
+          <Route path="/" element={<ErrorBoundary><Home /></ErrorBoundary>} />
+          <Route path="/life" element={<ErrorBoundary><Life /></ErrorBoundary>} />
+          <Route path="/program" element={<ErrorBoundary><Program /></ErrorBoundary>} />
+          <Route path="/admin" element={<ErrorBoundary><Admin /></ErrorBoundary>} />
+        </Routes>
+        <Footer />
+      </Router>
+    </ErrorBoundary>
   );
 }
 
