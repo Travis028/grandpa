@@ -48,6 +48,95 @@ function LoginForm({ onLogin }) {
   );
 }
 
+// ── Program Editor ───────────────────────────────────────────────────────────
+function ProgramEditor({ program, token, onSaved }) {
+  const [form, setForm] = useState({ ...program });
+  const [saving, setSaving] = useState(false);
+  const [msg, setMsg] = useState('');
+  const flash = (m) => { setMsg(m); setTimeout(() => setMsg(''), 3000); };
+  const setOrder = (i, field, val) => {
+    const order = form.order.map((o, idx) => idx === i ? { ...o, [field]: val } : o);
+    setForm({ ...form, order });
+  };
+  const addItem = () => setForm({ ...form, order: [...form.order, { time: '', item: '', leader: '' }] });
+  const removeItem = (i) => setForm({ ...form, order: form.order.filter((_, idx) => idx !== i) });
+  const save = async () => {
+    setSaving(true);
+    try { await api.put('/api/admin/program', form, { headers: authHeader(token) }); flash('Saved! Changes are live.'); onSaved(); }
+    catch { flash('Error saving.'); }
+    setSaving(false);
+  };
+  return (
+    <div>
+      <div style={S.card}>
+        <h4 style={{ marginBottom: '14px' }}>Event Details</h4>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginBottom: '12px' }}>
+          {[['event_name','Event Name'],['date','Date'],['venue','Venue'],['venue_address','Venue Address'],
+            ['time_start','Start Time'],['time_end','End Time'],['dress_code','Dress Code'],['burial_location','Burial Location']
+          ].map(([key, label]) => (
+            <div key={key}>
+              <label style={S.label}>{label}</label>
+              <input style={S.input} value={form[key] || ''} onChange={e => setForm({ ...form, [key]: e.target.value })} />
+            </div>
+          ))}
+        </div>
+        <button style={{ ...S.btn, ...S.btnBlack }} onClick={save} disabled={saving}>{saving ? 'Saving...' : 'Save Details'}</button>
+        {msg && <span style={{ marginLeft: '10px', color: '#276749', fontSize: '0.85rem' }}>{msg}</span>}
+      </div>
+      <div style={S.card}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
+          <h4>Order of Service ({form.order.length} items)</h4>
+          <button style={{ ...S.btn, ...S.btnGreen }} onClick={addItem}>+ Add Item</button>
+        </div>
+        {form.order.map((item, i) => (
+          <div key={i} style={{ display: 'grid', gridTemplateColumns: '110px 1fr 1fr 36px', gap: '8px', marginBottom: '8px', alignItems: 'center' }}>
+            <input style={S.input} placeholder="Time" value={item.time} onChange={e => setOrder(i, 'time', e.target.value)} />
+            <input style={S.input} placeholder="Item" value={item.item} onChange={e => setOrder(i, 'item', e.target.value)} />
+            <input style={S.input} placeholder="Leader" value={item.leader} onChange={e => setOrder(i, 'leader', e.target.value)} />
+            <button onClick={() => removeItem(i)} style={{ ...S.btn, ...S.btnRed, padding: '8px' }}>x</button>
+          </div>
+        ))}
+        <button style={{ ...S.btn, ...S.btnBlack, marginTop: '10px' }} onClick={save} disabled={saving}>{saving ? 'Saving...' : 'Save Order'}</button>
+      </div>
+    </div>
+  );
+}
+
+// ── Feedback Tab ──────────────────────────────────────────────────────────────
+function FeedbackTab({ feedback, token, onSaved }) {
+  const [msg, setMsg] = useState('');
+  const flash = (m) => { setMsg(m); setTimeout(() => setMsg(''), 3000); };
+  const del = async (idx) => {
+    if (!window.confirm('Delete this feedback?')) return;
+    try { await api.delete(`/api/admin/feedback/${idx}`, { headers: authHeader(token) }); flash('Deleted.'); onSaved(); }
+    catch { flash('Error.'); }
+  };
+  const stars = (r) => '★'.repeat(r || 5) + '☆'.repeat(5 - (r || 5));
+  const avg = feedback.length ? (feedback.reduce((a, f) => a + (f.rating || 5), 0) / feedback.length).toFixed(1) : '—';
+  return (
+    <div>
+      {msg && <p style={{ color: '#276749', marginBottom: '10px' }}>{msg}</p>}
+      <div style={{ ...S.card, display: 'flex', gap: '30px', flexWrap: 'wrap', marginBottom: '20px' }}>
+        <div style={{ textAlign: 'center' }}><p style={{ color: '#888', fontSize: '0.8rem' }}>Total</p><p style={{ fontSize: '2rem', fontWeight: 'bold' }}>{feedback.length}</p></div>
+        <div style={{ textAlign: 'center' }}><p style={{ color: '#888', fontSize: '0.8rem' }}>Avg Rating</p><p style={{ fontSize: '2rem', fontWeight: 'bold', color: '#d97706' }}>{avg} / 5</p></div>
+      </div>
+      {feedback.length === 0 && <p style={{ color: '#aaa' }}>No feedback yet.</p>}
+      {[...feedback].reverse().map((f, i) => (
+        <div key={i} style={S.card}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+            <div>
+              <p style={{ fontWeight: 600 }}>{f.name} <span style={{ color: '#d97706', marginLeft: '8px', letterSpacing: '2px' }}>{stars(f.rating)}</span></p>
+              <p style={{ fontStyle: 'italic', margin: '6px 0', fontSize: '0.9rem' }}>"{f.message}"</p>
+              <p style={{ fontSize: '0.78rem', color: '#aaa' }}>{f.date}</p>
+            </div>
+            <button style={{ ...S.btn, ...S.btnRed }} onClick={() => del(feedback.length - 1 - i)}>Delete</button>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 // ── Grandpa Editor ───────────────────────────────────────────────────────────
 function GrandpaEditor({ grandpa, token, onSaved }) {
   const [form, setForm] = useState({ ...grandpa });
@@ -455,13 +544,16 @@ export default function Admin() {
   if (!token) return <LoginForm onLogin={handleLogin} />;
   if (!data) return <div style={{ padding: '100px', textAlign: 'center' }}>Loading dashboard...</div>;
 
+  const pendingReqs = data.admin_requests.filter(r => r.status === 'pending').length;
   const TABS = [
     { key: 'overview', label: 'Overview' },
     { key: 'grandpa', label: 'Grandpa Info' },
-    { key: 'activity', label: `Activity` },
+    { key: 'program', label: 'Program' },
+    { key: 'activity', label: 'Activity' },
     { key: 'family', label: `Family (${data.family.length})` },
     { key: 'tributes', label: `Tributes (${data.tributes.length})` },
-    { key: 'requests', label: `Requests ${data.admin_requests.filter(r => r.status === 'pending').length > 0 ? `(${data.admin_requests.filter(r => r.status === 'pending').length})` : ''}` },
+    { key: 'feedback', label: `Feedback (${(data.feedback || []).length})` },
+    { key: 'requests', label: `Requests${pendingReqs > 0 ? ` (${pendingReqs})` : ''}` },
   ];
 
   return (
@@ -491,7 +583,9 @@ export default function Admin() {
 
       {tab === 'overview' && <OverviewTab data={data} />}
       {tab === 'grandpa' && <GrandpaEditor grandpa={data.grandpa} token={token} onSaved={() => fetch()} />}
+      {tab === 'program' && <ProgramEditor program={data.program} token={token} onSaved={() => fetch()} />}
       {tab === 'activity' && <ActivityTab data={data} />}
+      {tab === 'feedback' && <FeedbackTab feedback={data.feedback || []} token={token} onSaved={() => fetch()} />}
       {tab === 'family' && (
         <div>
           <p style={{ color: '#666', marginBottom: '16px', fontSize: '0.88rem' }}>Click any family member to expand and edit their details, portrait, gallery, and grandchildren photos.</p>
