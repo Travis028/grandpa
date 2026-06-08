@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import api, { API_BASE } from '../config';
+import api, { API_BASE, apiCache } from '../config';
 
 export default function Life() {
   const [grandpa, setGrandpa] = useState(null);
@@ -17,8 +17,8 @@ export default function Life() {
     let retries = 0;
     const fetchData = () => {
       Promise.all([
-        api.get('/api/grandpa'),
-        api.get('/api/life_photos')
+        apiCache.get('/api/grandpa'),
+        apiCache.get('/api/life_photos')
       ]).then(([resGrandpa, resPhotos]) => {
         setGrandpa(resGrandpa.data);
         setLifePhotos(resPhotos.data);

@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { io } from 'socket.io-client';
-import api, { API_BASE } from '../config';
+import api, { API_BASE, apiCache } from '../config';
 
 function Reveal({ children }) {
   return (
@@ -25,6 +25,7 @@ export default function Home() {
   const [loadError, setLoadError] = useState(false);
   const [dots, setDots] = useState('');
   const [viewingPhoto, setViewingPhoto] = useState(null);
+  const [viewingGallery, setViewingGallery] = useState(null);
 
   const [tributeForm, setTributeForm] = useState({ name: '', relation: '', message: '' });
   const [tributeMsg, setTributeMsg] = useState('');
@@ -39,10 +40,10 @@ export default function Home() {
     const MAX = 10;
     const fetchData = () => {
       Promise.all([
-        api.get('/api/grandpa'),
-        api.get('/api/family'),
-        api.get('/api/memories'),
-        api.get('/api/tributes')
+        apiCache.get('/api/grandpa'),
+        apiCache.get('/api/family'),
+        apiCache.get('/api/memories'),
+        apiCache.get('/api/tributes')
       ]).then(([resGrandpa, resFamily, resMemories, resTributes]) => {
         setGrandpa(resGrandpa.data);
         setFamilyData(resFamily.data);
@@ -256,23 +257,11 @@ export default function Home() {
                     )}
 
                     {child.gallery && child.gallery.length > 0 && (
-                      <>
-                        <span className="grandchildren-label" style={{marginTop:'12px',display:'block'}}>Gallery</span>
-                        <div style={{display:'flex',gap:'6px',flexWrap:'wrap',marginTop:'8px'}}>
-                          {child.gallery.map((item, gIdx) => {
-                            const photo = typeof item === 'string' ? item : item.path;
-                            const comment = typeof item === 'string' ? '' : (item.comment || '');
-                            return (
-                              <div key={gIdx} style={{ cursor: 'pointer', overflow: 'hidden', borderRadius: '4px' }} onClick={() => setViewingPhoto({ photo, comment })}>
-                                <motion.img whileHover={{ scale: 1.1 }} src={`${API_BASE}/api/static/images/children/${photo}`} alt="gallery"
-                                  loading="lazy"
-                                  style={{width:'64px',height:'64px',objectFit:'cover',display:'block'}}
-                                  onError={e => e.target.parentElement.style.display='none'} />
-                              </div>
-                            );
-                          })}
-                        </div>
-                      </>
+                      <div style={{marginTop:'16px'}}>
+                        <button className="btn-secondary" style={{padding:'8px 16px', fontSize:'0.9rem', cursor:'pointer', background:'#e5e7eb', border:'none', borderRadius:'20px', color:'#374151', fontWeight:500}} onClick={() => setViewingGallery({ name: child.name, photos: child.gallery })}>
+                          View {child.name}'s Gallery ({child.gallery.length} photos)
+                        </button>
+                      </div>
                     )}
                   </div>
                 </motion.div>
@@ -395,8 +384,31 @@ export default function Home() {
         </div>
       </section>
 
+      {viewingGallery && !viewingPhoto && (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.95)', zIndex: 9998, display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '40px 20px', overflowY: 'auto' }} onClick={() => setViewingGallery(null)}>
+          <button style={{ position: 'absolute', top: '20px', right: '30px', background: 'transparent', border: 'none', color: '#fff', fontSize: '3rem', cursor: 'pointer', lineHeight: 1 }} onClick={() => setViewingGallery(null)}>&times;</button>
+          <h2 style={{ color: '#fff', marginBottom: '30px', fontFamily: '"Playfair Display", serif' }}>{viewingGallery.name}'s Gallery</h2>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', justifyContent: 'center', maxWidth: '1000px' }}>
+            {viewingGallery.photos.map((item, gIdx) => {
+              const photo = typeof item === 'string' ? item : item.path;
+              const comment = typeof item === 'string' ? '' : (item.comment || '');
+              return (
+                <div key={gIdx} style={{ cursor: 'pointer', overflow: 'hidden', borderRadius: '8px', background: '#222' }} onClick={(e) => { e.stopPropagation(); setViewingPhoto({ photo, comment }); }}>
+                  <img src={`${API_BASE}/api/static/images/children/${photo}`} alt="gallery"
+                    loading="lazy"
+                    style={{width:'180px',height:'180px',objectFit:'cover',display:'block',opacity:0.9,transition:'0.3s'}}
+                    onMouseOver={e => e.target.style.opacity=1}
+                    onMouseOut={e => e.target.style.opacity=0.9}
+                    onError={e => e.target.parentElement.style.display='none'} />
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
       {viewingPhoto && (
-        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.9)', zIndex: 9999, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '20px' }} onClick={() => setViewingPhoto(null)}>
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.98)', zIndex: 9999, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '20px' }} onClick={() => setViewingPhoto(null)}>
           <button style={{ position: 'absolute', top: '20px', right: '30px', background: 'transparent', border: 'none', color: '#fff', fontSize: '3rem', cursor: 'pointer', lineHeight: 1 }} onClick={() => setViewingPhoto(null)}>&times;</button>
           <img src={`${API_BASE}/api/static/images/children/${viewingPhoto.photo}`} style={{ maxHeight: '75vh', maxWidth: '100%', objectFit: 'contain', borderRadius: '8px', boxShadow: '0 20px 40px rgba(0,0,0,0.5)' }} onClick={e => e.stopPropagation()} />
           {viewingPhoto.comment && <p style={{ color: '#fff', marginTop: '20px', fontSize: '1.2rem', maxWidth: '600px', textAlign: 'center', fontStyle: 'italic', letterSpacing: '0.5px' }}>"{viewingPhoto.comment}"</p>}

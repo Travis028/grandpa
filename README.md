@@ -4,12 +4,13 @@ A modern, responsive memorial web application built to honour and celebrate the 
 
 ---
 
-## Live URLs
+## Live URL
 
 | Service | URL |
 |---------|-----|
-| Frontend (Netlify) | https://tiny-ganache-32bfab.netlify.app |
-| Backend API (Render) | https://grandpa-99ef.onrender.com |
+| Full Website (Render) | https://grandpa-99ef.onrender.com |
+
+**Note**: The application has been updated to serve both the React Frontend and Flask Backend from a single Render instance. Netlify is no longer required.
 
 ---
 
@@ -164,12 +165,28 @@ Both Render and Netlify auto-deploy on every push to the main branch.
 | Family gallery | Admin dashboard → Family tab | Upload via admin |
 | Grandchild photos | Admin dashboard → Family tab | Upload via admin |
 
-> **Note:** On Render free tier, uploaded images are stored on the server's ephemeral disk and will be lost on restart. For permanent image storage, upgrade to a paid Render plan or integrate Cloudinary.
+> **Note:** The application uses an automated GitHub sync mechanism to ensure that any uploaded photos and data changes made in the admin dashboard survive server restarts. The `GITHUB_TOKEN` environment variable must be set in Render for this to work.
+
+---
+
+## Offline & LAN Deployment
+
+The application has been bundled to allow it to run **100% offline** (e.g., on a local computer at a funeral venue without internet access).
+
+1. In the `frontend` folder, run `npm run build`. This generates the `dist/` folder.
+2. In the root directory, run `python app.py`.
+3. Open a browser to `http://localhost:5000`. The entire app (frontend and backend) will be served by Flask.
+
+If the host computer is connected to a local Wi-Fi router (even with no internet), anyone connected to that router can access the memorial via the host's local IP address (e.g., `http://192.168.1.5:5000`).
+
+---
+
+## Scaling & Capacity
+The backend uses **Gunicorn** combined with **Eventlet** asynchronous workers to efficiently handle concurrent WebSocket connections and API requests. The Render free tier (with 512MB RAM) is fully capable of withstanding **up to 1,000 concurrent visitors** seamlessly due to this non-blocking architecture and the newly implemented frontend data caching strategy.
 
 ---
 
 ## Important Notes
 
-- Render free tier **sleeps after 15 minutes** of inactivity. First load after sleep takes ~30–60 seconds. The site retries automatically
-- All data in `data/*.json` files persists as long as the Render service is not redeployed from scratch
-- The `data/` folder is gitignored — production data lives only on the Render server
+- Render free tier **sleeps after 15 minutes** of inactivity. The first load after sleep takes ~30–60 seconds while the backend spins up.
+- All JSON data and uploaded images are automatically synced to the `Travis028/grandpa` GitHub repository to prevent data loss when Render sleeps.

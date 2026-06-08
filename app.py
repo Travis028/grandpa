@@ -613,6 +613,18 @@ def manage_grandchild(idx, gidx):
     socketio.emit('family_updated', {'idx': idx})
     return jsonify({'success': True})
 
+@app.route('/api/admin/family/<int:idx>/grandchild', methods=['POST'])
+@token_required
+def add_grandchild(idx):
+    family = load_family()
+    if not (0 <= idx < len(family)): return jsonify({'error': 'Not found'}), 404
+    gc = family[idx].get('grandchildren', [])
+    gc.append({'name': 'New Grandchild', 'photo': ''})
+    family[idx]['grandchildren'] = gc
+    save_family(family)
+    socketio.emit('family_updated', {'idx': idx})
+    return jsonify({'success': True})
+
 # ── ADMIN REQUESTS ────────────────────────────────────────────────────────────
 @app.route('/api/admin/requests/<int:idx>', methods=['PUT'])
 @token_required
@@ -625,5 +637,37 @@ def handle_admin_request(idx):
     return jsonify({'success': True})
 
 # ── ADMIN DATA (updated to include feedback & program) ────────────────────────
+@app.route('/api/admin/data')
+@token_required
+def get_admin_data():
+    return jsonify({
+        'grandpa': load_grandpa(),
+        'program': _load(PROGRAM_FILE, DEFAULT_PROGRAM),
+        'family': load_family(),
+        'tributes': _load(TRIBUTES_FILE),
+        'visitors': _load(VISITORS_FILE),
+        'unique_visitors': list({v['name'] for v in _load(VISITORS_FILE)}),
+        'activity': _load(ACTIVITY_FILE),
+        'shares': _load(SHARES_FILE),
+        'feedback': _load(FEEDBACK_FILE),
+        'admin_requests': _load(REQUESTS_FILE),
+        'live_visitors': sum(1 for v in live_visitors.values() if (datetime.now(timezone.utc) - v['time']) < timedelta(minutes=5)),
+        'live_visitor_details': [{'name': v['name'], 'page': v['page'], 'time': v['time'].strftime('%H:%M:%S')} for v in live_visitors.values() if (datetime.now(timezone.utc) - v['time']) < timedelta(minutes=5)]
+    })
+
+# ── STATIC FRONTEND SERVING ───────────────────────────────────────────────────
+from flask import send_from_directory
+
+@app.route('/', defaults={'path': ''})
+@app.route('/<path:path>')
+def serve(path):
+    if path.startswith('api/') or path.startswith('socket.io/'):
+        return jsonify({'error': 'Not found'}), 404
+    dist_dir = os.path.join(os.path.dirname(__file__), 'frontend', 'dist')
+    if path != "" and os.path.exists(os.path.join(dist_dir, path)):
+        return send_from_directory(dist_dir, path)
+    else:
+        return send_from_directory(dist_dir, 'index.html')
+
 if __name__ == '__main__':
     socketio.run(app, debug=True, host='0.0.0.0', port=5000, allow_unsafe_werkzeug=True)

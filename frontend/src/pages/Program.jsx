@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import api from '../config';
+import api, { apiCache } from '../config';
 
 export default function Program() {
   const [program, setProgram] = useState(null);
@@ -19,7 +19,7 @@ export default function Program() {
     if (saved) setForm(f => ({ ...f, name: saved }));
     let retries = 0;
     const load = () => {
-      api.get('/api/program')
+      apiCache.get('/api/program')
         .then(r => {
           setProgram(r.data);
           if (window.location.hash === '#feedback') {

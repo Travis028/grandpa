@@ -431,6 +431,11 @@ function FamilyEditor({ member, idx, token, onSaved }) {
     catch { flash('Error.'); }
   };
 
+  const addGrandchild = async () => {
+    try { await api.post(`/api/admin/family/${idx}/grandchild`, {}, { headers: authHeader(token) }); flash('Grandchild added!'); onSaved(); }
+    catch { flash('Error adding grandchild.'); }
+  };
+
   return (
     <div style={S.card}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer' }} onClick={() => setOpen(!open)}>
@@ -469,22 +474,24 @@ function FamilyEditor({ member, idx, token, onSaved }) {
           <GalleryManager idx={idx} gallery={member.gallery || []} token={token} onSaved={onSaved} />
 
           {/* Grandchildren */}
-          {member.grandchildren && member.grandchildren.length > 0 && (
-            <div style={{ marginTop: '16px', borderTop: '1px solid #eee', paddingTop: '14px' }}>
-              <h5 style={{ marginBottom: '10px', color: '#555' }}>Grandchildren Photos</h5>
-              {member.grandchildren.map((gc, gidx) => (
-                <div key={gidx} style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px', padding: '8px', background: '#f9f9f9', borderRadius: '6px', flexWrap: 'wrap' }}>
-                  <img src={`${API_BASE}/api/static/images/children/${gc.photo}`} alt={gc.name}
-                    style={{ width: '40px', height: '40px', objectFit: 'cover', borderRadius: '50%', border: '2px solid #ddd', flexShrink: 0 }}
-                    onError={e => e.target.style.display = 'none'} />
-                  <input style={{ ...S.input, flex: 1, minWidth: '120px' }} defaultValue={gc.name} onBlur={e => { if(e.target.value !== gc.name) updateGcName(gidx, e.target.value); }} />
-                  <input type="file" accept="image/*" style={{ fontSize: '0.78rem', width: '150px' }} onChange={e => setGcPhotos({ ...gcPhotos, [gidx]: e.target.files[0] })} />
-                  <button style={{ ...S.btn, ...S.btnBlack, fontSize: '0.78rem' }} onClick={() => uploadGcPhoto(gidx)}>Upload</button>
-                  <button style={{ ...S.btn, ...S.btnRed, fontSize: '0.78rem' }} onClick={() => deleteGc(gidx)}>x</button>
-                </div>
-              ))}
+          <div style={{ marginTop: '16px', borderTop: '1px solid #eee', paddingTop: '14px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+              <h5 style={{ color: '#555', margin: 0 }}>Grandchildren</h5>
+              <button style={{ ...S.btn, ...S.btnBlack, fontSize: '0.75rem', padding: '4px 10px' }} onClick={addGrandchild}>+ Add Grandchild</button>
             </div>
-          )}
+            {(member.grandchildren || []).map((gc, gidx) => (
+              <div key={gidx} style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px', padding: '8px', background: '#f9f9f9', borderRadius: '6px', flexWrap: 'wrap' }}>
+                <img src={`${API_BASE}/api/static/images/children/${gc.photo}`} alt={gc.name}
+                  style={{ width: '40px', height: '40px', objectFit: 'cover', borderRadius: '50%', border: '2px solid #ddd', flexShrink: 0 }}
+                  onError={e => e.target.style.display = 'none'} />
+                <input style={{ ...S.input, flex: 1, minWidth: '120px' }} defaultValue={gc.name} onBlur={e => { if(e.target.value !== gc.name) updateGcName(gidx, e.target.value); }} />
+                <input type="file" accept="image/*" style={{ fontSize: '0.78rem', width: '150px' }} onChange={e => setGcPhotos({ ...gcPhotos, [gidx]: e.target.files[0] })} />
+                <button style={{ ...S.btn, ...S.btnBlack, fontSize: '0.78rem' }} onClick={() => uploadGcPhoto(gidx)}>Upload</button>
+                <button style={{ ...S.btn, ...S.btnRed, fontSize: '0.78rem' }} onClick={() => deleteGc(gidx)}>x</button>
+              </div>
+            ))}
+            {(member.grandchildren || []).length === 0 && <p style={{ color: '#aaa', fontSize: '0.85rem' }}>No grandchildren listed.</p>}
+          </div>
         </div>
       )}
     </div>

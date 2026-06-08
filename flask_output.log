@@ -1875,3 +1875,72 @@ Traceback (most recent call last):
   File "C:\Users\wayne\AppData\Local\Programs\Python\Python312\Lib\site-packages\eventlet\convenience.py", line 78, in listen
     sock.bind(addr)
 OSError: [WinError 10048] Only one usage of each socket address (protocol/network address/port) is normally permitted
+ * Detected change in 'c:\\Users\\wayne\\OneDrive\\Desktop\\grandpa\\app.py', reloading
+Exception ignored in: <function _removeHandlerRef at 0x000001E1F4114F40>
+Traceback (most recent call last):
+  File "C:\Users\wayne\AppData\Local\Programs\Python\Python312\Lib\logging\__init__.py", line 884, in _removeHandlerRef
+  File "C:\Users\wayne\AppData\Local\Programs\Python\Python312\Lib\logging\__init__.py", line 241, in _acquireLock
+  File "C:\Users\wayne\AppData\Local\Programs\Python\Python312\Lib\threading.py", line 198, in acquire
+  File "C:\Users\wayne\AppData\Local\Programs\Python\Python312\Lib\site-packages\eventlet\green\thread.py", line 39, in get_ident
+RuntimeError: greenlet is being finalized
+ * Restarting with stat
+c:\Users\wayne\OneDrive\Desktop\grandpa\app.py:2: EventletDeprecationWarning: 
+Eventlet is deprecated. It is currently being maintained in bugfix mode, and
+we strongly recommend against using it for new projects.
+
+If you are already using Eventlet, we recommend migrating to a different
+framework.  For more detail see
+https://eventlet.readthedocs.io/en/latest/asyncio/migration.html
+
+  import eventlet
+ * Debugger is active!
+ * Debugger PIN: 982-939-560
+Exception in thread Thread-1 (run_server):
+Traceback (most recent call last):
+  File "C:\Users\wayne\AppData\Local\Programs\Python\Python312\Lib\threading.py", line 1075, in _bootstrap_inner
+    self.run()
+  File "C:\Users\wayne\AppData\Local\Programs\Python\Python312\Lib\threading.py", line 1012, in run
+    self._target(*self._args, **self._kwargs)
+  File "C:\Users\wayne\AppData\Local\Programs\Python\Python312\Lib\site-packages\flask_socketio\__init__.py", line 685, in run_server
+    eventlet_socket = eventlet.listen(addresses[0][4],
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\wayne\AppData\Local\Programs\Python\Python312\Lib\site-packages\eventlet\convenience.py", line 78, in listen
+    sock.bind(addr)
+OSError: [WinError 10048] Only one usage of each socket address (protocol/network address/port) is normally permitted
+ * Detected change in 'c:\\Users\\wayne\\OneDrive\\Desktop\\grandpa\\app.py', reloading
+Exception ignored in: <function _removeHandlerRef at 0x0000023BB8E74F40>
+Traceback (most recent call last):
+  File "C:\Users\wayne\AppData\Local\Programs\Python\Python312\Lib\logging\__init__.py", line 884, in _removeHandlerRef
+  File "C:\Users\wayne\AppData\Local\Programs\Python\Python312\Lib\logging\__init__.py", line 241, in _acquireLock
+  File "C:\Users\wayne\AppData\Local\Programs\Python\Python312\Lib\threading.py", line 198, in acquire
+  File "C:\Users\wayne\AppData\Local\Programs\Python\Python312\Lib\site-packages\eventlet\green\thread.py", line 39, in get_ident
+RuntimeError: greenlet is being finalized
+ * Restarting with stat
+c:\Users\wayne\OneDrive\Desktop\grandpa\app.py:2: EventletDeprecationWarning: 
+Eventlet is deprecated. It is currently being maintained in bugfix mode, and
+we strongly recommend against using it for new projects.
+
+If you are already using Eventlet, we recommend migrating to a different
+framework.  For more detail see
+https://eventlet.readthedocs.io/en/latest/asyncio/migration.html
+
+  import eventlet
+Traceback (most recent call last):
+  File "c:\Users\wayne\OneDrive\Desktop\grandpa\app.py", line 628, in <module>
+    @app.route('/api/admin/data')
+     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\wayne\AppData\Local\Programs\Python\Python312\Lib\site-packages\flask\sansio\scaffold.py", line 362, in decorator
+    self.add_url_rule(rule, endpoint, f, **options)
+  File "C:\Users\wayne\AppData\Local\Programs\Python\Python312\Lib\site-packages\flask\sansio\scaffold.py", line 47, in wrapper_func
+    return f(self, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\wayne\AppData\Local\Programs\Python\Python312\Lib\site-packages\flask\sansio\app.py", line 657, in add_url_rule
+    raise AssertionError(
+AssertionError: View function mapping is overwriting an existing endpoint function: get_admin_data
+Exception ignored in: <function _removeHandlerRef at 0x0000017D8D514F40>
+Traceback (most recent call last):
+  File "C:\Users\wayne\AppData\Local\Programs\Python\Python312\Lib\logging\__init__.py", line 884, in _removeHandlerRef
+  File "C:\Users\wayne\AppData\Local\Programs\Python\Python312\Lib\logging\__init__.py", line 241, in _acquireLock
+  File "C:\Users\wayne\AppData\Local\Programs\Python\Python312\Lib\threading.py", line 198, in acquire
+  File "C:\Users\wayne\AppData\Local\Programs\Python\Python312\Lib\site-packages\eventlet\green\thread.py", line 39, in get_ident
+RuntimeError: greenlet is being finalized
