@@ -413,6 +413,21 @@ def upload_family_photo(idx):
     socketio.emit('family_updated', {'idx': idx})
     return jsonify({'success': True, 'portrait': family[idx]['portrait']})
 
+@app.route('/api/admin/family/<int:idx>/photo', methods=['DELETE'])
+@token_required
+def delete_family_photo(idx):
+    family = load_family()
+    if not (0 <= idx < len(family)): return jsonify({'error': 'Not found'}), 404
+    path = family[idx].get('portrait')
+    if path:
+        full = os.path.join('static', 'images', 'children', path)
+        if os.path.exists(full):
+            os.remove(full)
+        family[idx]['portrait'] = ''
+        save_family(family)
+        socketio.emit('family_updated', {'idx': idx})
+    return jsonify({'success': True})
+
 @app.route('/api/admin/family/<int:idx>/gallery', methods=['POST'])
 @token_required
 def upload_gallery_photo(idx):
@@ -637,23 +652,6 @@ def handle_admin_request(idx):
     return jsonify({'success': True})
 
 # ── ADMIN DATA (updated to include feedback & program) ────────────────────────
-@app.route('/api/admin/data')
-@token_required
-def get_admin_data():
-    return jsonify({
-        'grandpa': load_grandpa(),
-        'program': _load(PROGRAM_FILE, DEFAULT_PROGRAM),
-        'family': load_family(),
-        'tributes': _load(TRIBUTES_FILE),
-        'visitors': _load(VISITORS_FILE),
-        'unique_visitors': list({v['name'] for v in _load(VISITORS_FILE)}),
-        'activity': _load(ACTIVITY_FILE),
-        'shares': _load(SHARES_FILE),
-        'feedback': _load(FEEDBACK_FILE),
-        'admin_requests': _load(REQUESTS_FILE),
-        'live_visitors': sum(1 for v in live_visitors.values() if (datetime.now(timezone.utc) - v['time']) < timedelta(minutes=5)),
-        'live_visitor_details': [{'name': v['name'], 'page': v['page'], 'time': v['time'].strftime('%H:%M:%S')} for v in live_visitors.values() if (datetime.now(timezone.utc) - v['time']) < timedelta(minutes=5)]
-    })
 
 # ── STATIC FRONTEND SERVING ───────────────────────────────────────────────────
 from flask import send_from_directory

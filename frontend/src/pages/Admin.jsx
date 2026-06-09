@@ -413,6 +413,12 @@ function FamilyEditor({ member, idx, token, onSaved }) {
     catch { flash('Upload failed.'); }
   };
 
+  const deletePortrait = async () => {
+    if (!window.confirm('Delete portrait photo?')) return;
+    try { await api.delete(`/api/admin/family/${idx}/photo`, { headers: authHeader(token) }); flash('Portrait deleted.'); onSaved(); }
+    catch { flash('Error deleting portrait.'); }
+  };
+
   const uploadGcPhoto = async (gidx) => {
     const file = gcPhotos[gidx]; if (!file) return;
     const fd = new FormData(); fd.append('photo', file);
@@ -465,7 +471,8 @@ function FamilyEditor({ member, idx, token, onSaved }) {
           </div>
           <div style={{ display: 'flex', gap: '8px', alignItems: 'flex-end', marginBottom: '12px', flexWrap: 'wrap' }}>
             <div style={{ flex: 1 }}><label style={S.label}>Portrait Photo</label><input type="file" accept="image/*" onChange={e => setPortraitFile(e.target.files[0])} style={{ fontSize: '0.82rem' }} /></div>
-            <button style={{ ...S.btn, ...S.btnBlack }} onClick={uploadPortrait}>Upload Portrait</button>
+            <button style={{ ...S.btn, ...S.btnBlack }} onClick={uploadPortrait}>Upload</button>
+            {member.portrait && <button style={{ ...S.btn, ...S.btnRed }} onClick={deletePortrait}>Delete</button>}
           </div>
           <button style={{ ...S.btn, ...S.btnBlack }} onClick={save} disabled={saving}>{saving ? 'Saving...' : 'Save Changes'}</button>
           {msg && <span style={{ marginLeft: '10px', color: '#276749', fontSize: '0.82rem' }}>{msg}</span>}
