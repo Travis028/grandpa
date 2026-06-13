@@ -4,8 +4,8 @@ __pycache__/
 .env
 .venv
 venv/
-dist/
-build/
+/dist/
+/build/
 .DS_Store
 flask_output.log
 *.log

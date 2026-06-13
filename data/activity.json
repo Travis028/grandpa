@@ -310,5 +310,23 @@
     "action": "navigated",
     "detail": "/",
     "time": "2026-06-14 01:11:24"
+  },
+  {
+    "name": "wayne",
+    "action": "navigated",
+    "detail": "/",
+    "time": "2026-06-14 01:22:47"
+  },
+  {
+    "name": "wayne",
+    "action": "navigated",
+    "detail": "/",
+    "time": "2026-06-14 01:22:51"
+  },
+  {
+    "name": "wayne",
+    "action": "navigated",
+    "detail": "/admin",
+    "time": "2026-06-14 01:23:10"
   }
 ]
