@@ -7,13 +7,10 @@ import Program from './pages/Program';
 import Admin from './pages/Admin';
 import api from './config';
 
-// Keep Render awake — ping every 14 min so it never sleeps
-const RENDER_URL = import.meta.env.VITE_API_URL || '';
-if (RENDER_URL) {
-  const ping = () => fetch(`${RENDER_URL}/`).catch(() => {});
-  ping();
-  setInterval(ping, 14 * 60 * 1000);
-}
+// Keep Render awake — ping every 14 min so it never sleeps while a user is connected
+const ping = () => fetch(`/api/grandpa`).catch(() => {});
+ping();
+setInterval(ping, 14 * 60 * 1000);
 
 // ── Error Boundary ─────────────────────────────────────────────────────────────
 class ErrorBoundary extends Component {
