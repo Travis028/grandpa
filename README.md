@@ -20,8 +20,7 @@ A modern, responsive memorial web application built to honour and celebrate the 
 |-------|-----------|
 | Frontend | React 19 + Vite |
 | Backend | Python 3.12 + Flask + Flask-SocketIO |
-| Hosting (Frontend) | Netlify |
-| Hosting (Backend) | Render (free tier) |
+| Hosting | Render (Web Service) |
 | Real-time | Socket.IO (WebSockets) |
 | Auth | PyJWT |
 
@@ -132,18 +131,16 @@ npm run dev
 
 ## Deployment
 
-### Backend — Render
-- **Build command:** `pip install -r requirements.txt`
-- **Start command:** `gunicorn --worker-class eventlet -w 1 app:app` (set in `Procfile`)
-- **Environment:** Python 3.12
-- No environment variables needed
+### Single Render Deployment (Frontend + Backend)
+The entire application (frontend and backend) is deployed as a single Web Service on Render.
 
-### Frontend — Netlify
-- **Base directory:** `frontend`
-- **Build command:** `npm install && npm run build`
-- **Publish directory:** `dist`
-- **Environment variable:** `VITE_API_URL=https://grandpa-99ef.onrender.com` (set in `frontend/.env.production` — committed to repo, no dashboard config needed)
-- SPA redirects handled by `netlify.toml` and `public/_redirects`
+- **Build Command:** `./build.sh` (or `cd frontend && npm install && npm run build && cd .. && pip install -r requirements.txt`)
+- **Start Command:** `gunicorn --worker-class eventlet -w 1 app:app`
+- **Environment:** Python 3.12
+- **Environment Variables:**
+  - `GITHUB_TOKEN`: Required for data persistence to survive Render sleeps.
+
+With this setup, Render will automatically build the React frontend and then start the Python server to host both the API and the static files.
 
 ### To deploy updates
 ```bash
@@ -169,13 +166,15 @@ Both Render and Netlify auto-deploy on every push to the main branch.
 
 ---
 
-## Offline & LAN Deployment
+## Offline capabilities & PWA
 
-The application has been bundled to allow it to run **100% offline** (e.g., on a local computer at a funeral venue without internet access).
+The application is configured as a Progressive Web App (PWA). Once visitors load the page for the first time while connected to the internet, all assets and data are cached by a Service Worker. They can completely disconnect from the internet and the site will still load perfectly.
 
-1. In the `frontend` folder, run `npm run build`. This generates the `dist/` folder.
-2. In the root directory, run `python app.py`.
-3. Open a browser to `http://localhost:5000`. The entire app (frontend and backend) will be served by Flask.
+To deploy fully offline on a local LAN (e.g., on a local computer at a funeral venue):
+
+1. Run `./build.sh` (which builds the frontend and installs backend dependencies).
+2. Run `python app.py`.
+3. Open a browser to `http://localhost:5000`. 
 
 If the host computer is connected to a local Wi-Fi router (even with no internet), anyone connected to that router can access the memorial via the host's local IP address (e.g., `http://192.168.1.5:5000`).
 

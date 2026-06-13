@@ -442,6 +442,12 @@ function FamilyEditor({ member, idx, token, onSaved }) {
     catch { flash('Error adding grandchild.'); }
   };
 
+  const deleteFamilyMember = async () => {
+    if (!window.confirm('Delete this family member entirely? This cannot be undone.')) return;
+    try { await api.delete(`/api/admin/family/${idx}`, { headers: authHeader(token) }); onSaved(); }
+    catch { flash('Error deleting member.'); }
+  };
+
   return (
     <div style={S.card}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer' }} onClick={() => setOpen(!open)}>
@@ -474,8 +480,11 @@ function FamilyEditor({ member, idx, token, onSaved }) {
             <button style={{ ...S.btn, ...S.btnBlack }} onClick={uploadPortrait}>Upload</button>
             {member.portrait && <button style={{ ...S.btn, ...S.btnRed }} onClick={deletePortrait}>Delete</button>}
           </div>
-          <button style={{ ...S.btn, ...S.btnBlack }} onClick={save} disabled={saving}>{saving ? 'Saving...' : 'Save Changes'}</button>
-          {msg && <span style={{ marginLeft: '10px', color: '#276749', fontSize: '0.82rem' }}>{msg}</span>}
+          <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+            <button style={{ ...S.btn, ...S.btnBlack }} onClick={save} disabled={saving}>{saving ? 'Saving...' : 'Save Changes'}</button>
+            <button style={{ ...S.btn, ...S.btnRed }} onClick={deleteFamilyMember}>Delete Member</button>
+            {msg && <span style={{ marginLeft: '10px', color: '#276749', fontSize: '0.82rem' }}>{msg}</span>}
+          </div>
 
           {/* Gallery */}
           <GalleryManager idx={idx} gallery={member.gallery || []} token={token} onSaved={onSaved} />
@@ -681,7 +690,13 @@ export default function Admin() {
       {tab === 'feedback' && <FeedbackTab feedback={data.feedback || []} token={token} onSaved={() => fetch()} />}
       {tab === 'family' && (
         <div>
-          <p style={{ color: '#666', marginBottom: '16px', fontSize: '0.88rem' }}>Click any family member to expand and edit their details, portrait, gallery, and grandchildren photos.</p>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+            <p style={{ color: '#666', fontSize: '0.88rem', margin: 0 }}>Click any family member to expand and edit their details, portrait, gallery, and grandchildren photos.</p>
+            <button style={{ ...S.btn, ...S.btnBlack }} onClick={async () => {
+              try { await api.post('/api/admin/family', {}, { headers: authHeader(token) }); fetch(); }
+              catch { alert('Error adding member'); }
+            }}>+ Add Member</button>
+          </div>
           {data.family.map((m, idx) => <FamilyEditor key={idx} member={m} idx={idx} token={token} onSaved={() => fetch()} />)}
         </div>
       )}

@@ -227,9 +227,9 @@ def get_life_photos():
     return [f for f in os.listdir(d) if f.lower().endswith(('.jpg', '.jpeg', '.png'))]
 
 # ── PUBLIC API ────────────────────────────────────────────────────────────────
-@app.route('/')
-def index():
-    return jsonify({"status": "Memorial API is running!"})
+#@app.route('/')
+#def index():
+    #return jsonify({"status": "Memorial API is running!"})
 
 @app.route('/api/grandpa')
 def get_grandpa():
@@ -381,6 +381,36 @@ def get_admin_data():
     })
 
 # ── ADMIN EDIT FAMILY ─────────────────────────────────────────────────────────
+@app.route('/api/admin/family', methods=['POST'])
+@token_required
+def add_family_member():
+    family = load_family()
+    body = request.json or {}
+    new_member = {
+        "name": body.get("name", "New Family Member"),
+        "spouse": body.get("spouse", ""),
+        "note": body.get("note", ""),
+        "portrait": "",
+        "tribute": "",
+        "gallery": [],
+        "grandchildren": []
+    }
+    family.append(new_member)
+    save_family(family)
+    socketio.emit('family_updated', {'idx': len(family) - 1})
+    return jsonify({'success': True, 'member': new_member})
+
+@app.route('/api/admin/family/<int:idx>', methods=['DELETE'])
+@token_required
+def delete_family_member(idx):
+    family = load_family()
+    if not (0 <= idx < len(family)):
+        return jsonify({'error': 'Not found'}), 404
+    family.pop(idx)
+    save_family(family)
+    socketio.emit('family_updated', {'idx': -1})
+    return jsonify({'success': True})
+
 @app.route('/api/admin/family/<int:idx>', methods=['PUT'])
 @token_required
 def update_family_member(idx):
@@ -659,13 +689,19 @@ from flask import send_from_directory
 @app.route('/', defaults={'path': ''})
 @app.route('/<path:path>')
 def serve(path):
+    # Skip API and WebSocket routes
     if path.startswith('api/') or path.startswith('socket.io/'):
         return jsonify({'error': 'Not found'}), 404
+    
     dist_dir = os.path.join(os.path.dirname(__file__), 'frontend', 'dist')
-    if path != "" and os.path.exists(os.path.join(dist_dir, path)):
+    file_path = os.path.join(dist_dir, path)
+    
+    # If the file exists, serve it with correct MIME type
+    if path != "" and os.path.exists(file_path) and os.path.isfile(file_path):
         return send_from_directory(dist_dir, path)
-    else:
-        return send_from_directory(dist_dir, 'index.html')
+    
+    # For all other paths (including React routes), serve index.html
+    return send_from_directory(dist_dir, 'index.html')
 
 if __name__ == '__main__':
     socketio.run(app, debug=True, host='0.0.0.0', port=5000, allow_unsafe_werkzeug=True)
