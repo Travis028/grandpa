@@ -280,5 +280,35 @@
     "action": "navigated",
     "detail": "/admin",
     "time": "2026-06-14 00:32:10"
+  },
+  {
+    "name": "wayne",
+    "action": "navigated",
+    "detail": "/admin",
+    "time": "2026-06-14 01:04:34"
+  },
+  {
+    "name": "wayne",
+    "action": "navigated",
+    "detail": "/program",
+    "time": "2026-06-14 01:04:48"
+  },
+  {
+    "name": "wayne",
+    "action": "navigated",
+    "detail": "/",
+    "time": "2026-06-14 01:04:53"
+  },
+  {
+    "name": "wayne",
+    "action": "navigated",
+    "detail": "/admin",
+    "time": "2026-06-14 01:07:54"
+  },
+  {
+    "name": "wayne",
+    "action": "navigated",
+    "detail": "/",
+    "time": "2026-06-14 01:11:24"
   }
 ]

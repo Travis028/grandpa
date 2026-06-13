@@ -2,21 +2,44 @@
    VARIABLES & FONTS
    ============================================ */
    :root {
-    /* Colors - Obsidian & Champagne Gold Theme */
-    --primary: #121212;
-    --secondary: #1F1F1F;
-    --charcoal: #000000;
-    --text-dark: #E4E4E7;
-    --text-light: #FAFAFA;
-    --text-muted: #A1A1AA;
+    /* Colors - Royal Navy & Gold Theme (Light Mode) */
+    --primary: #0A192F;
+    --secondary: #F0F4F8;
+    --charcoal: #112240;
+    --text-dark: #0F172A;
+    --text-light: #E2E8F0;
+    --text-muted: #64748B;
     --gold: #D4AF37;
-    --gold2: #C5A028;
-    --bg-light: #09090B;
-    --bg-warm: #000000;
-    --white: #18181B;
-    --border: #27272A;
+    --gold2: #B08D57;
+    --bg-light: #FFFFFF;
+    --bg-warm: #F8FAFC;
+    --white: #FFFFFF;
+    --border: #E2E8F0;
     
     /* Typography */
+    --font-serif: 'Cormorant Garamond', serif;
+    --font-sans: 'Inter', sans-serif;
+    
+    /* Transitions */
+    --transition-fast: 0.2s ease;
+    --transition-normal: 0.4s ease;
+    --transition-slow: 0.8s ease;
+}
+
+[data-theme="dark"] {
+    /* Colors - Royal Navy & Gold Theme (Dark Mode) */
+    --primary: #07101E;
+    --secondary: #112240;
+    --charcoal: #0B1120;
+    --text-dark: #F8FAFC;
+    --text-light: #F8FAFC;
+    --text-muted: #94A3B8;
+    --gold: #FCD34D;
+    --gold2: #F59E0B;
+    --bg-light: #1E293B;
+    --bg-warm: #0F172A;
+    --white: #1E293B;
+    --border: #334155;
     --font-serif: 'Cormorant Garamond', serif;
     --font-sans: 'Inter', sans-serif;
     

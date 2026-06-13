@@ -125,6 +125,14 @@ function PageTracker({ socketRef }) {
 function Navbar({ visitors }) {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [theme, setTheme] = useState(localStorage.getItem('theme') || 'light');
+
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem('theme', theme);
+  }, [theme]);
+
+  const toggleTheme = () => setTheme(t => t === 'light' ? 'dark' : 'light');
 
   useEffect(() => {
     const h = () => setScrolled(window.scrollY > 50);
@@ -137,6 +145,9 @@ function Navbar({ visitors }) {
       <div className="nav-container">
         <Link to="/" className="nav-logo">APOLLO J. FIZVALENTINE OWINO.</Link>
         <div className="nav-right" style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+          <button onClick={toggleTheme} title="Toggle Theme" style={{ background: 'transparent', border: 'none', cursor: 'pointer', fontSize: '1.2rem', color: 'var(--gold)', padding: '0', display: 'flex' }}>
+            {theme === 'light' ? '🌙' : '☀️'}
+          </button>
           <div className="live-visitors">
             <span className="live-dot"></span>
             {visitors} Live
