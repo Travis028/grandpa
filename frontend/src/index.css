@@ -2,19 +2,19 @@
    VARIABLES & FONTS
    ============================================ */
    :root {
-    /* Colors - Midnight Blue & Antique Gold Theme */
-    --primary: #1A2530;
-    --secondary: #F0F4F8;
-    --charcoal: #0F172A;
-    --text-dark: #1E293B;
-    --text-light: #F8FAFC;
-    --text-muted: #64748B;
+    /* Colors - Obsidian & Champagne Gold Theme */
+    --primary: #121212;
+    --secondary: #1F1F1F;
+    --charcoal: #000000;
+    --text-dark: #E4E4E7;
+    --text-light: #FAFAFA;
+    --text-muted: #A1A1AA;
     --gold: #D4AF37;
-    --gold2: #B08D57;
-    --bg-light: #FFFFFF;
-    --bg-warm: #F8F9FA;
-    --white: #FFFFFF;
-    --border: #E2E8F0;
+    --gold2: #C5A028;
+    --bg-light: #09090B;
+    --bg-warm: #000000;
+    --white: #18181B;
+    --border: #27272A;
     
     /* Typography */
     --font-serif: 'Cormorant Garamond', serif;

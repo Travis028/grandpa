@@ -44,12 +44,7 @@ def sync_to_github(filepath, commit_msg):
 def sync_file_bg(filepath):
     threading.Thread(target=sync_to_github, args=(filepath, f"Auto-sync {filepath}")).start()
 
-ALLOWED_ORIGINS = [
-    "https://flourishing-platypus-5c2766.netlify.app",
-    "https://tiny-ganache-32bfab.netlify.app",
-    "http://localhost:5173",
-    "http://localhost:5174",
-]
+ALLOWED_ORIGINS = "*"
 
 app = Flask(__name__, static_folder='static')
 CORS(app, origins=ALLOWED_ORIGINS)

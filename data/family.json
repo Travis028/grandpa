@@ -34,7 +34,7 @@
     ]
   },
   {
-    "name": "Joyce Odhiambo",
+    "name": "Joyce owino",
     "spouse": "",
     "note": "",
     "portrait": "joy_odhiambo/portrait.jpg",
@@ -43,15 +43,15 @@
     "grandchildren": []
   },
   {
-    "name": "Jeff Apollo",
-    "spouse": "Roseline Jeff",
+    "name": "Jeph Apollo",
+    "spouse": "Roseline Jeph",
     "note": "",
     "portrait": "jeff_apollo/portrait.jpg",
     "tribute": "[FILL IN: Jeff's tribute to Dad]",
     "gallery": [],
     "grandchildren": [
       {
-        "name": "Dean Revs Ochieng",
+        "name": "Dean Reeves Ochieng",
         "photo": "jeff_apollo/grandchildren/dean.jpg"
       },
       {
@@ -59,7 +59,7 @@
         "photo": "jeff_apollo/grandchildren/jimmy.jpg"
       },
       {
-        "name": "Mark Johoo",
+        "name": "Marc joe",
         "photo": "jeff_apollo/grandchildren/mark.jpg"
       },
       {
@@ -69,7 +69,7 @@
     ]
   },
   {
-    "name": "Cherls Were",
+    "name": "Cherles Were",
     "spouse": "Lilian Were",
     "note": "",
     "portrait": "cherls_were/portrait.jpg",
@@ -165,25 +165,38 @@
     "gallery": [],
     "grandchildren": [
       {
-        "name": "Richard Leakey",
+        "name": "Richard Leakey Otieno",
         "photo": "joan_apollo/grandchildren/richard.jpg"
       },
       {
-        "name": "Macreen",
+        "name": "Cynthia Otieno (Siste)",
         "photo": "joan_apollo/grandchildren/macreen.jpg"
       },
       {
-        "name": "Bonney",
+        "name": "Ferdinand Bruno",
         "photo": "joan_apollo/grandchildren/bonney.jpg"
       },
       {
-        "name": "Siste",
+        "name": " Macreen Awuor",
         "photo": "joan_apollo/grandchildren/siste.jpg"
       },
       {
-        "name": "Boss",
+        "name": "Frankline Owino(Owis)",
         "photo": "joan_apollo/grandchildren/boss.jpg"
+      },
+      {
+        "name": " Bonny Protus",
+        "photo": ""
       }
     ]
+  },
+  {
+    "name": "Nabi owino",
+    "spouse": "",
+    "note": "",
+    "portrait": "",
+    "tribute": "Dad ",
+    "gallery": [],
+    "grandchildren": []
   }
 ]
