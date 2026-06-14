@@ -367,6 +367,8 @@ function DropzoneArea({ onDrop, accept = 'image/*', uploading = false }) {
 // ── Gallery Manager ───────────────────────────────────────────────────────────
 function GalleryManager({ idx, gallery, token, onSaved }) {
   const [uploading, setUploading] = useState(false);
+  const [msg, setMsg] = useState('');
+  const flash = (m) => { setMsg(m); setTimeout(() => setMsg(''), 3000); };
 
   const onDrop = async (acceptedFiles) => {
     const file = acceptedFiles[0];
