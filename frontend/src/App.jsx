@@ -5,6 +5,7 @@ import Home from './pages/Home';
 import Life from './pages/Life';
 import Program from './pages/Program';
 import Admin from './pages/Admin';
+import FamilyDetail from './pages/FamilyDetail';
 import api from './config';
 
 // Keep Render awake — ping every 14 min so it never sleeps while a user is connected
@@ -241,6 +242,7 @@ function App() {
           <Route path="/" element={<ErrorBoundary><Home /></ErrorBoundary>} />
           <Route path="/life" element={<ErrorBoundary><Life /></ErrorBoundary>} />
           <Route path="/program" element={<ErrorBoundary><Program /></ErrorBoundary>} />
+          <Route path="/family/:id" element={<ErrorBoundary><FamilyDetail /></ErrorBoundary>} />
           <Route path="/admin" element={<ErrorBoundary><Admin /></ErrorBoundary>} />
         </Routes>
         <Footer />

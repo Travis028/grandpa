@@ -11,7 +11,10 @@ from functools import wraps
 import os, json, threading
 from datetime import datetime, timezone, timedelta
 import urllib.request, urllib.error, base64
-
+import sqlite3
+from PIL import Image, ImageOps
+import imagehash
+import io
 GITHUB_TOKEN = os.environ.get('GITHUB_TOKEN', '')
 GITHUB_REPO = 'Travis028/grandpa'
 GITHUB_BRANCH = 'main'
@@ -66,7 +69,6 @@ SHARES_FILE      = os.path.join(DATA_DIR, 'shares.json')
 REQUESTS_FILE    = os.path.join(DATA_DIR, 'admin_requests.json')
 os.makedirs(DATA_DIR, exist_ok=True)
 
-# ── DEFAULT DATA (only used if JSON file does not exist yet) ──────────────────
 DEFAULT_GRANDPA = {
     "name": "APOLLO J. FIZVALENTINE OWINO.",
     "birth_year": "1940", "death_year": "2026",
@@ -77,6 +79,37 @@ DEFAULT_GRANDPA = {
     "firstborn_name": "Bon Apollo",
     "firstborn_note": "Firstborn of APOLLO J. FIZVALENTINE OWINO. Preceded his father in death. Forever remembered. Forever loved."
 }
+
+DB_FILE = os.path.join(DATA_DIR, 'database.db')
+
+def get_db():
+    conn = sqlite3.connect(DB_FILE)
+    conn.row_factory = sqlite3.Row
+    return conn
+
+def init_db():
+    conn = get_db()
+    c = conn.cursor()
+    c.execute('''CREATE TABLE IF NOT EXISTS family_members (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT,
+        spouse TEXT,
+        note TEXT,
+        tribute TEXT
+    )''')
+    c.execute('''CREATE TABLE IF NOT EXISTS photos (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        member_id INTEGER,
+        type TEXT,
+        path TEXT,
+        comment TEXT,
+        phash TEXT,
+        FOREIGN KEY(member_id) REFERENCES family_members(id)
+    )''')
+    conn.commit()
+    conn.close()
+
+init_db()
 
 DEFAULT_FAMILY = [
     {"name":"Evans Odhiambo","spouse":"Mama Young","note":"","portrait":"evans_odhiambo/portrait.jpg","tribute":"[FILL IN: Evans' tribute to Grandpa]","gallery":[],"grandchildren":[
@@ -169,21 +202,99 @@ def load_grandpa():
 def save_grandpa(data):
     _save(GRANDPA_FILE, data)
 
+def migrate_json_to_db():
+    conn = get_db()
+    c = conn.cursor()
+    c.execute('SELECT COUNT(*) as count FROM family_members')
+    if c.fetchone()['count'] == 0:
+        fam_json = _load(FAMILY_FILE, DEFAULT_FAMILY)
+        for member in fam_json:
+            c.execute('''INSERT INTO family_members (name, spouse, note, tribute)
+                         VALUES (?, ?, ?, ?)''', (member.get('name', ''), member.get('spouse', ''), member.get('note', ''), member.get('tribute', '')))
+            member_id = c.lastrowid
+            
+            if member.get('portrait'):
+                c.execute('''INSERT INTO photos (member_id, type, path, comment, phash)
+                             VALUES (?, ?, ?, ?, ?)''', (member_id, 'portrait', member['portrait'], '', ''))
+            
+            for g in member.get('gallery', []):
+                path = g if isinstance(g, str) else g.get('path', '')
+                comment = '' if isinstance(g, str) else g.get('comment', '')
+                if path:
+                    c.execute('''INSERT INTO photos (member_id, type, path, comment, phash)
+                                 VALUES (?, ?, ?, ?, ?)''', (member_id, 'gallery', path, comment, ''))
+            
+            for gc in member.get('grandchildren', []):
+                if gc.get('photo'):
+                    c.execute('''INSERT INTO photos (member_id, type, path, comment, phash)
+                                 VALUES (?, ?, ?, ?, ?)''', (member_id, 'grandchild', gc['photo'], gc.get('name', ''), ''))
+        conn.commit()
+    conn.close()
+
+migrate_json_to_db()
+
 def load_family():
-    fam = _load(FAMILY_FILE, DEFAULT_FAMILY)
-    for f in fam:
-        if 'gallery' in f:
-            new_gal = []
-            for item in f['gallery']:
-                if isinstance(item, str):
-                    new_gal.append({'path': item, 'comment': ''})
-                else:
-                    new_gal.append(item)
-            f['gallery'] = new_gal
-    return fam
+    conn = get_db()
+    c = conn.cursor()
+    c.execute('SELECT * FROM family_members ORDER BY id ASC')
+    members = c.fetchall()
+    
+    result = []
+    for m in members:
+        member_id = m['id']
+        member_dict = dict(m)
+        member_dict['gallery'] = []
+        member_dict['grandchildren'] = []
+        member_dict['portrait'] = ''
+        
+        c.execute('SELECT * FROM photos WHERE member_id = ? ORDER BY id ASC', (member_id,))
+        photos = c.fetchall()
+        for p in photos:
+            if p['type'] == 'portrait':
+                member_dict['portrait'] = p['path']
+            elif p['type'] == 'gallery':
+                member_dict['gallery'].append({'path': p['path'], 'comment': p['comment']})
+            elif p['type'] == 'grandchild':
+                member_dict['grandchildren'].append({'name': p['comment'], 'photo': p['path']})
+        
+        result.append(member_dict)
+    conn.close()
+    return result
 
 def save_family(data):
-    _save(FAMILY_FILE, data)
+    # Backward compatibility for API routes that still mutate the entire JSON structure and save it.
+    conn = get_db()
+    c = conn.cursor()
+    
+    # We clear and re-insert to keep it simple, but we maintain the logic.
+    # Note: A better approach is to use precise UPDATE statements via API routes, 
+    # but for full compatibility with existing routes modifying the list in memory:
+    c.execute('DELETE FROM photos')
+    c.execute('DELETE FROM family_members')
+    
+    for member in data:
+        c.execute('''INSERT INTO family_members (name, spouse, note, tribute)
+                     VALUES (?, ?, ?, ?)''', (member.get('name', ''), member.get('spouse', ''), member.get('note', ''), member.get('tribute', '')))
+        member_id = c.lastrowid
+        
+        if member.get('portrait'):
+            c.execute('''INSERT INTO photos (member_id, type, path, comment, phash)
+                         VALUES (?, ?, ?, ?, ?)''', (member_id, 'portrait', member['portrait'], '', ''))
+        
+        for g in member.get('gallery', []):
+            path = g if isinstance(g, str) else g.get('path', '')
+            comment = '' if isinstance(g, str) else g.get('comment', '')
+            if path:
+                c.execute('''INSERT INTO photos (member_id, type, path, comment, phash)
+                             VALUES (?, ?, ?, ?, ?)''', (member_id, 'gallery', path, comment, ''))
+        
+        for gc in member.get('grandchildren', []):
+            if gc.get('photo'):
+                c.execute('''INSERT INTO photos (member_id, type, path, comment, phash)
+                             VALUES (?, ?, ?, ?, ?)''', (member_id, 'grandchild', gc['photo'], gc.get('name', ''), ''))
+    conn.commit()
+    conn.close()
+    _save(FAMILY_FILE, data) # Also keep the JSON file updated for GitHub sync logic
 
 def load_program():
     return _load(os.path.join(DATA_DIR, 'program.json'), DEFAULT_PROGRAM)
@@ -219,7 +330,39 @@ def get_life_photos():
     d = os.path.join('static', 'images', 'life_photos')
     if not os.path.exists(d):
         return []
-    return [f for f in os.listdir(d) if f.lower().endswith(('.jpg', '.jpeg', '.png'))]
+    return [f for f in os.listdir(d) if f.lower().endswith(('.jpg', '.jpeg', '.png', '.webp'))]
+
+def process_and_save_image(file, save_dir, filename_prefix, img_type='portrait'):
+    try:
+        img = Image.open(file)
+        if img.mode in ('RGBA', 'P'):
+            img = img.convert('RGB')
+            
+        phash_val = str(imagehash.phash(img))
+        
+        conn = get_db()
+        c = conn.cursor()
+        c.execute('SELECT path FROM photos WHERE phash = ? AND phash != ""', (phash_val,))
+        dup = c.fetchone()
+        conn.close()
+        
+        if dup:
+            return {"error": "Duplicate photo detected."}
+
+        if img_type == 'portrait' or img_type == 'grandchild':
+            size = min(img.size)
+            img = ImageOps.fit(img, (size, size), Image.Resampling.LANCZOS)
+        elif img_type == 'gallery':
+            # Optionally crop to 16:9 if it is very tall, else keep original
+            pass
+            
+        filename = f"{filename_prefix}.webp"
+        save_path = os.path.join(save_dir, filename)
+        img.save(save_path, 'WEBP', quality=85)
+        
+        return {"success": True, "filename": filename, "phash": phash_val}
+    except Exception as e:
+        return {"error": str(e)}
 
 # ── PUBLIC API ────────────────────────────────────────────────────────────────
 #@app.route('/')
@@ -431,10 +574,25 @@ def upload_family_photo(idx):
     folder = family[idx]['name'].lower().replace(' ', '_')
     d = os.path.join('static', 'images', 'children', folder)
     os.makedirs(d, exist_ok=True)
-    request.files['photo'].save(os.path.join(d, 'portrait.jpg'))
-    family[idx]['portrait'] = f"{folder}/portrait.jpg"
+    
+    file = request.files['photo']
+    res = process_and_save_image(file, d, 'portrait', img_type='portrait')
+    
+    if "error" in res:
+        return jsonify({'error': res["error"]}), 400
+        
+    path = f"{folder}/{res['filename']}"
+    family[idx]['portrait'] = path
     save_family(family)
-    sync_file_bg(os.path.join(d, 'portrait.jpg'))
+    
+    # Update DB directly with phash for portrait
+    conn = get_db()
+    c = conn.cursor()
+    c.execute("UPDATE photos SET phash = ? WHERE type = 'portrait' AND path = ?", (res['phash'], path))
+    conn.commit()
+    conn.close()
+    
+    sync_file_bg(os.path.join(d, res['filename']))
     socketio.emit('family_updated', {'idx': idx})
     return jsonify({'success': True, 'portrait': family[idx]['portrait']})
 
@@ -466,13 +624,24 @@ def upload_gallery_photo(idx):
     d = os.path.join('static', 'images', 'children', folder, 'gallery')
     os.makedirs(d, exist_ok=True)
     ts = datetime.now().strftime('%Y%m%d%H%M%S')
-    safe_name = file.filename.replace(' ', '_')
-    filename = f"{ts}_{safe_name}"
-    file.save(os.path.join(d, filename))
-    path = f"{folder}/gallery/{filename}"
+    safe_name = file.filename.replace(' ', '_').rsplit('.', 1)[0]
+    filename_prefix = f"{ts}_{safe_name}"
+    
+    res = process_and_save_image(file, d, filename_prefix, img_type='gallery')
+    if "error" in res:
+        return jsonify({'error': res["error"]}), 400
+        
+    path = f"{folder}/gallery/{res['filename']}"
     family[idx].setdefault('gallery', []).append({'path': path, 'comment': ''})
     save_family(family)
-    sync_file_bg(os.path.join(d, filename))
+    
+    conn = get_db()
+    c = conn.cursor()
+    c.execute("UPDATE photos SET phash = ? WHERE type = 'gallery' AND path = ?", (res['phash'], path))
+    conn.commit()
+    conn.close()
+    
+    sync_file_bg(os.path.join(d, res['filename']))
     socketio.emit('family_updated', {'idx': idx})
     return jsonify({'success': True, 'path': path})
 
@@ -519,10 +688,23 @@ def upload_grandchild_photo(idx, gidx):
     gc_slug = gc[gidx]['name'].lower().replace(' ', '_').replace('(', '').replace(')', '')
     d = os.path.join('static', 'images', 'children', folder, 'grandchildren')
     os.makedirs(d, exist_ok=True)
-    request.files['photo'].save(os.path.join(d, f"{gc_slug}.jpg"))
-    family[idx]['grandchildren'][gidx]['photo'] = f"{folder}/grandchildren/{gc_slug}.jpg"
+    
+    file = request.files['photo']
+    res = process_and_save_image(file, d, gc_slug, img_type='grandchild')
+    if "error" in res:
+        return jsonify({'error': res["error"]}), 400
+        
+    path = f"{folder}/grandchildren/{res['filename']}"
+    family[idx]['grandchildren'][gidx]['photo'] = path
     save_family(family)
-    sync_file_bg(os.path.join(d, f"{gc_slug}.jpg"))
+    
+    conn = get_db()
+    c = conn.cursor()
+    c.execute("UPDATE photos SET phash = ? WHERE type = 'grandchild' AND path = ?", (res['phash'], path))
+    conn.commit()
+    conn.close()
+    
+    sync_file_bg(os.path.join(d, res['filename']))
     socketio.emit('family_updated', {'idx': idx})
     return jsonify({'success': True})
 

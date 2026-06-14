@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { io } from 'socket.io-client';
 import api, { API_BASE } from '../config';
 import { motion } from 'framer-motion';
+import { useDropzone } from 'react-dropzone';
 
 const S = {
   btn: { padding: '8px 16px', cursor: 'pointer', border: 'none', borderRadius: '4px', fontSize: '0.85rem' },
@@ -331,19 +332,55 @@ function ActivityTab({ data }) {
   );
 }
 
+// ── Dropzone Uploader ─────────────────────────────────────────────────────────
+function DropzoneArea({ onDrop, accept = 'image/*', uploading = false }) {
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({
+    onDrop,
+    accept: { 'image/*': [] },
+    multiple: false
+  });
+
+  return (
+    <div {...getRootProps()} style={{
+      border: '2px dashed ' + (isDragActive ? '#276749' : '#ccc'),
+      borderRadius: '8px',
+      padding: '20px',
+      textAlign: 'center',
+      cursor: 'pointer',
+      background: isDragActive ? '#f0fff4' : '#fafafa',
+      transition: 'all 0.2s ease',
+      opacity: uploading ? 0.6 : 1,
+      pointerEvents: uploading ? 'none' : 'auto'
+    }}>
+      <input {...getInputProps()} />
+      {uploading ? (
+        <p style={{ color: '#555', margin: 0 }}>Uploading photo... please wait</p>
+      ) : isDragActive ? (
+        <p style={{ color: '#276749', margin: 0, fontWeight: 600 }}>Drop the image here ...</p>
+      ) : (
+        <p style={{ color: '#666', margin: 0 }}>Drag 'n' drop an image here, or click to select</p>
+      )}
+    </div>
+  );
+}
+
 // ── Gallery Manager ───────────────────────────────────────────────────────────
 function GalleryManager({ idx, gallery, token, onSaved }) {
-  const [file, setFile] = useState(null);
-  const [msg, setMsg] = useState('');
-  const flash = (m) => { setMsg(m); setTimeout(() => setMsg(''), 3000); };
+  const [uploading, setUploading] = useState(false);
 
-  const upload = async () => {
+  const onDrop = async (acceptedFiles) => {
+    const file = acceptedFiles[0];
     if (!file) return;
+    setUploading(true);
     const fd = new FormData(); fd.append('photo', file);
     try {
-      await api.post(`/api/admin/family/${idx}/gallery`, fd, { headers: authHeader(token) });
-      flash('Photo added to gallery!'); setFile(null); onSaved();
-    } catch { flash('Upload failed.'); }
+      const res = await api.post(`/api/admin/family/${idx}/gallery`, fd, { headers: authHeader(token) });
+      flash('Photo added to gallery!'); 
+      onSaved();
+    } catch (e) {
+      flash(e.response?.data?.error || 'Upload failed.');
+    }
+    setUploading(false);
   };
 
   const remove = async (gidx) => {
@@ -380,11 +417,10 @@ function GalleryManager({ idx, gallery, token, onSaved }) {
         })}
         {gallery.length === 0 && <p style={{ color: '#aaa', fontSize: '0.85rem' }}>No gallery photos yet.</p>}
       </div>
-      <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-        <input type="file" accept="image/*" multiple onChange={e => setFile(e.target.files[0])} style={{ fontSize: '0.82rem', flex: 1 }} />
-        <button style={{ ...S.btn, ...S.btnBlack }} onClick={upload}>Add Photo</button>
+      <div style={{ marginTop: '10px' }}>
+        <DropzoneArea onDrop={onDrop} uploading={uploading} />
       </div>
-      {msg && <p style={{ color: '#276749', fontSize: '0.82rem', marginTop: '6px' }}>{msg}</p>}
+      {msg && <p style={{ color: msg.includes('fail') || msg.includes('Duplicate') ? '#e53e3e' : '#276749', fontSize: '0.85rem', marginTop: '8px' }}>{msg}</p>}
     </div>
   );
 }

@@ -4,3 +4,5 @@ flask-socketio
 PyJWT
 gunicorn
 eventlet
+Pillow>=10.0.0
+imagehash>=4.3.0

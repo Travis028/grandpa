@@ -224,46 +224,24 @@ export default function Home() {
                   whileHover={{ scale: 1.05, boxShadow: "0 20px 40px rgba(0,0,0,0.15)" }}
                   transition={{ duration: 0.3 }}
                 >
-                  <div className="family-photo-wrap">
-                    <img src={`${API_BASE}/api/static/images/children/${child.portrait}`} alt={child.name} loading="lazy" onError={(e) => { e.target.style.display = 'none'; e.target.nextElementSibling.style.display = 'flex'; }} />
-                    <div className="family-photo-placeholder" style={{display: 'none'}}>
-                      <span>{child.name[0]}</span>
-                    </div>
-                    <div className="family-photo-overlay"></div>
-                  </div>
-                  <div className="family-body">
-                    <h3 className="family-name">{child.name}</h3>
-                    {child.note && <p className="family-note">{child.note}</p>}
-                    {child.spouse && <p className="family-spouse">❧ {child.spouse}</p>}
-
-                    <div className="child-tribute">
-                      <span className="child-tribute-label">Their tribute to Dad</span>
-                      <p className="child-tribute-text">"{child.tribute}"</p>
-                    </div>
-
-                    {child.grandchildren && child.grandchildren.length > 0 && (
-                      <>
-                        <span className="grandchildren-label">Grandchildren</span>
-                        <div className="grandchildren-row">
-                          {child.grandchildren.map((grand, gIdx) => (
-                            <motion.div className="grandchild" key={gIdx} whileHover={{ scale: 1.1 }}>
-                              <img className="grandchild-photo" src={`${API_BASE}/api/static/images/children/${grand.photo}`} alt={grand.name} loading="lazy" onError={(e) => { e.target.style.display = 'none'; e.target.nextElementSibling.style.display = 'flex'; }} />
-                              <div className="grandchild-photo-placeholder" style={{display: 'none'}}>{grand.name[0]}</div>
-                              <span className="grandchild-name">{grand.name}</span>
-                            </motion.div>
-                          ))}
-                        </div>
-                      </>
-                    )}
-
-                    {child.gallery && child.gallery.length > 0 && (
-                      <div style={{marginTop:'16px'}}>
-                        <button className="btn-secondary" style={{padding:'8px 16px', fontSize:'0.9rem', cursor:'pointer', background:'#e5e7eb', border:'none', borderRadius:'20px', color:'#374151', fontWeight:500}} onClick={() => setViewingGallery({ name: child.name, photos: child.gallery })}>
-                          View {child.name}'s Gallery ({child.gallery.length} photos)
-                        </button>
+                  <Link to={`/family/${idx}`} style={{ textDecoration: 'none', color: 'inherit' }}>
+                    <div className="family-photo-wrap">
+                      <img src={`${API_BASE}/api/static/images/children/${child.portrait}`} alt={child.name} loading="lazy" onError={(e) => { e.target.style.display = 'none'; e.target.nextElementSibling.style.display = 'flex'; }} />
+                      <div className="family-photo-placeholder" style={{display: 'none'}}>
+                        <span>{child.name[0]}</span>
                       </div>
-                    )}
-                  </div>
+                      <div className="family-photo-overlay"></div>
+                    </div>
+                    <div className="family-body" style={{ textAlign: 'center' }}>
+                      <h3 className="family-name">{child.name}</h3>
+                      {child.spouse && <p className="family-spouse">❧ {child.spouse}</p>}
+                      <div style={{ marginTop: '15px' }}>
+                        <span className="btn-secondary" style={{ display: 'inline-block', padding: '8px 20px', fontSize: '0.9rem', background: '#f3f4f6', borderRadius: '20px', color: '#111', fontWeight: 600 }}>
+                          View Details & Gallery →
+                        </span>
+                      </div>
+                    </div>
+                  </Link>
                 </motion.div>
               </Reveal>
             ))}
