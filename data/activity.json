@@ -328,5 +328,65 @@
     "action": "navigated",
     "detail": "/admin",
     "time": "2026-06-14 01:23:10"
+  },
+  {
+    "name": "Guest",
+    "action": "navigated",
+    "detail": "/",
+    "time": "2026-06-14 12:34:32"
+  },
+  {
+    "name": "Test User",
+    "action": "visited",
+    "detail": "Entered memorial",
+    "time": "2026-06-14 14:56:26"
+  },
+  {
+    "name": "Test User",
+    "action": "navigated",
+    "detail": "/family/0",
+    "time": "2026-06-14 14:57:11"
+  },
+  {
+    "name": "Test User",
+    "action": "navigated",
+    "detail": "/admin",
+    "time": "2026-06-14 14:57:33"
+  },
+  {
+    "name": "Test User",
+    "action": "navigated",
+    "detail": "/family/0",
+    "time": "2026-06-14 14:59:20"
+  },
+  {
+    "name": "Test User",
+    "action": "navigated",
+    "detail": "/",
+    "time": "2026-06-14 14:59:52"
+  },
+  {
+    "name": "Test User",
+    "action": "navigated",
+    "detail": "/family/1",
+    "time": "2026-06-14 15:00:26"
+  },
+  {
+    "name": "Test User",
+    "action": "navigated",
+    "detail": "/admin",
+    "time": "2026-06-14 15:00:40"
+  },
+  {
+    "name": "Test User",
+    "action": "navigated",
+    "detail": "/family/0",
+    "time": "2026-06-14 15:05:17"
+  },
+  {
+    "name": "Test User",
+    "action": "navigated",
+    "detail": "/api/family/0",
+    "time": "2026-06-14 15:05:30"
   }
 ]
