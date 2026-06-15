@@ -66,7 +66,7 @@ export default function FamilyDetail() {
               src={`${API_BASE}/api/static/images/children/${member.portrait}`} 
               alt={member.name}
               style={{ width: '180px', height: '180px', objectFit: 'cover', borderRadius: '50%', border: '4px solid #fff', boxShadow: '0 10px 25px rgba(0,0,0,0.1)' }}
-              onError={(e) => { e.target.style.display = 'none'; }}
+              onError={(e) => { e.target.onerror = null; e.target.src = `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23eee'/%3E%3Ccircle cx='50' cy='40' r='20' fill='%23ccc'/%3E%3Cpath d='M20 100c0-20 15-35 30-35s30 15 30 35' fill='%23ccc'/%3E%3C/svg%3E`; }}
             />
           ) : (
             <div style={{ width: '180px', height: '180px', borderRadius: '50%', border: '4px solid #fff', boxShadow: '0 10px 25px rgba(0,0,0,0.1)', background: '#eee' }}></div>
@@ -100,7 +100,7 @@ export default function FamilyDetail() {
                   src={`${API_BASE}/api/static/images/children/${gc.photo}`} 
                   alt={gc.name}
                   style={{ width: '80px', height: '80px', objectFit: 'cover', borderRadius: '50%', marginBottom: '8px', border: '2px solid #ddd' }}
-                  onError={(e) => { e.target.style.display = 'none'; }}
+                  onError={(e) => { e.target.onerror = null; e.target.src = `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23eee'/%3E%3Ccircle cx='50' cy='40' r='20' fill='%23ccc'/%3E%3Cpath d='M20 100c0-20 15-35 30-35s30 15 30 35' fill='%23ccc'/%3E%3C/svg%3E`; }}
                 />
                 <p style={{ margin: 0, fontSize: '0.9rem', fontWeight: 500 }}>{gc.name}</p>
               </motion.div>

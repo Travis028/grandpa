@@ -173,7 +173,7 @@ function LifePhotosManager({ token }) {
           <div key={idx} style={{ position: 'relative' }}>
             <img src={`${API_BASE}/api/static/images/life_photos/${ph}`} alt=""
               style={{ width: '80px', height: '80px', objectFit: 'cover', borderRadius: '6px', border: '1px solid #ddd' }}
-              onError={e => e.target.style.display = 'none'} />
+              onError={e => { e.target.onerror = null; e.target.src = `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23eee'/%3E%3Ccircle cx='50' cy='40' r='20' fill='%23ccc'/%3E%3Cpath d='M20 100c0-20 15-35 30-35s30 15 30 35' fill='%23ccc'/%3E%3C/svg%3E`; }} />
             <button onClick={() => remove(ph)}
               style={{ position: 'absolute', top: '-6px', right: '-6px', background: '#e53e3e', color: '#fff', border: 'none', borderRadius: '50%', width: '20px', height: '20px', cursor: 'pointer', fontSize: '0.7rem', lineHeight: '20px', padding: 0 }}>
               x
@@ -411,7 +411,7 @@ function GalleryManager({ idx, gallery, token, onSaved }) {
             <div key={gidx} style={{ display: 'flex', gap: '10px', alignItems: 'center', background: '#f9f9f9', padding: '8px', borderRadius: '6px' }}>
               <img src={`${API_BASE}/api/static/images/children/${ph}`} alt=""
                 style={{ width: '60px', height: '60px', objectFit: 'cover', borderRadius: '4px', border: '1px solid #ddd', flexShrink: 0 }}
-                onError={e => e.target.style.display = 'none'} />
+                onError={e => { e.target.onerror = null; e.target.src = `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23eee'/%3E%3Ccircle cx='50' cy='40' r='20' fill='%23ccc'/%3E%3Cpath d='M20 100c0-20 15-35 30-35s30 15 30 35' fill='%23ccc'/%3E%3C/svg%3E`; }} />
               <input style={{ ...S.input, flex: 1 }} defaultValue={comment} placeholder="Add a comment or caption..." onBlur={e => { if(e.target.value !== comment) updateComment(gidx, e.target.value); }} />
               <button onClick={() => remove(gidx)} style={{ ...S.btn, ...S.btnRed, padding: '6px 10px' }}>x</button>
             </div>
@@ -493,7 +493,7 @@ function FamilyEditor({ member, idx, token, onSaved }) {
           {member.portrait && member.portrait !== '' ? (
             <img src={`${API_BASE}/api/static/images/children/${member.portrait}`} alt=""
               style={{ width: '48px', height: '48px', objectFit: 'cover', borderRadius: '50%', border: '2px solid #ddd' }}
-              onError={e => e.target.style.display = 'none'} />
+              onError={e => { e.target.onerror = null; e.target.src = `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23eee'/%3E%3Ccircle cx='50' cy='40' r='20' fill='%23ccc'/%3E%3Cpath d='M20 100c0-20 15-35 30-35s30 15 30 35' fill='%23ccc'/%3E%3C/svg%3E`; }} />
           ) : (
             <div style={{ width: '48px', height: '48px', borderRadius: '50%', border: '2px solid #ddd', background: '#eee' }}></div>
           )}
@@ -541,7 +541,7 @@ function FamilyEditor({ member, idx, token, onSaved }) {
               <div key={gidx} style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px', padding: '8px', background: '#f9f9f9', borderRadius: '6px', flexWrap: 'wrap' }}>
                 <img src={`${API_BASE}/api/static/images/children/${gc.photo}`} alt={gc.name}
                   style={{ width: '40px', height: '40px', objectFit: 'cover', borderRadius: '50%', border: '2px solid #ddd', flexShrink: 0 }}
-                  onError={e => e.target.style.display = 'none'} />
+                  onError={e => { e.target.onerror = null; e.target.src = `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23eee'/%3E%3Ccircle cx='50' cy='40' r='20' fill='%23ccc'/%3E%3Cpath d='M20 100c0-20 15-35 30-35s30 15 30 35' fill='%23ccc'/%3E%3C/svg%3E`; }} />
                 <input style={{ ...S.input, flex: 1, minWidth: '120px' }} defaultValue={gc.name} onBlur={e => { if(e.target.value !== gc.name) updateGcName(gidx, e.target.value); }} />
                 <input type="file" accept="image/*" style={{ fontSize: '0.78rem', width: '150px' }} onChange={e => setGcPhotos({ ...gcPhotos, [gidx]: e.target.files[0] })} />
                 <button style={{ ...S.btn, ...S.btnBlack, fontSize: '0.78rem' }} onClick={() => uploadGcPhoto(gidx)}>Upload</button>

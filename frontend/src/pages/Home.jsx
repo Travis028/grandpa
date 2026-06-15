@@ -229,7 +229,7 @@ export default function Home() {
                 >
                   <Link to={`/family/${idx}`} style={{ textDecoration: 'none', color: 'inherit' }}>
                     <div className="family-photo-wrap">
-                      <img src={`${API_BASE}/api/static/images/children/${child.portrait}`} alt={child.name} loading="lazy" onError={(e) => { e.target.style.display = 'none'; e.target.nextElementSibling.style.display = 'flex'; }} />
+                      <img src={`${API_BASE}/api/static/images/children/${child.portrait}`} alt={child.name} loading="lazy" onError={(e) => { e.target.onerror = null; e.target.src = `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23eee'/%3E%3Ccircle cx='50' cy='40' r='20' fill='%23ccc'/%3E%3Cpath d='M20 100c0-20 15-35 30-35s30 15 30 35' fill='%23ccc'/%3E%3C/svg%3E`; }} />
                       <div className="family-photo-placeholder" style={{display: 'none'}}>
                         <span>{child.name[0]}</span>
                       </div>
