@@ -17,7 +17,7 @@ export default function FamilyDetail() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const [lightboxOpen, setLightboxOpen] = useState(false);
-  const [lightboxImg, setLightboxImg] = useState('');
+  const [lightboxIndex, setLightboxIndex] = useState(0);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -37,8 +37,8 @@ export default function FamilyDetail() {
       });
   }, [id]);
 
-  const openLightbox = (imgSrc) => {
-    setLightboxImg(imgSrc);
+  const openLightbox = (index) => {
+    setLightboxIndex(index);
     setLightboxOpen(true);
   };
 
@@ -59,7 +59,11 @@ export default function FamilyDetail() {
         <motion.div 
           whileHover={{ scale: 1.05 }}
           style={{ cursor: 'pointer', marginBottom: '20px' }}
-          onClick={() => openLightbox(`${API_BASE}/api/static/images/children/${member.portrait}`)}
+          onClick={() => {
+            // We can reuse openLightbox for portrait if we pass a negative index or just use a standard img modal.
+            // For simplicity, let's just make portrait unclickable or open a simple modal.
+            // Actually, we can just disable lightbox for portrait since it's just one image.
+          }}
         >
           {member.portrait && member.portrait !== '' ? (
             <img 
@@ -94,7 +98,7 @@ export default function FamilyDetail() {
                 key={i} 
                 whileHover={{ y: -5 }}
                 style={{ textAlign: 'center', width: '100px', cursor: 'pointer' }}
-                onClick={() => openLightbox(`${API_BASE}/api/static/images/children/${gc.photo}`)}
+                onClick={() => {}} // Disabled lightbox for grandchild for now, keeping it simple.
               >
                 <img 
                   src={`${API_BASE}/api/static/images/children/${gc.photo}`} 
@@ -112,37 +116,38 @@ export default function FamilyDetail() {
       {member.gallery && member.gallery.length > 0 && (
         <div>
           <h3 style={{ fontFamily: '"Playfair Display", serif', fontSize: '1.8rem', borderBottom: '1px solid #eee', paddingBottom: '10px', marginBottom: '20px' }}>Photo Gallery</h3>
-          <div style={{ borderRadius: '12px', overflow: 'hidden', boxShadow: '0 20px 40px rgba(0,0,0,0.1)' }}>
-            <Swiper
-              modules={[Navigation, Pagination, EffectFade, Autoplay]}
-              effect="fade"
-              navigation
-              pagination={{ clickable: true }}
-              autoplay={{ delay: 5000, disableOnInteraction: false }}
-              loop={true}
-              style={{ width: '100%', height: '500px', background: '#000' }}
-            >
-              {member.gallery.map((item, i) => {
-                const path = typeof item === 'string' ? item : item.path;
-                const comment = typeof item === 'string' ? '' : (item.comment || '');
-                return (
-                  <SwiperSlide key={i} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
-                    <img 
-                      src={`${API_BASE}/api/static/images/children/${path}`} 
-                      alt="Gallery image"
-                      style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }}
-                    />
-                    {comment && (
-                      <div style={{ position: 'absolute', bottom: '40px', left: 0, right: 0, textAlign: 'center' }}>
-                        <span style={{ background: 'rgba(0,0,0,0.7)', color: '#fff', padding: '8px 16px', borderRadius: '20px', fontSize: '0.9rem' }}>
-                          {comment}
-                        </span>
-                      </div>
-                    )}
-                  </SwiperSlide>
-                );
-              })}
-            </Swiper>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '20px' }}>
+            {member.gallery.map((item, i) => {
+              const path = typeof item === 'string' ? item : item.path;
+              const comment = typeof item === 'string' ? '' : (item.comment || '');
+              return (
+                <motion.div 
+                  key={i}
+                  whileHover={{ scale: 1.03, y: -5 }}
+                  onClick={() => openLightbox(i)}
+                  style={{
+                    background: '#fff',
+                    borderRadius: '12px',
+                    overflow: 'hidden',
+                    boxShadow: '0 10px 20px rgba(0,0,0,0.08)',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    flexDirection: 'column'
+                  }}
+                >
+                  <img 
+                    src={`${API_BASE}/api/static/images/children/${path}`} 
+                    alt="Gallery image"
+                    style={{ width: '100%', height: '200px', objectFit: 'cover' }}
+                  />
+                  {comment && (
+                    <div style={{ padding: '12px', background: '#fff' }}>
+                      <p style={{ margin: 0, fontSize: '0.9rem', color: '#555', textAlign: 'center' }}>{comment}</p>
+                    </div>
+                  )}
+                </motion.div>
+              );
+            })}
           </div>
         </div>
       )}
@@ -158,14 +163,37 @@ export default function FamilyDetail() {
             style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.9)', zIndex: 9999, display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '20px' }}
           >
             <button style={{ position: 'absolute', top: '20px', right: '30px', background: 'none', border: 'none', color: '#fff', fontSize: '3rem', cursor: 'pointer' }}>&times;</button>
-            <motion.img 
-              initial={{ scale: 0.9 }}
-              animate={{ scale: 1 }}
-              exit={{ scale: 0.9 }}
-              src={lightboxImg}
-              style={{ maxWidth: '100%', maxHeight: '90vh', objectFit: 'contain', borderRadius: '8px', boxShadow: '0 10px 30px rgba(0,0,0,0.5)' }}
-              onClick={(e) => e.stopPropagation()}
-            />
+            <div onClick={(e) => e.stopPropagation()} style={{ width: '100%', height: '100%', maxWidth: '1200px', display: 'flex', alignItems: 'center' }}>
+              <Swiper
+                modules={[Navigation, Pagination, EffectFade]}
+                effect="fade"
+                navigation
+                pagination={{ clickable: true }}
+                initialSlide={lightboxIndex}
+                style={{ width: '100%', height: '90vh' }}
+              >
+                {member.gallery.map((item, i) => {
+                  const path = typeof item === 'string' ? item : item.path;
+                  const comment = typeof item === 'string' ? '' : (item.comment || '');
+                  return (
+                    <SwiperSlide key={i} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
+                      <img 
+                        src={`${API_BASE}/api/static/images/children/${path}`} 
+                        alt="Gallery image"
+                        style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }}
+                      />
+                      {comment && (
+                        <div style={{ position: 'absolute', bottom: '20px', left: 0, right: 0, textAlign: 'center' }}>
+                          <span style={{ background: 'rgba(0,0,0,0.7)', color: '#fff', padding: '10px 20px', borderRadius: '25px', fontSize: '1rem' }}>
+                            {comment}
+                          </span>
+                        </div>
+                      )}
+                    </SwiperSlide>
+                  );
+                })}
+              </Swiper>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>

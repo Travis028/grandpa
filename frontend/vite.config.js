@@ -49,6 +49,15 @@ export default defineConfig({
               expiration: { maxEntries: 50, maxAgeSeconds: 60 * 60 * 24 * 30 },
               networkTimeoutSeconds: 5
             }
+          },
+          {
+            urlPattern: /\/api\/static\/images\/.*/i,
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'image-cache',
+              expiration: { maxEntries: 200, maxAgeSeconds: 60 * 60 * 24 * 30 },
+              cacheableResponse: { statuses: [0, 200] }
+            }
           }
         ]
       }

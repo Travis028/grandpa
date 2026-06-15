@@ -333,11 +333,11 @@ function ActivityTab({ data }) {
 }
 
 // ── Dropzone Uploader ─────────────────────────────────────────────────────────
-function DropzoneArea({ onDrop, accept = 'image/*', uploading = false }) {
+function DropzoneArea({ onDrop, accept = 'image/*', uploading = false, multiple = false }) {
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
     accept: { 'image/*': [] },
-    multiple: false
+    multiple
   });
 
   return (
@@ -358,7 +358,7 @@ function DropzoneArea({ onDrop, accept = 'image/*', uploading = false }) {
       ) : isDragActive ? (
         <p style={{ color: '#276749', margin: 0, fontWeight: 600 }}>Drop the image here ...</p>
       ) : (
-        <p style={{ color: '#666', margin: 0 }}>Drag 'n' drop an image here, or click to select</p>
+        <p style={{ color: '#666', margin: 0 }}>Drag 'n' drop image(s) here, or click to select</p>
       )}
     </div>
   );
@@ -371,16 +371,23 @@ function GalleryManager({ idx, gallery, token, onSaved }) {
   const flash = (m) => { setAlertMsg(m); setTimeout(() => setAlertMsg(''), 3000); };
 
   const onDrop = async (acceptedFiles) => {
-    const file = acceptedFiles[0];
-    if (!file) return;
+    if (!acceptedFiles || acceptedFiles.length === 0) return;
     setUploading(true);
-    const fd = new FormData(); fd.append('photo', file);
-    try {
-      const res = await api.post(`/api/admin/family/${idx}/gallery`, fd, { headers: authHeader(token) });
-      flash('Photo added to gallery!'); 
+    let successCount = 0;
+    
+    for (const file of acceptedFiles) {
+      const fd = new FormData(); fd.append('photo', file);
+      try {
+        await api.post(`/api/admin/family/${idx}/gallery`, fd, { headers: authHeader(token) });
+        successCount++;
+      } catch (e) {
+        flash(e.response?.data?.error || `Failed to upload ${file.name}`);
+      }
+    }
+    
+    if (successCount > 0) {
+      flash(`Successfully added ${successCount} photo(s) to gallery!`); 
       onSaved();
-    } catch (e) {
-      flash(e.response?.data?.error || 'Upload failed.');
     }
     setUploading(false);
   };
@@ -420,7 +427,7 @@ function GalleryManager({ idx, gallery, token, onSaved }) {
         {gallery.length === 0 && <p style={{ color: '#aaa', fontSize: '0.85rem' }}>No gallery photos yet.</p>}
       </div>
       <div style={{ marginTop: '10px' }}>
-        <DropzoneArea onDrop={onDrop} uploading={uploading} />
+        <DropzoneArea onDrop={onDrop} uploading={uploading} multiple={true} />
       </div>
       {alertMsg && <p style={{ color: String(alertMsg).includes('fail') || msg.includes('Duplicate') ? '#e53e3e' : '#276749', fontSize: '0.85rem', marginTop: '8px' }}>{alertMsg}</p>}
     </div>
