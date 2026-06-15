@@ -1403,19 +1403,15 @@ img {
 
 @media (max-width: 768px) {
     .floating-photo-container {
-        top: 15%;
-        left: 50%;
-        transform: translateX(-50%);
-        animation: floatMobile 6s ease-in-out infinite;
-    }
-    @keyframes floatMobile {
-        0% { transform: translate(-50%, 0px) rotate(-2deg); }
-        50% { transform: translate(-50%, -15px) rotate(2deg); }
-        100% { transform: translate(-50%, 0px) rotate(-2deg); }
+        top: 12%;
+        left: auto;
+        right: 5%;
+        transform: none;
+        animation: float 6s ease-in-out infinite;
     }
     .floating-photo {
-        width: 150px;
-        height: 180px;
+        width: 100px;
+        height: 120px;
     }
 }
 
