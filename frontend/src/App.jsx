@@ -29,6 +29,61 @@ class ErrorBoundary extends Component {
   }
 }
 
+// ── Install App Button ──────────────────────────────────────────────────────────
+function InstallAppButton() {
+  const [deferredPrompt, setDeferredPrompt] = useState(null);
+
+  useEffect(() => {
+    const handler = (e) => {
+      // Prevent the mini-infobar from appearing on mobile
+      e.preventDefault();
+      // Stash the event so it can be triggered later.
+      setDeferredPrompt(e);
+    };
+    window.addEventListener('beforeinstallprompt', handler);
+    return () => window.removeEventListener('beforeinstallprompt', handler);
+  }, []);
+
+  if (!deferredPrompt) return null;
+
+  const handleInstallClick = async () => {
+    // Show the install prompt
+    deferredPrompt.prompt();
+    // Wait for the user to respond to the prompt
+    const { outcome } = await deferredPrompt.userChoice;
+    // We've used the prompt, and can't use it again, throw it away
+    setDeferredPrompt(null);
+  };
+
+  return (
+    <button 
+      onClick={handleInstallClick} 
+      style={{
+        background: 'var(--gold)',
+        color: 'var(--charcoal)',
+        border: 'none',
+        borderRadius: '20px',
+        padding: '5px 15px',
+        fontWeight: 'bold',
+        cursor: 'pointer',
+        fontSize: '0.9rem',
+        boxShadow: '0 4px 10px rgba(212, 175, 55, 0.3)',
+        display: 'flex',
+        alignItems: 'center',
+        gap: '5px'
+      }}
+      title="Install Memorial App"
+    >
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+        <polyline points="7 10 12 15 17 10"></polyline>
+        <line x1="12" y1="15" x2="12" y2="3"></line>
+      </svg>
+      Install App
+    </button>
+  );
+}
+
 // ── Visitor Name Modal ─────────────────────────────────────────────────────────
 function VisitorModal({ onDone }) {
   const [name, setName] = useState('');
@@ -147,6 +202,7 @@ function Navbar({ visitors }) {
       <div className="nav-container">
         <Link to="/" className="nav-logo">APOLLO J. FIZVALENTINE OWINO.</Link>
         <div className="nav-right" style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+          <InstallAppButton />
           <button onClick={toggleTheme} title="Toggle Theme" style={{ background: 'transparent', border: 'none', cursor: 'pointer', fontSize: '1.2rem', color: 'var(--gold)', padding: '0', display: 'flex' }}>
             {theme === 'light' ? '🌙' : '☀️'}
           </button>
