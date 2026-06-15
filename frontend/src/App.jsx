@@ -194,8 +194,8 @@ function App() {
     const socketUrl = import.meta.env.VITE_API_URL || window.location.origin;
     const socket = io(socketUrl, {
       path: '/socket.io',
-      // polling first — most reliable through proxies/firewalls, upgrades to websocket if possible
-      transports: ['polling', 'websocket'],
+      // Force polling to avoid websocket connection errors on Render's free tier proxy
+      transports: ['polling'],
       reconnection: true,
       reconnectionAttempts: 10,
       reconnectionDelay: 2000,
@@ -219,6 +219,24 @@ function App() {
     });
 
     return () => socket.disconnect();
+  }, []);
+
+  // Global Interactive Click Event Listener
+  useEffect(() => {
+    const handleMouseClick = (e) => {
+      const ripple = document.createElement('div');
+      ripple.className = 'click-ripple';
+      ripple.style.left = `${e.clientX}px`;
+      ripple.style.top = `${e.clientY}px`;
+      document.body.appendChild(ripple);
+      setTimeout(() => {
+        if (document.body.contains(ripple)) {
+          ripple.remove();
+        }
+      }, 600);
+    };
+    window.addEventListener('click', handleMouseClick);
+    return () => window.removeEventListener('click', handleMouseClick);
   }, []);
 
   const handleNameSet = (name) => {

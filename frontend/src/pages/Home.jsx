@@ -62,7 +62,7 @@ export default function Home() {
     const socketUrl = import.meta.env.VITE_API_URL || window.location.origin;
     let socket;
     try {
-      socket = io(socketUrl, { path: '/socket.io', transports: ['websocket', 'polling'] });
+      socket = io(socketUrl, { path: '/socket.io', transports: ['polling'] });
       socket.on('new_tribute', (tribute) => {
         setTributes(prev => {
           // avoid duplicates if we just submitted it ourselves
@@ -116,6 +116,9 @@ export default function Home() {
           <div className="hero-overlay"></div>
         </div>
         <div className="hero-top-bar"></div>
+        <div className="floating-photo-container">
+          <img src={`${API_BASE}/api/static/images/grandpa/floating_photo.jpg`} alt="Grandpa" className="floating-photo" onError={(e) => { e.target.src = '/assets/floating_photo.jpg' }} />
+        </div>
         <div className="hero-content">
           <p className="hero-eyebrow">In Loving Memory</p>
           <h1 className="hero-name">{grandpa.name}</h1>

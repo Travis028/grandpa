@@ -61,12 +61,16 @@ export default function FamilyDetail() {
           style={{ cursor: 'pointer', marginBottom: '20px' }}
           onClick={() => openLightbox(`${API_BASE}/api/static/images/children/${member.portrait}`)}
         >
-          <img 
-            src={`${API_BASE}/api/static/images/children/${member.portrait}`} 
-            alt={member.name}
-            style={{ width: '180px', height: '180px', objectFit: 'cover', borderRadius: '50%', border: '4px solid #fff', boxShadow: '0 10px 25px rgba(0,0,0,0.1)' }}
-            onError={(e) => { e.target.style.display = 'none'; }}
-          />
+          {member.portrait && member.portrait !== '' ? (
+            <img 
+              src={`${API_BASE}/api/static/images/children/${member.portrait}`} 
+              alt={member.name}
+              style={{ width: '180px', height: '180px', objectFit: 'cover', borderRadius: '50%', border: '4px solid #fff', boxShadow: '0 10px 25px rgba(0,0,0,0.1)' }}
+              onError={(e) => { e.target.style.display = 'none'; }}
+            />
+          ) : (
+            <div style={{ width: '180px', height: '180px', borderRadius: '50%', border: '4px solid #fff', boxShadow: '0 10px 25px rgba(0,0,0,0.1)', background: '#eee' }}></div>
+          )}
         </motion.div>
         
         <h1 style={{ fontFamily: '"Playfair Display", serif', fontSize: '2.5rem', margin: '0 0 10px 0' }}>{member.name}</h1>

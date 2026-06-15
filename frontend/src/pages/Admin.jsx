@@ -53,8 +53,8 @@ function LoginForm({ onLogin }) {
 function ProgramEditor({ program, token, onSaved }) {
   const [form, setForm] = useState({ ...program });
   const [saving, setSaving] = useState(false);
-  const [msg, setMsg] = useState('');
-  const flash = (m) => { setMsg(m); setTimeout(() => setMsg(''), 3000); };
+  const [alertMsg, setAlertMsg] = useState('');
+  const flash = (m) => { setAlertMsg(m); setTimeout(() => setAlertMsg(''), 3000); };
   const setOrder = (i, field, val) => {
     const order = form.order.map((o, idx) => idx === i ? { ...o, [field]: val } : o);
     setForm({ ...form, order });
@@ -82,7 +82,7 @@ function ProgramEditor({ program, token, onSaved }) {
           ))}
         </div>
         <button style={{ ...S.btn, ...S.btnBlack }} onClick={save} disabled={saving}>{saving ? 'Saving...' : 'Save Details'}</button>
-        {msg && <span style={{ marginLeft: '10px', color: '#276749', fontSize: '0.85rem' }}>{msg}</span>}
+        {alertMsg && <span style={{ marginLeft: '10px', color: '#276749', fontSize: '0.85rem' }}>{alertMsg}</span>}
       </div>
       <div style={S.card}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
@@ -105,8 +105,8 @@ function ProgramEditor({ program, token, onSaved }) {
 
 // ── Feedback Tab ──────────────────────────────────────────────────────────────
 function FeedbackTab({ feedback, token, onSaved }) {
-  const [msg, setMsg] = useState('');
-  const flash = (m) => { setMsg(m); setTimeout(() => setMsg(''), 3000); };
+  const [alertMsg, setAlertMsg] = useState('');
+  const flash = (m) => { setAlertMsg(m); setTimeout(() => setAlertMsg(''), 3000); };
   const del = async (idx) => {
     if (!window.confirm('Delete this feedback?')) return;
     try { await api.delete(`/api/admin/feedback/${idx}`, { headers: authHeader(token) }); flash('Deleted.'); onSaved(); }
@@ -116,7 +116,7 @@ function FeedbackTab({ feedback, token, onSaved }) {
   const avg = feedback.length ? (feedback.reduce((a, f) => a + (f.rating || 5), 0) / feedback.length).toFixed(1) : '—';
   return (
     <div>
-      {msg && <p style={{ color: '#276749', marginBottom: '10px' }}>{msg}</p>}
+      {alertMsg && <p style={{ color: '#276749', marginBottom: '10px' }}>{alertMsg}</p>}
       <div style={{ ...S.card, display: 'flex', gap: '30px', flexWrap: 'wrap', marginBottom: '20px' }}>
         <div style={{ textAlign: 'center' }}><p style={{ color: '#888', fontSize: '0.8rem' }}>Total</p><p style={{ fontSize: '2rem', fontWeight: 'bold' }}>{feedback.length}</p></div>
         <div style={{ textAlign: 'center' }}><p style={{ color: '#888', fontSize: '0.8rem' }}>Avg Rating</p><p style={{ fontSize: '2rem', fontWeight: 'bold', color: '#d97706' }}>{avg} / 5</p></div>
@@ -142,8 +142,8 @@ function FeedbackTab({ feedback, token, onSaved }) {
 function LifePhotosManager({ token }) {
   const [photos, setPhotos] = useState([]);
   const [file, setFile] = useState(null);
-  const [msg, setMsg] = useState('');
-  const flash = (m) => { setMsg(m); setTimeout(() => setMsg(''), 3000); };
+  const [alertMsg, setAlertMsg] = useState('');
+  const flash = (m) => { setAlertMsg(m); setTimeout(() => setAlertMsg(''), 3000); };
 
   const loadPhotos = () => api.get('/api/life_photos').then(r => setPhotos(r.data)).catch(() => {});
   useEffect(() => { loadPhotos(); }, []);
@@ -186,7 +186,7 @@ function LifePhotosManager({ token }) {
         <input type="file" accept="image/*" onChange={e => setFile(e.target.files[0])} style={{ fontSize: '0.82rem', flex: 1 }} />
         <button style={{ ...S.btn, ...S.btnBlack }} onClick={upload}>Add Photo</button>
       </div>
-      {msg && <p style={{ color: '#276749', fontSize: '0.82rem', marginTop: '6px' }}>{msg}</p>}
+      {alertMsg && <p style={{ color: '#276749', fontSize: '0.82rem', marginTop: '6px' }}>{alertMsg}</p>}
     </div>
   );
 }
@@ -195,8 +195,8 @@ function LifePhotosManager({ token }) {
 function GrandpaEditor({ grandpa, token, onSaved }) {
   const [form, setForm] = useState({ ...grandpa });
   const [saving, setSaving] = useState(false);
-  const [msg, setMsg] = useState('');
-  const flash = (m) => { setMsg(m); setTimeout(() => setMsg(''), 3000); };
+  const [alertMsg, setAlertMsg] = useState('');
+  const flash = (m) => { setAlertMsg(m); setTimeout(() => setAlertMsg(''), 3000); };
   const save = async () => {
     setSaving(true);
     try { await api.put('/api/admin/grandpa', form, { headers: authHeader(token) }); flash('Saved! Changes are now live.'); onSaved(); }
@@ -223,7 +223,7 @@ function GrandpaEditor({ grandpa, token, onSaved }) {
         <textarea style={{ ...S.input, minHeight: '140px', resize: 'vertical' }} value={form.life_story || ''} onChange={e => setForm({ ...form, life_story: e.target.value })} />
       </div>
       <button style={{ ...S.btn, ...S.btnBlack }} onClick={save} disabled={saving}>{saving ? 'Saving...' : 'Save Changes'}</button>
-      {msg && <span style={{ marginLeft: '10px', color: '#276749', fontSize: '0.85rem' }}>{msg}</span>}
+      {alertMsg && <span style={{ marginLeft: '10px', color: '#276749', fontSize: '0.85rem' }}>{alertMsg}</span>}
       <LifePhotosManager token={token} />
     </div>
   );
@@ -367,8 +367,8 @@ function DropzoneArea({ onDrop, accept = 'image/*', uploading = false }) {
 // ── Gallery Manager ───────────────────────────────────────────────────────────
 function GalleryManager({ idx, gallery, token, onSaved }) {
   const [uploading, setUploading] = useState(false);
-  const [msg, setMsg] = useState('');
-  const flash = (m) => { setMsg(m); setTimeout(() => setMsg(''), 3000); };
+  const [alertMsg, setAlertMsg] = useState('');
+  const flash = (m) => { setAlertMsg(m); setTimeout(() => setAlertMsg(''), 3000); };
 
   const onDrop = async (acceptedFiles) => {
     const file = acceptedFiles[0];
@@ -422,7 +422,7 @@ function GalleryManager({ idx, gallery, token, onSaved }) {
       <div style={{ marginTop: '10px' }}>
         <DropzoneArea onDrop={onDrop} uploading={uploading} />
       </div>
-      {msg && <p style={{ color: msg.includes('fail') || msg.includes('Duplicate') ? '#e53e3e' : '#276749', fontSize: '0.85rem', marginTop: '8px' }}>{msg}</p>}
+      {alertMsg && <p style={{ color: String(alertMsg).includes('fail') || msg.includes('Duplicate') ? '#e53e3e' : '#276749', fontSize: '0.85rem', marginTop: '8px' }}>{alertMsg}</p>}
     </div>
   );
 }
@@ -431,11 +431,11 @@ function GalleryManager({ idx, gallery, token, onSaved }) {
 function FamilyEditor({ member, idx, token, onSaved }) {
   const [form, setForm] = useState({ name: member.name, spouse: member.spouse || '', note: member.note || '', tribute: member.tribute || '' });
   const [saving, setSaving] = useState(false);
-  const [msg, setMsg] = useState('');
+  const [alertMsg, setAlertMsg] = useState('');
   const [portraitFile, setPortraitFile] = useState(null);
   const [gcPhotos, setGcPhotos] = useState({});
   const [open, setOpen] = useState(false);
-  const flash = (m) => { setMsg(m); setTimeout(() => setMsg(''), 3000); };
+  const flash = (m) => { setAlertMsg(m); setTimeout(() => setAlertMsg(''), 3000); };
 
   const save = async () => {
     setSaving(true);
@@ -490,9 +490,13 @@ function FamilyEditor({ member, idx, token, onSaved }) {
     <div style={S.card}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer' }} onClick={() => setOpen(!open)}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-          <img src={`${API_BASE}/api/static/images/children/${member.portrait}`} alt=""
-            style={{ width: '48px', height: '48px', objectFit: 'cover', borderRadius: '50%', border: '2px solid #ddd' }}
-            onError={e => e.target.style.display = 'none'} />
+          {member.portrait && member.portrait !== '' ? (
+            <img src={`${API_BASE}/api/static/images/children/${member.portrait}`} alt=""
+              style={{ width: '48px', height: '48px', objectFit: 'cover', borderRadius: '50%', border: '2px solid #ddd' }}
+              onError={e => e.target.style.display = 'none'} />
+          ) : (
+            <div style={{ width: '48px', height: '48px', borderRadius: '50%', border: '2px solid #ddd', background: '#eee' }}></div>
+          )}
           <div>
             <strong>{member.name}</strong>
             {member.spouse && <span style={{ color: '#888', fontSize: '0.82rem', marginLeft: '8px' }}>& {member.spouse}</span>}
@@ -521,7 +525,7 @@ function FamilyEditor({ member, idx, token, onSaved }) {
           <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
             <button style={{ ...S.btn, ...S.btnBlack }} onClick={save} disabled={saving}>{saving ? 'Saving...' : 'Save Changes'}</button>
             <button style={{ ...S.btn, ...S.btnRed }} onClick={deleteFamilyMember}>Delete Member</button>
-            {msg && <span style={{ marginLeft: '10px', color: '#276749', fontSize: '0.82rem' }}>{msg}</span>}
+            {alertMsg && <span style={{ marginLeft: '10px', color: '#276749', fontSize: '0.82rem' }}>{alertMsg}</span>}
           </div>
 
           {/* Gallery */}
@@ -556,8 +560,8 @@ function FamilyEditor({ member, idx, token, onSaved }) {
 function TributesTab({ tributes, token, onSaved }) {
   const [editing, setEditing] = useState(null);
   const [ef, setEf] = useState({});
-  const [msg, setMsg] = useState('');
-  const flash = (m) => { setMsg(m); setTimeout(() => setMsg(''), 3000); };
+  const [alertMsg, setAlertMsg] = useState('');
+  const flash = (m) => { setAlertMsg(m); setTimeout(() => setAlertMsg(''), 3000); };
 
   const save = async (idx) => {
     try { await api.put(`/api/admin/tributes/${idx}`, ef, { headers: authHeader(token) }); setEditing(null); flash('Updated!'); onSaved(); }
@@ -571,7 +575,7 @@ function TributesTab({ tributes, token, onSaved }) {
 
   return (
     <div>
-      {msg && <p style={{ color: '#276749', marginBottom: '10px' }}>{msg}</p>}
+      {alertMsg && <p style={{ color: '#276749', marginBottom: '10px' }}>{alertMsg}</p>}
       {tributes.length === 0 && <p style={{ color: '#aaa' }}>No tributes yet.</p>}
       {tributes.map((t, idx) => (
         <div key={idx} style={S.card}>
@@ -603,8 +607,8 @@ function TributesTab({ tributes, token, onSaved }) {
 
 // ── Admin Requests Tab ────────────────────────────────────────────────────────
 function RequestsTab({ requests, token, onSaved }) {
-  const [msg, setMsg] = useState('');
-  const flash = (m) => { setMsg(m); setTimeout(() => setMsg(''), 3000); };
+  const [alertMsg, setAlertMsg] = useState('');
+  const flash = (m) => { setAlertMsg(m); setTimeout(() => setAlertMsg(''), 3000); };
 
   const update = async (idx, status) => {
     try { await api.put(`/api/admin/requests/${idx}`, { status }, { headers: authHeader(token) }); flash(`Request ${status}.`); onSaved(); }
@@ -615,7 +619,7 @@ function RequestsTab({ requests, token, onSaved }) {
 
   return (
     <div>
-      {msg && <p style={{ color: '#276749', marginBottom: '10px' }}>{msg}</p>}
+      {alertMsg && <p style={{ color: '#276749', marginBottom: '10px' }}>{alertMsg}</p>}
       {requests.length === 0 && <p style={{ color: '#aaa' }}>No access requests yet.</p>}
       {requests.map((r, idx) => (
         <div key={idx} style={S.card}>
