@@ -18,6 +18,8 @@ export default function FamilyDetail() {
   const [error, setError] = useState(false);
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [lightboxIndex, setLightboxIndex] = useState(0);
+  const [spouseModalOpen, setSpouseModalOpen] = useState(false);
+  const [grandchildModalData, setGrandchildModalData] = useState(null);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -56,26 +58,39 @@ export default function FamilyDetail() {
       <Link to="/" style={{ color: '#888', textDecoration: 'none', marginBottom: '20px', display: 'inline-block' }}>← Back to Family</Link>
       
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', marginBottom: '40px' }}>
-        <motion.div 
-          whileHover={{ scale: 1.05 }}
-          style={{ cursor: 'pointer', marginBottom: '20px' }}
-          onClick={() => {
-            // We can reuse openLightbox for portrait if we pass a negative index or just use a standard img modal.
-            // For simplicity, let's just make portrait unclickable or open a simple modal.
-            // Actually, we can just disable lightbox for portrait since it's just one image.
-          }}
-        >
-          {member.portrait && member.portrait !== '' ? (
-            <img 
-              src={`${API_BASE}/api/static/images/children/${member.portrait}`} 
-              alt={member.name}
-              style={{ width: '180px', height: '180px', objectFit: 'cover', borderRadius: '50%', border: '4px solid #fff', boxShadow: '0 10px 25px rgba(0,0,0,0.1)' }}
-              onError={(e) => { e.target.onerror = null; e.target.src = `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23eee'/%3E%3Ccircle cx='50' cy='40' r='20' fill='%23ccc'/%3E%3Cpath d='M20 100c0-20 15-35 30-35s30 15 30 35' fill='%23ccc'/%3E%3C/svg%3E`; }}
-            />
-          ) : (
-            <div style={{ width: '180px', height: '180px', borderRadius: '50%', border: '4px solid #fff', boxShadow: '0 10px 25px rgba(0,0,0,0.1)', background: '#eee' }}></div>
+        <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'center', gap: '20px', marginBottom: '20px' }}>
+          <motion.div 
+            whileHover={{ scale: 1.05 }}
+            style={{ cursor: 'default' }}
+          >
+            {member.portrait && member.portrait !== '' ? (
+              <img 
+                src={`${API_BASE}/api/static/images/children/${member.portrait}`} 
+                alt={member.name}
+                style={{ width: '180px', height: '180px', objectFit: 'cover', borderRadius: '50%', border: '4px solid #fff', boxShadow: '0 10px 25px rgba(0,0,0,0.1)' }}
+                onError={(e) => { e.target.onerror = null; e.target.src = `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23eee'/%3E%3Ccircle cx='50' cy='40' r='20' fill='%23ccc'/%3E%3Cpath d='M20 100c0-20 15-35 30-35s30 15 30 35' fill='%23ccc'/%3E%3C/svg%3E`; }}
+              />
+            ) : (
+              <div style={{ width: '180px', height: '180px', borderRadius: '50%', border: '4px solid #fff', boxShadow: '0 10px 25px rgba(0,0,0,0.1)', background: '#eee' }}></div>
+            )}
+          </motion.div>
+          
+          {member.spouse_portrait && member.spouse_portrait !== '' && (
+            <motion.div 
+              whileHover={{ scale: 1.08 }}
+              style={{ cursor: 'pointer', zIndex: 2, position: 'relative', left: '-40px' }}
+              onClick={() => setSpouseModalOpen(true)}
+              title={`View photo of ${member.spouse || 'Spouse'}`}
+            >
+              <img 
+                src={`${API_BASE}/api/static/images/children/${member.spouse_portrait}`} 
+                alt={member.spouse || 'Spouse'}
+                style={{ width: '120px', height: '120px', objectFit: 'cover', borderRadius: '50%', border: '4px solid #fff', boxShadow: '0 10px 20px rgba(0,0,0,0.15)' }}
+                onError={(e) => { e.target.onerror = null; e.target.src = `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23eee'/%3E%3Ccircle cx='50' cy='40' r='20' fill='%23ccc'/%3E%3Cpath d='M20 100c0-20 15-35 30-35s30 15 30 35' fill='%23ccc'/%3E%3C/svg%3E`; }}
+              />
+            </motion.div>
           )}
-        </motion.div>
+        </div>
         
         <h1 style={{ fontFamily: '"Playfair Display", serif', fontSize: '2.5rem', margin: '0 0 10px 0' }}>{member.name}</h1>
         {member.spouse && <p style={{ fontSize: '1.1rem', color: '#666', fontStyle: 'italic', margin: '0 0 10px 0' }}>& {member.spouse}</p>}
@@ -98,7 +113,7 @@ export default function FamilyDetail() {
                 key={i} 
                 whileHover={{ y: -5 }}
                 style={{ textAlign: 'center', width: '100px', cursor: 'pointer' }}
-                onClick={() => {}} // Disabled lightbox for grandchild for now, keeping it simple.
+                onClick={() => setGrandchildModalData(gc)}
               >
                 <img 
                   src={`${API_BASE}/api/static/images/children/${gc.photo}`} 
@@ -194,6 +209,59 @@ export default function FamilyDetail() {
                 })}
               </Swiper>
             </div>
+          </motion.div>
+        )}
+        
+        {spouseModalOpen && member.spouse_portrait && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setSpouseModalOpen(false)}
+            style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.9)', zIndex: 9999, display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '20px' }}
+          >
+            <button style={{ position: 'absolute', top: '20px', right: '30px', background: 'none', border: 'none', color: '#fff', fontSize: '3rem', cursor: 'pointer' }}>&times;</button>
+            <motion.img 
+              initial={{ scale: 0.9 }}
+              animate={{ scale: 1 }}
+              exit={{ scale: 0.9 }}
+              src={`${API_BASE}/api/static/images/children/${member.spouse_portrait}`}
+              alt={member.spouse}
+              style={{ maxWidth: '100%', maxHeight: '90vh', objectFit: 'contain', borderRadius: '8px', boxShadow: '0 10px 30px rgba(0,0,0,0.5)' }}
+              onClick={(e) => e.stopPropagation()}
+            />
+          </motion.div>
+        )}
+
+        {grandchildModalData && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setGrandchildModalData(null)}
+            style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.85)', zIndex: 9999, display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '20px' }}
+          >
+            <motion.div 
+              initial={{ y: 50, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              exit={{ y: 50, opacity: 0 }}
+              onClick={(e) => e.stopPropagation()}
+              style={{ background: '#fff', padding: '40px', borderRadius: '20px', maxWidth: '500px', width: '100%', textAlign: 'center', boxShadow: '0 25px 50px rgba(0,0,0,0.3)' }}
+            >
+              <img 
+                src={`${API_BASE}/api/static/images/children/${grandchildModalData.photo}`} 
+                alt={grandchildModalData.name}
+                style={{ width: '150px', height: '150px', objectFit: 'cover', borderRadius: '50%', border: '4px solid #eee', marginBottom: '20px' }}
+                onError={(e) => { e.target.onerror = null; e.target.src = `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23eee'/%3E%3Ccircle cx='50' cy='40' r='20' fill='%23ccc'/%3E%3Cpath d='M20 100c0-20 15-35 30-35s30 15 30 35' fill='%23ccc'/%3E%3C/svg%3E`; }}
+              />
+              <h2 style={{ margin: '0 0 10px 0', fontFamily: '"Playfair Display", serif', fontSize: '2rem' }}>{grandchildModalData.name}</h2>
+              {grandchildModalData.tribute ? (
+                <p style={{ color: '#555', fontStyle: 'italic', fontSize: '1.1rem', lineHeight: 1.6 }}>"{grandchildModalData.tribute}"</p>
+              ) : (
+                <p style={{ color: '#aaa', fontStyle: 'italic' }}>Tribute coming soon.</p>
+              )}
+              <button onClick={() => setGrandchildModalData(null)} style={{ marginTop: '20px', padding: '10px 20px', background: 'var(--gold)', color: '#fff', border: 'none', borderRadius: '25px', cursor: 'pointer', fontSize: '1rem', fontWeight: 'bold' }}>Close</button>
+            </motion.div>
           </motion.div>
         )}
       </AnimatePresence>

@@ -178,6 +178,42 @@ function PageTracker({ socketRef }) {
   return null;
 }
 
+// ── Site Loader ───────────────────────────────────────────────────────────────
+function SiteLoader({ loaded }) {
+  return (
+    <AnimatePresence>
+      {!loaded && (
+        <motion.div
+          initial={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.8, ease: "easeInOut" }}
+          style={{
+            position: 'fixed',
+            inset: 0,
+            background: 'var(--bg-color)',
+            zIndex: 99999,
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center',
+            alignItems: 'center',
+            color: 'var(--gold)'
+          }}
+        >
+          <motion.div
+            animate={{ scale: [1, 1.1, 1], opacity: [0.5, 1, 0.5] }}
+            transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+            style={{ fontFamily: '"Playfair Display", serif', fontSize: '2rem', letterSpacing: '2px' }}
+          >
+            APOLLO J. FIZVALENTINE OWINO.
+          </motion.div>
+          <div style={{ marginTop: '20px', width: '40px', height: '40px', border: '3px solid rgba(212, 175, 55, 0.3)', borderTop: '3px solid var(--gold)', borderRadius: '50%', animation: 'spin 1s linear infinite' }} />
+          <style>{`@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }`}</style>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
+}
+
 // ── Navbar ─────────────────────────────────────────────────────────────────────
 function Navbar({ visitors }) {
   const [scrolled, setScrolled] = useState(false);
@@ -244,8 +280,17 @@ function Footer() {
 function App() {
   const [visitors, setVisitors] = useState(0);
   const [visitorName, setVisitorName] = useState(localStorage.getItem('visitorName'));
+  const [appLoaded, setAppLoaded] = useState(false);
   const socketRef = useRef(null);
   const nameRef = useRef(localStorage.getItem('visitorName'));
+
+  useEffect(() => {
+    // Preload the heavy background image for a smooth reveal
+    const img = new Image();
+    img.src = '/api/static/images/grandpa/main_photo.jpg';
+    img.onload = () => setTimeout(() => setAppLoaded(true), 300); // Slight delay for smoothness
+    img.onerror = () => setAppLoaded(true); // Fallback if image doesn't exist yet
+  }, []);
 
   useEffect(() => {
     const socketUrl = import.meta.env.VITE_API_URL || window.location.origin;
@@ -310,6 +355,7 @@ function App() {
   return (
     <ErrorBoundary>
       {!visitorName && <VisitorModal onDone={handleNameSet} />}
+      <SiteLoader loaded={appLoaded} />
       <Router>
         <PageTracker socketRef={socketRef} />
         <Navbar visitors={visitors} />

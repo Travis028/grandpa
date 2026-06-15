@@ -440,6 +440,7 @@ function FamilyEditor({ member, idx, token, onSaved }) {
   const [saving, setSaving] = useState(false);
   const [alertMsg, setAlertMsg] = useState('');
   const [portraitFile, setPortraitFile] = useState(null);
+  const [spousePortraitFile, setSpousePortraitFile] = useState(null);
   const [gcPhotos, setGcPhotos] = useState({});
   const [open, setOpen] = useState(false);
   const flash = (m) => { setAlertMsg(m); setTimeout(() => setAlertMsg(''), 3000); };
@@ -464,6 +465,19 @@ function FamilyEditor({ member, idx, token, onSaved }) {
     catch { flash('Error deleting portrait.'); }
   };
 
+  const uploadSpousePortrait = async () => {
+    if (!spousePortraitFile) return;
+    const fd = new FormData(); fd.append('photo', spousePortraitFile);
+    try { await api.post(`/api/admin/family/${idx}/spouse_photo`, fd, { headers: authHeader(token) }); flash('Spouse portrait uploaded!'); onSaved(); }
+    catch { flash('Upload failed.'); }
+  };
+
+  const deleteSpousePortrait = async () => {
+    if (!window.confirm('Delete spouse portrait photo?')) return;
+    try { await api.delete(`/api/admin/family/${idx}/spouse_photo`, { headers: authHeader(token) }); flash('Spouse portrait deleted.'); onSaved(); }
+    catch { flash('Error deleting spouse portrait.'); }
+  };
+
   const uploadGcPhoto = async (gidx) => {
     const file = gcPhotos[gidx]; if (!file) return;
     const fd = new FormData(); fd.append('photo', file);
@@ -474,6 +488,11 @@ function FamilyEditor({ member, idx, token, onSaved }) {
   const updateGcName = async (gidx, name) => {
     try { await api.put(`/api/admin/family/${idx}/grandchild/${gidx}`, { name }, { headers: authHeader(token) }); flash('Name updated!'); onSaved(); }
     catch { flash('Error updating name.'); }
+  };
+
+  const updateGcTribute = async (gidx, tribute) => {
+    try { await api.put(`/api/admin/family/${idx}/grandchild/${gidx}`, { tribute }, { headers: authHeader(token) }); flash('Tribute updated!'); onSaved(); }
+    catch { flash('Error updating tribute.'); }
   };
 
   const deleteGc = async (gidx) => {
@@ -525,9 +544,14 @@ function FamilyEditor({ member, idx, token, onSaved }) {
             <textarea style={{ ...S.input, minHeight: '80px', resize: 'vertical' }} value={form.tribute} onChange={e => setForm({ ...form, tribute: e.target.value })} />
           </div>
           <div style={{ display: 'flex', gap: '8px', alignItems: 'flex-end', marginBottom: '12px', flexWrap: 'wrap' }}>
-            <div style={{ flex: 1 }}><label style={S.label}>Portrait Photo</label><input type="file" accept="image/*" onChange={e => setPortraitFile(e.target.files[0])} style={{ fontSize: '0.82rem' }} /></div>
+            <div style={{ flex: 1, minWidth: '200px' }}><label style={S.label}>Portrait Photo</label><input type="file" accept="image/*" onChange={e => setPortraitFile(e.target.files[0])} style={{ fontSize: '0.82rem' }} /></div>
             <button style={{ ...S.btn, ...S.btnBlack }} onClick={uploadPortrait}>Upload</button>
             {member.portrait && <button style={{ ...S.btn, ...S.btnRed }} onClick={deletePortrait}>Delete</button>}
+          </div>
+          <div style={{ display: 'flex', gap: '8px', alignItems: 'flex-end', marginBottom: '12px', flexWrap: 'wrap' }}>
+            <div style={{ flex: 1, minWidth: '200px' }}><label style={S.label}>Spouse Portrait Photo</label><input type="file" accept="image/*" onChange={e => setSpousePortraitFile(e.target.files[0])} style={{ fontSize: '0.82rem' }} /></div>
+            <button style={{ ...S.btn, ...S.btnBlack }} onClick={uploadSpousePortrait}>Upload</button>
+            {member.spouse_portrait && <button style={{ ...S.btn, ...S.btnRed }} onClick={deleteSpousePortrait}>Delete</button>}
           </div>
           <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
             <button style={{ ...S.btn, ...S.btnBlack }} onClick={save} disabled={saving}>{saving ? 'Saving...' : 'Save Changes'}</button>
@@ -545,14 +569,17 @@ function FamilyEditor({ member, idx, token, onSaved }) {
               <button style={{ ...S.btn, ...S.btnBlack, fontSize: '0.75rem', padding: '4px 10px' }} onClick={addGrandchild}>+ Add Grandchild</button>
             </div>
             {(member.grandchildren || []).map((gc, gidx) => (
-              <div key={gidx} style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px', padding: '8px', background: '#f9f9f9', borderRadius: '6px', flexWrap: 'wrap' }}>
-                <img src={`${API_BASE}/api/static/images/children/${gc.photo}`} alt={gc.name}
-                  style={{ width: '40px', height: '40px', objectFit: 'cover', borderRadius: '50%', border: '2px solid #ddd', flexShrink: 0 }}
-                  onError={e => { e.target.onerror = null; e.target.src = `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23eee'/%3E%3Ccircle cx='50' cy='40' r='20' fill='%23ccc'/%3E%3Cpath d='M20 100c0-20 15-35 30-35s30 15 30 35' fill='%23ccc'/%3E%3C/svg%3E`; }} />
-                <input style={{ ...S.input, flex: 1, minWidth: '120px' }} defaultValue={gc.name} onBlur={e => { if(e.target.value !== gc.name) updateGcName(gidx, e.target.value); }} />
-                <input type="file" accept="image/*" style={{ fontSize: '0.78rem', width: '150px' }} onChange={e => setGcPhotos({ ...gcPhotos, [gidx]: e.target.files[0] })} />
-                <button style={{ ...S.btn, ...S.btnBlack, fontSize: '0.78rem' }} onClick={() => uploadGcPhoto(gidx)}>Upload</button>
-                <button style={{ ...S.btn, ...S.btnRed, fontSize: '0.78rem' }} onClick={() => deleteGc(gidx)}>x</button>
+              <div key={gidx} style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '12px', padding: '10px', background: '#f9f9f9', borderRadius: '6px', border: '1px solid #eee' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
+                  <img src={`${API_BASE}/api/static/images/children/${gc.photo}`} alt={gc.name}
+                    style={{ width: '40px', height: '40px', objectFit: 'cover', borderRadius: '50%', border: '2px solid #ddd', flexShrink: 0 }}
+                    onError={e => { e.target.onerror = null; e.target.src = `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23eee'/%3E%3Ccircle cx='50' cy='40' r='20' fill='%23ccc'/%3E%3Cpath d='M20 100c0-20 15-35 30-35s30 15 30 35' fill='%23ccc'/%3E%3C/svg%3E`; }} />
+                  <input style={{ ...S.input, flex: 1, minWidth: '120px' }} defaultValue={gc.name} placeholder="Grandchild Name" onBlur={e => { if(e.target.value !== gc.name) updateGcName(gidx, e.target.value); }} />
+                  <input type="file" accept="image/*" style={{ fontSize: '0.78rem', width: '150px' }} onChange={e => setGcPhotos({ ...gcPhotos, [gidx]: e.target.files[0] })} />
+                  <button style={{ ...S.btn, ...S.btnBlack, fontSize: '0.78rem' }} onClick={() => uploadGcPhoto(gidx)}>Upload Photo</button>
+                  <button style={{ ...S.btn, ...S.btnRed, fontSize: '0.78rem' }} onClick={() => deleteGc(gidx)}>x</button>
+                </div>
+                <textarea style={{ ...S.input, minHeight: '60px', resize: 'vertical', fontSize: '0.85rem' }} defaultValue={gc.tribute || ''} placeholder={`Tribute to Grandpa from ${gc.name}`} onBlur={e => { if(e.target.value !== (gc.tribute || '')) updateGcTribute(gidx, e.target.value); }} />
               </div>
             ))}
             {(member.grandchildren || []).length === 0 && <p style={{ color: '#aaa', fontSize: '0.85rem' }}>No grandchildren listed.</p>}

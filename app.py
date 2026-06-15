@@ -245,17 +245,23 @@ def load_family():
         member_dict = dict(m)
         member_dict['gallery'] = []
         member_dict['grandchildren'] = []
-        member_dict['portrait'] = ''
+        member_dict['spouse_portrait'] = ''
         
         c.execute('SELECT * FROM photos WHERE member_id = ? ORDER BY id ASC', (member_id,))
         photos = c.fetchall()
         for p in photos:
             if p['type'] == 'portrait':
                 member_dict['portrait'] = p['path']
+            elif p['type'] == 'spouse_portrait':
+                member_dict['spouse_portrait'] = p['path']
             elif p['type'] == 'gallery':
                 member_dict['gallery'].append({'path': p['path'], 'comment': p['comment']})
             elif p['type'] == 'grandchild':
-                member_dict['grandchildren'].append({'name': p['comment'], 'photo': p['path']})
+                name_part = p['comment']
+                tribute_part = ''
+                if '|' in p['comment']:
+                    name_part, tribute_part = p['comment'].split('|', 1)
+                member_dict['grandchildren'].append({'name': name_part, 'tribute': tribute_part, 'photo': p['path']})
         
         result.append(member_dict)
     conn.close()
@@ -280,6 +286,10 @@ def save_family(data):
         if member.get('portrait'):
             c.execute('''INSERT INTO photos (member_id, type, path, comment, phash)
                          VALUES (?, ?, ?, ?, ?)''', (member_id, 'portrait', member['portrait'], '', ''))
+                         
+        if member.get('spouse_portrait'):
+            c.execute('''INSERT INTO photos (member_id, type, path, comment, phash)
+                         VALUES (?, ?, ?, ?, ?)''', (member_id, 'spouse_portrait', member['spouse_portrait'], '', ''))
         
         for g in member.get('gallery', []):
             path = g if isinstance(g, str) else g.get('path', '')
@@ -291,7 +301,7 @@ def save_family(data):
         for gc in member.get('grandchildren', []):
             if gc.get('photo'):
                 c.execute('''INSERT INTO photos (member_id, type, path, comment, phash)
-                             VALUES (?, ?, ?, ?, ?)''', (member_id, 'grandchild', gc['photo'], gc.get('name', ''), ''))
+                             VALUES (?, ?, ?, ?, ?)''', (member_id, 'grandchild', gc['photo'], f"{gc.get('name', '')}|{gc.get('tribute', '')}", ''))
     conn.commit()
     conn.close()
     _save(FAMILY_FILE, data) # Also keep the JSON file updated for GitHub sync logic
@@ -529,6 +539,7 @@ def add_family_member():
         "spouse": body.get("spouse", ""),
         "note": body.get("note", ""),
         "portrait": "",
+        "spouse_portrait": "",
         "tribute": "",
         "gallery": [],
         "grandchildren": []
@@ -607,6 +618,53 @@ def delete_family_photo(idx):
         if os.path.exists(full):
             os.remove(full)
         family[idx]['portrait'] = ''
+        save_family(family)
+        socketio.emit('family_updated', {'idx': idx})
+    return jsonify({'success': True})
+
+@app.route('/api/admin/family/<int:idx>/spouse_photo', methods=['POST'])
+@token_required
+def upload_spouse_photo(idx):
+    family = load_family()
+    if not (0 <= idx < len(family)):
+        return jsonify({'error': 'Not found'}), 404
+    if 'photo' not in request.files:
+        return jsonify({'error': 'No file'}), 400
+    folder = family[idx]['name'].lower().replace(' ', '_')
+    d = os.path.join('static', 'images', 'children', folder)
+    os.makedirs(d, exist_ok=True)
+    
+    file = request.files['photo']
+    res = process_and_save_image(file, d, 'spouse_portrait', img_type='portrait')
+    
+    if "error" in res:
+        return jsonify({'error': res["error"]}), 400
+        
+    path = f"{folder}/{res['filename']}"
+    family[idx]['spouse_portrait'] = path
+    save_family(family)
+    
+    conn = get_db()
+    c = conn.cursor()
+    c.execute("UPDATE photos SET phash = ? WHERE type = 'spouse_portrait' AND path = ?", (res['phash'], path))
+    conn.commit()
+    conn.close()
+    
+    sync_file_bg(os.path.join(d, res['filename']))
+    socketio.emit('family_updated', {'idx': idx})
+    return jsonify({'success': True, 'spouse_portrait': path})
+
+@app.route('/api/admin/family/<int:idx>/spouse_photo', methods=['DELETE'])
+@token_required
+def delete_spouse_photo(idx):
+    family = load_family()
+    if not (0 <= idx < len(family)): return jsonify({'error': 'Not found'}), 404
+    path = family[idx].get('spouse_portrait')
+    if path:
+        full = os.path.join('static', 'images', 'children', path)
+        if os.path.exists(full):
+            os.remove(full)
+        family[idx]['spouse_portrait'] = ''
         save_family(family)
         socketio.emit('family_updated', {'idx': idx})
     return jsonify({'success': True})
@@ -829,6 +887,8 @@ def manage_grandchild(idx, gidx):
         body = request.json or {}
         if 'name' in body:
             gc[gidx]['name'] = body['name']
+        if 'tribute' in body:
+            gc[gidx]['tribute'] = body['tribute']
             
     family[idx]['grandchildren'] = gc
     save_family(family)
@@ -841,7 +901,7 @@ def add_grandchild(idx):
     family = load_family()
     if not (0 <= idx < len(family)): return jsonify({'error': 'Not found'}), 404
     gc = family[idx].get('grandchildren', [])
-    gc.append({'name': 'New Grandchild', 'photo': ''})
+    gc.append({'name': 'New Grandchild', 'tribute': '', 'photo': ''})
     family[idx]['grandchildren'] = gc
     save_family(family)
     socketio.emit('family_updated', {'idx': idx})
