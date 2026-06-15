@@ -1,5 +1,6 @@
 import { BrowserRouter as Router, Routes, Route, Link, useLocation } from 'react-router-dom';
 import { useEffect, useState, useRef, Component } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
 import { io } from 'socket.io-client';
 import Home from './pages/Home';
 import Life from './pages/Life';
@@ -65,7 +66,7 @@ function VisitorModal({ onDone }) {
 // ── Share Button ───────────────────────────────────────────────────────────────
 function ShareButton() {
   const [open, setOpen] = useState(false);
-  const url = 'https://tiny-ganache-32bfab.netlify.app';
+  const url = window.location.origin;
   const text = 'Join us in honouring the life of APOLLO J. FIZVALENTINE OWINO.';
   const visitorName = localStorage.getItem('visitorName') || 'Guest';
 
@@ -256,16 +257,34 @@ function App() {
       <Router>
         <PageTracker socketRef={socketRef} />
         <Navbar visitors={visitors} />
-        <Routes>
-          <Route path="/" element={<ErrorBoundary><Home /></ErrorBoundary>} />
-          <Route path="/life" element={<ErrorBoundary><Life /></ErrorBoundary>} />
-          <Route path="/program" element={<ErrorBoundary><Program /></ErrorBoundary>} />
-          <Route path="/family/:id" element={<ErrorBoundary><FamilyDetail /></ErrorBoundary>} />
-          <Route path="/admin" element={<ErrorBoundary><Admin /></ErrorBoundary>} />
-        </Routes>
+        <AnimatedRoutes />
         <Footer />
       </Router>
     </ErrorBoundary>
+  );
+}
+
+// ── Animated Routes ────────────────────────────────────────────────────────────
+function AnimatedRoutes() {
+  const location = useLocation();
+  return (
+    <AnimatePresence mode="wait">
+      <Routes location={location} key={location.pathname}>
+        <Route path="/" element={<PageTransition><ErrorBoundary><Home /></ErrorBoundary></PageTransition>} />
+        <Route path="/life" element={<PageTransition><ErrorBoundary><Life /></ErrorBoundary></PageTransition>} />
+        <Route path="/program" element={<PageTransition><ErrorBoundary><Program /></ErrorBoundary></PageTransition>} />
+        <Route path="/family/:id" element={<PageTransition><ErrorBoundary><FamilyDetail /></ErrorBoundary></PageTransition>} />
+        <Route path="/admin" element={<PageTransition><ErrorBoundary><Admin /></ErrorBoundary></PageTransition>} />
+      </Routes>
+    </AnimatePresence>
+  );
+}
+
+function PageTransition({ children }) {
+  return (
+    <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -15 }} transition={{ duration: 0.3, ease: 'easeOut' }}>
+      {children}
+    </motion.div>
   );
 }
 
