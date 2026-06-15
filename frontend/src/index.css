@@ -1403,15 +1403,28 @@ img {
 
 @media (max-width: 768px) {
     .floating-photo-container {
-        top: 12%;
-        left: auto;
-        right: 5%;
-        transform: none;
-        animation: float 6s ease-in-out infinite;
+        top: 10%;
+        left: 50%;
+        right: auto;
+        transform: translateX(-50%);
+        animation: floatMobile 6s ease-in-out infinite;
+    }
+    @keyframes floatMobile {
+        0% { transform: translate(-50%, 0px) rotate(-2deg); }
+        50% { transform: translate(-50%, -10px) rotate(2deg); }
+        100% { transform: translate(-50%, 0px) rotate(-2deg); }
     }
     .floating-photo {
-        width: 100px;
+        width: 120px;
         height: 120px;
+        border-radius: 50%; /* Make it a circular portrait */
+        box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+    }
+    .hero-content {
+        margin-top: 140px; /* Push the text down significantly so they don't overlap */
+    }
+    .hero-name {
+        font-size: 2.8rem; /* Scale down the main title on mobile */
     }
 }
 
