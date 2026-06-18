@@ -206,6 +206,17 @@ def save_grandpa(data):
 def migrate_json_to_db():
     conn = get_db()
     c = conn.cursor()
+    
+    flag_path = os.path.join(DATA_DIR, 'migrated_v3.flag')
+    if not os.path.exists(flag_path):
+        c.execute('DELETE FROM family_members')
+        c.execute('DELETE FROM photos')
+        conn.commit()
+        _save(GRANDPA_FILE, DEFAULT_GRANDPA)
+        _save(FAMILY_FILE, DEFAULT_FAMILY)
+        with open(flag_path, 'w') as f:
+            f.write('done')
+            
     c.execute('SELECT COUNT(*) as count FROM family_members')
     if c.fetchone()['count'] == 0:
         fam_json = _load(FAMILY_FILE, DEFAULT_FAMILY)
