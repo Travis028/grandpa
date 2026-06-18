@@ -8,6 +8,7 @@ import Program from './pages/Program';
 import Admin from './pages/Admin';
 import FamilyDetail from './pages/FamilyDetail';
 import Tributes from './pages/Tributes';
+import FloatingFlowers from './components/FloatingFlowers';
 import api from './config';
 
 // Keep Render awake — ping every 14 min so it never sleeps while a user is connected
@@ -372,6 +373,7 @@ function AnimatedRoutes() {
   const location = useLocation();
   return (
     <AnimatePresence mode="wait">
+      <FloatingFlowers />
       <Routes location={location} key={location.pathname}>
         <Route path="/" element={<PageTransition><ErrorBoundary><Home /></ErrorBoundary></PageTransition>} />
         <Route path="/life" element={<PageTransition><ErrorBoundary><Life /></ErrorBoundary></PageTransition>} />

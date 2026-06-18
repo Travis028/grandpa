@@ -76,7 +76,7 @@ DEFAULT_GRANDPA = {
     "wife_name": "Joyce Owino",
     "final_words": "God was good to me.",
     "life_story": "APOLLO J. FIZVALENTINE OWINO. was born in [FILL IN] to [FILL IN PARENTS' NAMES]. He grew up knowing the value of hard work and faith. Throughout his life, he was known for his quiet strength, his generous spirit, and his deep love for his family.\n\nHe worked as a [FILL IN OCCUPATION] and provided for his family with dignity and pride. Even in difficult times, he never complained. Instead, he taught his children that every challenge is an opportunity to grow stronger.\n\nHis faith was the foundation of his life. He believed in [FILL IN FAITH/CHURCH] and prayed for his family every single day.\n\nIn his final months, he faced [FILL IN ILLNESS] with remarkable courage. Even when his body grew weak, his spirit remained strong. His last words to his family were, \"God was good to me.\"",
-    "firstborn_name": "Bon Apollo",
+    "firstborn_name": "Nabi Owino",
     "firstborn_note": "Firstborn of APOLLO J. FIZVALENTINE OWINO. Preceded his father in death. Forever remembered. Forever loved."
 }
 
@@ -112,21 +112,22 @@ def init_db():
 init_db()
 
 DEFAULT_FAMILY = [
-    {"name":"Evans Odhiambo","spouse":"Mama Young","note":"","portrait":"evans_odhiambo/portrait.jpg","tribute":"[FILL IN: Evans' tribute to Grandpa]","gallery":[],"grandchildren":[
+    {"name":"Evans Odhiambo","spouse":"Eunice Evance & the late Monica Odhiambo","note":"","portrait":"evans_odhiambo/portrait.jpg","tribute":"[FILL IN: Evans' tribute to Grandpa]","gallery":[],"grandchildren":[
         {"name":"Kevins Ochieng","photo":"evans_odhiambo/grandchildren/kevins.jpg"},
-        {"name":"Awuor","photo":"evans_odhiambo/grandchildren/awuor.jpg"},
+        {"name":"Ireene Awuor","photo":"evans_odhiambo/grandchildren/awuor.jpg"},
         {"name":"Peter Odhiambo","photo":"peter_odhiambo/portrait.jpg","tribute":"[FILL IN]"},
-        {"name":"Elly Opiyo","photo":"elly_opiyo/portrait.jpg","note":"Twin to Peter","tribute":"[FILL IN]"},
-        {"name":"Felix Otieno","photo":"felix_otieno/portrait.jpg","tribute":"[FILL IN]"}
+        {"name":"Elly Opiyo (junier)","photo":"elly_opiyo/portrait.jpg","note":"Twin to Peter","tribute":"[FILL IN]"},
+        {"name":"Felix Omondi","photo":"felix_otieno/portrait.jpg","tribute":"[FILL IN]"},
+        {"name":"Joy Odhiambo","photo":""}
     ]},
-    {"name":"Joy Odhiambo","spouse":"","note":"","portrait":"joy_odhiambo/portrait.jpg","tribute":"[FILL IN: Joy's tribute to Dad]","gallery":[],"grandchildren":[]},
-    {"name":"Jeff Apollo","spouse":"Roseline Jeff","note":"","portrait":"jeff_apollo/portrait.jpg","tribute":"[FILL IN: Jeff's tribute to Dad]","gallery":[],"grandchildren":[
-        {"name":"Dean Revs Ochieng","photo":"jeff_apollo/grandchildren/dean.jpg"},
-        {"name":"Jimmy Adams","photo":"jeff_apollo/grandchildren/jimmy.jpg"},
-        {"name":"Mark Johoo","photo":"jeff_apollo/grandchildren/mark.jpg"},
+    {"name":"Joyce Owino","spouse":"","note":"","portrait":"joy_odhiambo/portrait.jpg","tribute":"[FILL IN: Joyce's tribute to Dad]","gallery":[],"grandchildren":[]},
+    {"name":"Jeph Apollo","spouse":"Roseline Jeph","note":"","portrait":"jeff_apollo/portrait.jpg","tribute":"[FILL IN: Jeph's tribute to Dad]","gallery":[],"grandchildren":[
+        {"name":"Dean Reeves Ochieng","photo":"jeff_apollo/grandchildren/dean.jpg"},
+        {"name":"Jimmy Adams Ochieng","photo":"jeff_apollo/grandchildren/jimmy.jpg"},
+        {"name":"Marc Joe","photo":"jeff_apollo/grandchildren/mark.jpg"},
         {"name":"Amaya Joy","photo":"jeff_apollo/grandchildren/amaya.jpg"}
     ]},
-    {"name":"Cherls Were","spouse":"Lilian Were","note":"","portrait":"cherls_were/portrait.jpg","tribute":"[FILL IN: Cherls' tribute to Grandpa]","gallery":[],"grandchildren":[
+    {"name":"Cherles Were","spouse":"Lilian Were","note":"","portrait":"cherls_were/portrait.jpg","tribute":"[FILL IN: Cherles' tribute to Grandpa]","gallery":[],"grandchildren":[
         {"name":"Dashon Tindely","photo":"cherls_were/grandchildren/dashon.jpg"},
         {"name":"Pendo Daniela","photo":"cherls_were/grandchildren/pendo.jpg"}
     ]},
@@ -136,7 +137,7 @@ DEFAULT_FAMILY = [
         {"name":"Emmanuela Winslette","photo":"timothy_owino/grandchildren/emmanuela.jpg"},
         {"name":"Zach Gabriels","photo":"timothy_owino/grandchildren/zach.jpg"}
     ]},
-    {"name":"Hellon Owino","spouse":"","note":"","portrait":"hellon_owino/portrait.jpg","tribute":"[FILL IN: Hellon's tribute to Dad]","gallery":[],"grandchildren":[
+    {"name":"Hellen Owino","spouse":"","note":"","portrait":"hellon_owino/portrait.jpg","tribute":"[FILL IN: Hellen's tribute to Dad]","gallery":[],"grandchildren":[
         {"name":"Jerald Okello","photo":"hellon_owino/grandchildren/jerald.jpg"},
         {"name":"Bevaline Okello","photo":"hellon_owino/grandchildren/bevaline.jpg"},
         {"name":"Henry Okelo (Obash)","photo":"hellon_owino/grandchildren/henry.jpg"},
@@ -404,12 +405,35 @@ def get_program():
 @app.route('/api/tributes', methods=['GET', 'POST'])
 def api_tributes():
     if request.method == 'POST':
-        body = request.json or {}
+        if request.content_type and request.content_type.startswith('multipart/form-data'):
+            body = request.form
+            file = request.files.get('media')
+        else:
+            body = request.json or {}
+            file = None
+            
         msg = body.get('message', '').strip()
         if not msg:
             return jsonify({"error": "Message required"}), 400
-        tribute = {'name': body.get('name', 'Anonymous'), 'relation': body.get('relation', 'Friend'),
-                   'message': msg, 'date': datetime.now().strftime('%B %d, %Y')}
+            
+        tribute = {
+            'name': body.get('name', 'Anonymous'),
+            'relation': body.get('relation', 'Friend'),
+            'message': msg,
+            'date': datetime.now().strftime('%B %d, %Y')
+        }
+        
+        if file and file.filename:
+            d = os.path.join('static', 'images', 'tributes_media')
+            os.makedirs(d, exist_ok=True)
+            ts = datetime.now().strftime('%Y%m%d%H%M%S')
+            safe_name = file.filename.replace(' ', '_')
+            filename = f"{ts}_{safe_name}"
+            path = os.path.join(d, filename)
+            file.save(path)
+            sync_file_bg(path)
+            tribute['media'] = f"tributes_media/{filename}"
+
         tributes = _load(TRIBUTES_FILE)
         tributes.append(tribute)
         _save(TRIBUTES_FILE, tributes)
