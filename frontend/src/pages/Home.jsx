@@ -151,7 +151,7 @@ export default function Home() {
             <Link to="/life" className="quick-nav-btn">His Life Story</Link>
             <Link to="/program" className="quick-nav-btn">Funeral Program</Link>
             <a href="#family" className="quick-nav-btn">Our Family</a>
-            <a href="#tributes" className="quick-nav-btn">Leave a Tribute</a>
+            <Link to="/tributes" className="quick-nav-btn">Leave a Tribute</Link>
             <Link to="/program#feedback" className="quick-nav-btn">Leave Feedback</Link>
           </div>
         </div>
@@ -290,80 +290,6 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="section tributes-section" id="tributes">
-        <div className="container-narrow">
-          <Reveal>
-            <div className="section-header">
-              <span className="section-tag">Words from the Heart</span>
-              <h2 className="section-title">Tributes</h2>
-              <div className="section-rule">
-                <span className="section-rule-line"></span>
-                <span className="section-rule-dot"></span>
-                <span className="section-rule-line"></span>
-              </div>
-            </div>
-          </Reveal>
-
-          <div className="tributes-list">
-            {tributes && tributes.length > 0 ? (
-              [...tributes].reverse().map((tribute, idx) => (
-                <Reveal key={idx}>
-                  <div className="tribute-card">
-                    <div className="tribute-quote-mark">"</div>
-                    <p className="tribute-message">{tribute.message}</p>
-                    <div className="tribute-meta">
-                      <span className="tribute-name">{tribute.name}</span>
-                      <span>·</span>
-                      <span className="tribute-relation">{tribute.relation}</span>
-                      <span>·</span>
-                      <span className="tribute-date">{tribute.date}</span>
-                    </div>
-                  </div>
-                </Reveal>
-              ))
-            ) : (
-              <Reveal>
-                <div className="tribute-card">
-                  <div className="tribute-quote-mark">"</div>
-                  <p className="tribute-message">Be the first to leave a tribute for Grandpa.</p>
-                  <div className="tribute-meta">
-                    <span className="tribute-name">Family</span>
-                  </div>
-                </div>
-              </Reveal>
-            )}
-          </div>
-
-          <Reveal>
-            <div className="ornament">✦ &nbsp;&nbsp; ✦ &nbsp;&nbsp; ✦</div>
-          </Reveal>
-
-          <Reveal>
-            <div className="tribute-form-wrap" id="tribute-form">
-              <h3 className="form-title">Leave a Tribute</h3>
-              <p className="form-sub">Share a memory, a word of love, or a prayer for the family.</p>
-
-              <form onSubmit={handleTributeSubmit}>
-                <div className="form-grid">
-                  <div className="form-field">
-                    <label className="form-label" htmlFor="name">Your Name</label>
-                    <input className="form-input" type="text" id="name" required placeholder="e.g. Auntie Jane" value={tributeForm.name} onChange={e => setTributeForm({...tributeForm, name: e.target.value})} />
-                  </div>
-                  <div className="form-field">
-                    <label className="form-label" htmlFor="relation">Your Relation</label>
-                    <input className="form-input" type="text" id="relation" placeholder="e.g. Grandchild, Friend, Neighbor" value={tributeForm.relation} onChange={e => setTributeForm({...tributeForm, relation: e.target.value})} />
-                  </div>
-                  <div className="form-field full">
-                    <label className="form-label" htmlFor="message">Your Message</label>
-                    <textarea className="form-textarea" id="message" required placeholder="Write your tribute here…" value={tributeForm.message} onChange={e => setTributeForm({...tributeForm, message: e.target.value})}></textarea>
-                  </div>
-                </div>
-                <button className="btn-submit" type="submit">Share Your Tribute →</button>
-              </form>
-            </div>
-          </Reveal>
-        </div>
-      </section>
 
       {viewingGallery && !viewingPhoto && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.95)', zIndex: 9998, display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '40px 20px', overflowY: 'auto' }} onClick={() => setViewingGallery(null)}>

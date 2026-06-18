@@ -729,7 +729,6 @@ export default function Admin() {
     { key: 'program', label: 'Program' },
     { key: 'activity', label: 'Activity' },
     { key: 'family', label: `Family (${data.family.length})` },
-    { key: 'tributes', label: `Tributes (${data.tributes.length})` },
     { key: 'feedback', label: `Feedback (${(data.feedback || []).length})` },
     { key: 'requests', label: `Requests${pendingReqs > 0 ? ` (${pendingReqs})` : ''}` },
   ];
@@ -776,7 +775,6 @@ export default function Admin() {
           {data.family.map((m, idx) => <FamilyEditor key={idx} member={m} idx={idx} token={token} onSaved={() => fetch()} />)}
         </div>
       )}
-      {tab === 'tributes' && <TributesTab tributes={data.tributes} token={token} onSaved={() => fetch()} />}
       {tab === 'requests' && <RequestsTab requests={data.admin_requests} token={token} onSaved={() => fetch()} />}
     </motion.div>
   );

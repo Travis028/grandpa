@@ -7,6 +7,7 @@ import Life from './pages/Life';
 import Program from './pages/Program';
 import Admin from './pages/Admin';
 import FamilyDetail from './pages/FamilyDetail';
+import Tributes from './pages/Tributes';
 import api from './config';
 
 // Keep Render awake — ping every 14 min so it never sleeps while a user is connected
@@ -374,6 +375,7 @@ function AnimatedRoutes() {
       <Routes location={location} key={location.pathname}>
         <Route path="/" element={<PageTransition><ErrorBoundary><Home /></ErrorBoundary></PageTransition>} />
         <Route path="/life" element={<PageTransition><ErrorBoundary><Life /></ErrorBoundary></PageTransition>} />
+        <Route path="/tributes" element={<PageTransition><ErrorBoundary><Tributes /></ErrorBoundary></PageTransition>} />
         <Route path="/program" element={<PageTransition><ErrorBoundary><Program /></ErrorBoundary></PageTransition>} />
         <Route path="/family/:id" element={<PageTransition><ErrorBoundary><FamilyDetail /></ErrorBoundary></PageTransition>} />
         <Route path="/admin" element={<PageTransition><ErrorBoundary><Admin /></ErrorBoundary></PageTransition>} />

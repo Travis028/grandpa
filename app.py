@@ -59,7 +59,7 @@ active_visitors = {}   # sid -> {name, ip, time, page}
 _lock = threading.Lock()
 
 # ── FILE PATHS ────────────────────────────────────────────────────────────────
-DATA_DIR         = 'data'
+DATA_DIR         = os.path.join('static', 'images', 'app_data')
 FAMILY_FILE      = os.path.join(DATA_DIR, 'family.json')
 GRANDPA_FILE     = os.path.join(DATA_DIR, 'grandpa.json')
 TRIBUTES_FILE    = os.path.join(DATA_DIR, 'tributes.json')
@@ -225,9 +225,9 @@ def migrate_json_to_db():
                                  VALUES (?, ?, ?, ?, ?)''', (member_id, 'gallery', path, comment, ''))
             
             for gc in member.get('grandchildren', []):
-                if gc.get('photo'):
-                    c.execute('''INSERT INTO photos (member_id, type, path, comment, phash)
-                                 VALUES (?, ?, ?, ?, ?)''', (member_id, 'grandchild', gc['photo'], gc.get('name', ''), ''))
+                photo_path = gc.get('photo') or ''
+                c.execute('''INSERT INTO photos (member_id, type, path, comment, phash)
+                             VALUES (?, ?, ?, ?, ?)''', (member_id, 'grandchild', photo_path, gc.get('name', ''), ''))
         conn.commit()
     conn.close()
 
@@ -299,9 +299,9 @@ def save_family(data):
                              VALUES (?, ?, ?, ?, ?)''', (member_id, 'gallery', path, comment, ''))
         
         for gc in member.get('grandchildren', []):
-            if gc.get('photo'):
-                c.execute('''INSERT INTO photos (member_id, type, path, comment, phash)
-                             VALUES (?, ?, ?, ?, ?)''', (member_id, 'grandchild', gc['photo'], f"{gc.get('name', '')}|{gc.get('tribute', '')}", ''))
+            photo_path = gc.get('photo') or ''
+            c.execute('''INSERT INTO photos (member_id, type, path, comment, phash)
+                         VALUES (?, ?, ?, ?, ?)''', (member_id, 'grandchild', photo_path, f"{gc.get('name', '')}|{gc.get('tribute', '')}", ''))
     conn.commit()
     conn.close()
     _save(FAMILY_FILE, data) # Also keep the JSON file updated for GitHub sync logic
