@@ -268,7 +268,7 @@ function Footer() {
       <div className="container text-center">
         <div className="footer-ornament">✦</div>
         <p className="footer-name">APOLLO J. FIZVALENTINE OWINO.</p>
-        <p className="footer-dates">1940 — 2026</p>
+        <p className="footer-dates">1952 — 2026</p>
         <div style={{ margin: '20px 0' }}>
           <ShareButton />
         </div>

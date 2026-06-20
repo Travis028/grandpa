@@ -71,7 +71,7 @@ os.makedirs(DATA_DIR, exist_ok=True)
 
 DEFAULT_GRANDPA = {
     "name": "APOLLO J. FIZVALENTINE OWINO.",
-    "birth_year": "1940", "death_year": "2026",
+    "birth_year": "1952", "death_year": "2026",
     "birth_place": "[Fill in: Village/Town, Kenya]",
     "wife_name": "Joyce Owino",
     "final_words": "God was good to me.",
