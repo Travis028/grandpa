@@ -166,20 +166,31 @@ function FeedbackTab({ feedback, token, onSaved }) {
 // ── Life Photos Manager ───────────────────────────────────────────────────────
 function LifePhotosManager({ token }) {
   const [photos, setPhotos] = useState([]);
-  const [file, setFile] = useState(null);
+  const [uploading, setUploading] = useState(false);
   const [alertMsg, setAlertMsg] = useState('');
   const flash = (m) => { setAlertMsg(m); setTimeout(() => setAlertMsg(''), 3000); };
 
   const loadPhotos = () => api.get('/api/life_photos').then(r => setPhotos(r.data)).catch(() => {});
   useEffect(() => { loadPhotos(); }, []);
 
-  const upload = async () => {
-    if (!file) return;
-    const fd = new FormData(); fd.append('photo', file);
-    try {
-      await api.post(`/api/admin/life_photos`, fd, { headers: authHeader(token) });
-      flash('Photo added!'); setFile(null); loadPhotos();
-    } catch { flash('Upload failed.'); }
+  const onDrop = async (acceptedFiles) => {
+    if (!acceptedFiles || acceptedFiles.length === 0) return;
+    setUploading(true);
+    let successCount = 0;
+    for (const file of acceptedFiles) {
+      const fd = new FormData(); fd.append('photo', file);
+      try {
+        await api.post(`/api/admin/life_photos`, fd, { headers: authHeader(token) });
+        successCount++;
+      } catch (e) {
+        flash(`Failed to upload ${file.name}`);
+      }
+    }
+    if (successCount > 0) {
+      flash(`Successfully added ${successCount} photo(s)!`);
+      loadPhotos();
+    }
+    setUploading(false);
   };
 
   const remove = async (filename) => {
@@ -207,11 +218,10 @@ function LifePhotosManager({ token }) {
         ))}
         {photos.length === 0 && <p style={{ color: '#aaa', fontSize: '0.85rem' }}>No photos yet.</p>}
       </div>
-      <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-        <input type="file" accept="image/*" onChange={e => setFile(e.target.files[0])} style={{ fontSize: '0.82rem', flex: 1 }} />
-        <button style={{ ...S.btn, ...S.btnBlack }} onClick={upload}>Add Photo</button>
+      <div style={{ marginTop: '10px' }}>
+        <DropzoneArea onDrop={onDrop} uploading={uploading} multiple={true} />
       </div>
-      {alertMsg && <p style={{ color: '#276749', fontSize: '0.82rem', marginTop: '6px' }}>{alertMsg}</p>}
+      {alertMsg && <p style={{ color: String(alertMsg).includes('fail') ? '#e53e3e' : '#276749', fontSize: '0.82rem', marginTop: '6px' }}>{alertMsg}</p>}
     </div>
   );
 }
