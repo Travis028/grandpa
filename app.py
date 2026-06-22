@@ -741,6 +741,33 @@ def upload_gallery_photo(idx):
     socketio.emit('family_updated', {'idx': idx})
     return jsonify({'success': True, 'path': path})
 
+@app.route('/api/admin/memories', methods=['POST'])
+@token_required
+def upload_memory_photo():
+    if 'photo' not in request.files:
+        return jsonify({'error': 'No file'}), 400
+    file = request.files['photo']
+    d = os.path.join('static', 'images', 'memories')
+    os.makedirs(d, exist_ok=True)
+    ts = datetime.now().strftime('%Y%m%d%H%M%S')
+    safe_name = file.filename.replace(' ', '_').rsplit('.', 1)[0]
+    filename_prefix = f"{ts}_{safe_name}"
+    
+    res = process_and_save_image(file, d, filename_prefix, img_type='gallery')
+    if "error" in res:
+        return jsonify({'error': res["error"]}), 400
+        
+    sync_file_bg(os.path.join(d, res['filename']))
+    return jsonify({'success': True, 'filename': res['filename']})
+
+@app.route('/api/admin/memories/<path:filename>', methods=['DELETE'])
+@token_required
+def delete_memory_photo(filename):
+    full = os.path.join('static', 'images', 'memories', filename)
+    if os.path.exists(full):
+        os.remove(full)
+    return jsonify({'success': True})
+
 @app.route('/api/admin/family/<int:idx>/gallery/<int:gidx>', methods=['PUT', 'DELETE'])
 @token_required
 def manage_gallery_photo(idx, gidx):

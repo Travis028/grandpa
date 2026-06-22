@@ -255,7 +255,7 @@ function GrandpaEditor({ grandpa, token, onSaved }) {
       </div>
       <div style={{ marginBottom: '12px' }}>
         <label style={S.label}>Life Story</label>
-        <ReactQuill theme="snow" value={form.life_story || ''} onChange={val => setForm({ ...form, life_story: val })} style={{ background: '#fff' }} />
+        <ReactQuill theme="snow" value={form.life_story || ''} onChange={(val, delta, source) => { if (source === 'user') setForm({ ...form, life_story: val }); }} style={{ background: '#fff' }} />
       </div>
       <div style={{ marginTop: '20px', borderTop: '1px solid #eee', paddingTop: '16px', marginBottom: '12px' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
@@ -730,6 +730,72 @@ function RequestsTab({ requests, token, onSaved }) {
   );
 }
 
+// ── Memories Manager ────────────────────────────────────────────────────────────
+function MemoriesManager({ token, onSaved }) {
+  const [photos, setPhotos] = useState([]);
+  const [uploading, setUploading] = useState(false);
+  const [alertMsg, setAlertMsg] = useState('');
+  const flash = (m) => { setAlertMsg(m); setTimeout(() => setAlertMsg(''), 3000); };
+
+  const loadPhotos = () => api.get('/api/memories').then(r => setPhotos(r.data)).catch(() => {});
+  useEffect(() => { loadPhotos(); }, []);
+
+  const onDrop = async (acceptedFiles) => {
+    if (!acceptedFiles || acceptedFiles.length === 0) return;
+    setUploading(true);
+    let successCount = 0;
+    for (const file of acceptedFiles) {
+      const fd = new FormData(); fd.append('photo', file);
+      try {
+        await api.post(`/api/admin/memories`, fd, { headers: authHeader(token) });
+        successCount++;
+      } catch (e) {
+        flash(`Failed to upload ${file.name}`);
+      }
+    }
+    if (successCount > 0) {
+      flash(`Successfully added ${successCount} memory photo(s)!`);
+      loadPhotos();
+      onSaved();
+    }
+    setUploading(false);
+  };
+
+  const remove = async (filename) => {
+    if (!window.confirm('Remove this photo?')) return;
+    try {
+      await api.delete(`/api/admin/memories/${filename}`, { headers: authHeader(token) });
+      flash('Removed.'); loadPhotos(); onSaved();
+    } catch { flash('Error.'); }
+  };
+
+  return (
+    <div style={S.card}>
+      <h4 style={{ marginBottom: '10px' }}>Home Page Memories Gallery ({photos.length} photos)</h4>
+      <p style={{ fontSize: '0.85rem', color: '#666', marginBottom: '16px' }}>Upload photos here to display them in the "Snapshots in Time" section on the Home page.</p>
+      
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginBottom: '12px' }}>
+        {photos.map((ph, idx) => (
+          <div key={idx} style={{ position: 'relative' }}>
+            <img src={`${API_BASE}/api/static/images/memories/${ph.file}`} alt=""
+              style={{ width: '80px', height: '80px', objectFit: 'cover', borderRadius: '6px', border: '1px solid #ddd' }}
+              onError={e => { e.target.onerror = null; e.target.src = `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23eee'/%3E%3Ccircle cx='50' cy='40' r='20' fill='%23ccc'/%3E%3Cpath d='M20 100c0-20 15-35 30-35s30 15 30 35' fill='%23ccc'/%3E%3C/svg%3E`; }} />
+            <button onClick={() => remove(ph.file)}
+              style={{ position: 'absolute', top: '-6px', right: '-6px', background: '#e53e3e', color: '#fff', border: 'none', borderRadius: '50%', width: '20px', height: '20px', cursor: 'pointer', fontSize: '0.7rem', lineHeight: '20px', padding: 0 }}>
+              x
+            </button>
+          </div>
+        ))}
+        {photos.length === 0 && <p style={{ color: '#aaa', fontSize: '0.85rem' }}>No memory photos yet.</p>}
+      </div>
+      <div style={{ marginTop: '10px' }}>
+        <DropzoneArea onDrop={onDrop} uploading={uploading} multiple={true} />
+      </div>
+      {alertMsg && <p style={{ color: String(alertMsg).includes('fail') ? '#e53e3e' : '#276749', fontSize: '0.82rem', marginTop: '6px' }}>{alertMsg}</p>}
+    </div>
+  );
+}
+
 // ── Main Dashboard ────────────────────────────────────────────────────────────
 export default function Admin() {
   const [token, setToken] = useState(localStorage.getItem('adminToken'));
@@ -783,6 +849,7 @@ export default function Admin() {
     { key: 'program', label: 'Program' },
     { key: 'activity', label: 'Activity' },
     { key: 'family', label: `Family (${data.family.length})` },
+    { key: 'memories', label: 'Memories' },
     { key: 'feedback', label: `Feedback (${(data.feedback || []).length})` },
     { key: 'requests', label: `Requests${pendingReqs > 0 ? ` (${pendingReqs})` : ''}` },
   ];
@@ -829,6 +896,7 @@ export default function Admin() {
           {data.family.map((m, idx) => <FamilyEditor key={idx} member={m} idx={idx} token={token} onSaved={() => fetch()} />)}
         </div>
       )}
+      {tab === 'memories' && <MemoriesManager token={token} onSaved={() => fetch()} />}
       {tab === 'requests' && <RequestsTab requests={data.admin_requests} token={token} onSaved={() => fetch()} />}
     </motion.div>
   );

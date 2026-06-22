@@ -150,7 +150,7 @@ export default function Home() {
           <div className="quick-nav-buttons">
             <Link to="/life" className="quick-nav-btn">His Life Story</Link>
             <Link to="/program" className="quick-nav-btn">Funeral Program</Link>
-            <a href="/print-program" target="_blank" rel="noreferrer" className="quick-nav-btn" style={{ background: '#d4af37', color: '#111', fontWeight: 'bold' }}>🖨️ Download Program PDF</a>
+            <a href="/print-program" target="_blank" rel="noreferrer" className="quick-nav-btn" style={{ background: '#d4af37', color: '#111', fontWeight: 'bold', fontSize: '0.85rem', padding: '6px 14px', borderRadius: '20px', display: 'flex', alignItems: 'center', gap: '4px' }}>🖨️ Download Program</a>
             <a href="#family" className="quick-nav-btn">Our Family</a>
             <Link to="/tributes" className="quick-nav-btn">Leave a Tribute</Link>
             <Link to="/program#feedback" className="quick-nav-btn">Leave Feedback</Link>
