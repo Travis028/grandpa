@@ -138,27 +138,46 @@ export default function FamilyDetail() {
               return (
                 <motion.div 
                   key={i}
-                  whileHover={{ scale: 1.02, y: -5, rotate: i % 2 === 0 ? 1 : -1 }}
+                  whileHover={{ scale: 1.05, y: -10, rotate: i % 2 === 0 ? 2 : -2, zIndex: 10 }}
                   onClick={() => openLightbox(i)}
                   style={{
                     background: '#fff',
-                    padding: '14px 14px 24px 14px',
-                    borderRadius: '4px',
-                    boxShadow: '0 10px 25px rgba(0,0,0,0.1), 0 4px 10px rgba(0,0,0,0.05)',
+                    padding: '14px 14px 40px 14px', // Authentic polaroid thick bottom
+                    borderRadius: '2px', // Sharp paper edges
+                    boxShadow: '0 15px 35px rgba(0,0,0,0.1), 0 5px 15px rgba(0,0,0,0.05)',
                     cursor: 'pointer',
                     display: 'flex',
                     flexDirection: 'column',
-                    border: '1px solid #f0f0f0'
+                    border: '1px solid #eaeaea',
+                    position: 'relative',
+                    transformOrigin: 'center center'
                   }}
                 >
-                  <img 
-                    src={`${API_BASE}/api/static/images/children/${path}`} 
-                    alt="Gallery image"
-                    style={{ width: '100%', height: '240px', objectFit: 'cover', borderRadius: '2px', background: '#eee' }}
-                  />
+                  <div style={{
+                    position: 'absolute',
+                    top: '-10px',
+                    left: '50%',
+                    transform: 'translateX(-50%)',
+                    width: '40px',
+                    height: '15px',
+                    background: 'rgba(255,255,255,0.4)',
+                    border: '1px solid rgba(0,0,0,0.1)',
+                    boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
+                    backdropFilter: 'blur(2px)',
+                    zIndex: 2,
+                    transform: `translateX(-50%) rotate(${i % 2 === 0 ? -3 : 3}deg)` // Tape effect
+                  }}></div>
+                  
+                  <div style={{ width: '100%', height: '240px', background: '#1a1a1a', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <img 
+                      src={`${API_BASE}/api/static/images/children/${path}`} 
+                      alt="Gallery image"
+                      style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+                    />
+                  </div>
                   {comment && (
-                    <div style={{ paddingTop: '16px', background: '#fff' }}>
-                      <p style={{ margin: 0, fontSize: '1rem', color: '#333', textAlign: 'center', fontFamily: '"Playfair Display", serif', fontStyle: 'italic', letterSpacing: '0.5px' }}>{comment}</p>
+                    <div style={{ paddingTop: '20px', background: '#fff', display: 'flex', justifyContent: 'center' }}>
+                      <p style={{ margin: 0, fontSize: '1.1rem', color: '#333', textAlign: 'center', fontFamily: '"Playfair Display", serif', fontStyle: 'italic', letterSpacing: '0.5px' }}>{comment}</p>
                     </div>
                   )}
                 </motion.div>
