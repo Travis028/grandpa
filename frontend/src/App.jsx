@@ -8,6 +8,7 @@ import Program from './pages/Program';
 import Admin from './pages/Admin';
 import FamilyDetail from './pages/FamilyDetail';
 import Tributes from './pages/Tributes';
+import ProgramPDF from './pages/ProgramPDF';
 import FloatingFlowers from './components/FloatingFlowers';
 import api from './config';
 
@@ -381,6 +382,7 @@ function AnimatedRoutes() {
         <Route path="/program" element={<PageTransition><ErrorBoundary><Program /></ErrorBoundary></PageTransition>} />
         <Route path="/family/:id" element={<PageTransition><ErrorBoundary><FamilyDetail /></ErrorBoundary></PageTransition>} />
         <Route path="/admin" element={<PageTransition><ErrorBoundary><Admin /></ErrorBoundary></PageTransition>} />
+        <Route path="/print-program" element={<ProgramPDF />} />
       </Routes>
     </AnimatePresence>
   );

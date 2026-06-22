@@ -84,7 +84,7 @@ Admin panel is at: `https://tiny-ganache-32bfab.netlify.app/admin`
 The admin dashboard has the following tabs:
 
 - **Overview** — Live visitor count, total visitors, named visitors list, live activity table (who is on site, what page), tributes count, shares count, pending requests
-- **Grandpa Info** — Edit name, birth year, death year, birth place, wife name, final words, full life story
+- **Grandpa Info** — Edit name, birth year, death year, birth place, wife name, final words. Includes a full rich text editor for formatting the life story.
 - **Program** — Edit all funeral program details and order of service (add/remove/edit items)
 - **Activity** — Full activity log (last 100 actions) — who visited, navigated, shared, left a tribute or feedback. Share breakdown by platform
 - **Family** — Edit every child's name, spouse, note, tribute. Upload portrait. Add/remove gallery photos. Upload grandchild photos
@@ -101,6 +101,7 @@ All changes are saved permanently to JSON files in the `data/` folder and surviv
 - **Visitor name prompt** — every visitor must enter their name on first visit. Logged for admin
 - **Live visitor count** — shown in navbar via WebSocket
 - **Family section** — each child with portrait, tribute, grandchildren, and gallery
+- **Program Download** — highly visible button on the home page for users to easily download the memorial booklet
 - **Tributes** — visitors can leave tributes (name, relation, message)
 - **Feedback** — visitors can leave private star-rated feedback (admin-only view)
 - **Share button** — footer share button for WhatsApp, Facebook, Twitter/X, Copy Link. All shares tracked

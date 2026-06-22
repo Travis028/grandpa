@@ -1,0 +1,193 @@
+[
+  {
+    "name": "Evans Odhiambo",
+    "spouse": "Eunice Evance & the late Monica Odhiambo",
+    "note": "",
+    "portrait": "evans_odhiambo/portrait.jpg",
+    "tribute": "[FILL IN: Evans' tribute to Grandpa]",
+    "gallery": [],
+    "grandchildren": [
+      {
+        "name": "Kevins Ochieng",
+        "photo": "evans_odhiambo/grandchildren/kevins.jpg"
+      },
+      {
+        "name": "Ireene Awuor",
+        "photo": "evans_odhiambo/grandchildren/awuor.jpg"
+      },
+      {
+        "name": "Peter Odhiambo",
+        "photo": "peter_odhiambo/portrait.jpg",
+        "tribute": "[FILL IN]"
+      },
+      {
+        "name": "Elly Opiyo (junier)",
+        "photo": "elly_opiyo/portrait.jpg",
+        "note": "Twin to Peter",
+        "tribute": "[FILL IN]"
+      },
+      {
+        "name": "Felix Omondi",
+        "photo": "felix_otieno/portrait.jpg",
+        "tribute": "[FILL IN]"
+      },
+      {
+        "name": "Joy Odhiambo",
+        "photo": ""
+      }
+    ]
+  },
+  {
+    "name": "Joyce Owino",
+    "spouse": "",
+    "note": "",
+    "portrait": "joy_odhiambo/portrait.jpg",
+    "tribute": "[FILL IN: Joyce's tribute to Dad]",
+    "gallery": [],
+    "grandchildren": []
+  },
+  {
+    "name": "Jeph Apollo",
+    "spouse": "Roseline Jeph",
+    "note": "",
+    "portrait": "jeff_apollo/portrait.jpg",
+    "tribute": "[FILL IN: Jeph's tribute to Dad]",
+    "gallery": [],
+    "grandchildren": [
+      {
+        "name": "Dean Reeves Ochieng",
+        "photo": "jeff_apollo/grandchildren/dean.jpg"
+      },
+      {
+        "name": "Jimmy Adams Ochieng",
+        "photo": "jeff_apollo/grandchildren/jimmy.jpg"
+      },
+      {
+        "name": "Marc Joe",
+        "photo": "jeff_apollo/grandchildren/mark.jpg"
+      },
+      {
+        "name": "Amaya Joy",
+        "photo": "jeff_apollo/grandchildren/amaya.jpg"
+      }
+    ]
+  },
+  {
+    "name": "Cherles Were",
+    "spouse": "Lilian Were",
+    "note": "",
+    "portrait": "cherls_were/portrait.jpg",
+    "tribute": "[FILL IN: Cherles' tribute to Grandpa]",
+    "gallery": [],
+    "grandchildren": [
+      {
+        "name": "Dashon Tindely",
+        "photo": "cherls_were/grandchildren/dashon.jpg"
+      },
+      {
+        "name": "Pendo Daniela",
+        "photo": "cherls_were/grandchildren/pendo.jpg"
+      }
+    ]
+  },
+  {
+    "name": "Timothy Owino",
+    "spouse": "Nancy Otieno",
+    "note": "",
+    "portrait": "timothy_owino/portrait.jpg",
+    "tribute": "[FILL IN: Timothy's tribute to Dad]",
+    "gallery": [],
+    "grandchildren": [
+      {
+        "name": "Wayne Travis",
+        "photo": "timothy_owino/grandchildren/wayne.jpg"
+      },
+      {
+        "name": "Natasha Pinkette",
+        "photo": "timothy_owino/grandchildren/natasha.jpg"
+      },
+      {
+        "name": "Emmanuela Winslette",
+        "photo": "timothy_owino/grandchildren/emmanuela.jpg"
+      },
+      {
+        "name": "Zach Gabriels",
+        "photo": "timothy_owino/grandchildren/zach.jpg"
+      }
+    ]
+  },
+  {
+    "name": "Hellen Owino",
+    "spouse": "",
+    "note": "",
+    "portrait": "hellon_owino/portrait.jpg",
+    "tribute": "[FILL IN: Hellen's tribute to Dad]",
+    "gallery": [],
+    "grandchildren": [
+      {
+        "name": "Jerald Okello",
+        "photo": "hellon_owino/grandchildren/jerald.jpg"
+      },
+      {
+        "name": "Bevaline Okello",
+        "photo": "hellon_owino/grandchildren/bevaline.jpg"
+      },
+      {
+        "name": "Henry Okelo (Obash)",
+        "photo": "hellon_owino/grandchildren/henry.jpg"
+      },
+      {
+        "name": "Antonette Okello",
+        "photo": "hellon_owino/grandchildren/antonette.jpg"
+      },
+      {
+        "name": "Katindi",
+        "photo": "hellon_owino/grandchildren/katindi.jpg"
+      }
+    ]
+  },
+  {
+    "name": "Beryl Mercy",
+    "spouse": "",
+    "note": "",
+    "portrait": "beryl_mercy/portrait.jpg",
+    "tribute": "[FILL IN: Beryl's tribute to Dad]",
+    "gallery": [],
+    "grandchildren": [
+      {
+        "name": "Peter",
+        "photo": "beryl_mercy/grandchildren/peter.jpg"
+      }
+    ]
+  },
+  {
+    "name": "Joan Apollo",
+    "spouse": "",
+    "note": "",
+    "portrait": "joan_apollo/portrait.jpg",
+    "tribute": "[FILL IN: Joan's tribute to Dad]",
+    "gallery": [],
+    "grandchildren": [
+      {
+        "name": "Richard Leakey",
+        "photo": "joan_apollo/grandchildren/richard.jpg"
+      },
+      {
+        "name": "Macreen",
+        "photo": "joan_apollo/grandchildren/macreen.jpg"
+      },
+      {
+        "name": "Bonney",
+        "photo": "joan_apollo/grandchildren/bonney.jpg"
+      },
+      {
+        "name": "Siste",
+        "photo": "joan_apollo/grandchildren/siste.jpg"
+      },
+      {
+        "name": "Boss",
+        "photo": "joan_apollo/grandchildren/boss.jpg"
+      }
+    ]
+  }
+]

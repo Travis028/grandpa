@@ -60,6 +60,20 @@ export default function Life() {
 
             <div className="life-story-full" dangerouslySetInnerHTML={{ __html: grandpa.life_story }} />
 
+            {grandpa.activities && grandpa.activities.length > 0 && (
+              <div style={{ marginTop: '3rem', padding: '2rem', background: '#f9f9f9', borderRadius: '12px', borderLeft: '4px solid var(--gold, #d4af37)', boxShadow: '0 4px 15px rgba(0,0,0,0.05)' }}>
+                <h3 style={{ fontFamily: '"Playfair Display", serif', fontSize: '1.8rem', color: '#111', marginBottom: '1.5rem', borderBottom: '1px solid #ddd', paddingBottom: '0.5rem' }}>Life Milestones</h3>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '1.2rem' }}>
+                  {grandpa.activities.map((act, idx) => (
+                    <div key={idx} style={{ display: 'flex', alignItems: 'baseline', gap: '1rem' }}>
+                      <span style={{ fontWeight: 'bold', fontSize: '1.1rem', color: 'var(--gold, #d4af37)', minWidth: '70px', flexShrink: 0 }}>{act.year}</span>
+                      <span style={{ fontSize: '1.1rem', color: '#333', lineHeight: 1.5 }}>{act.event}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
             {lifePhotos && lifePhotos.length > 0 && (
               <div className="life-photos">
                 <h3 className="life-photos-title">Life Story & Joyce Owino Gallery</h3>

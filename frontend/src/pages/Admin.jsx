@@ -3,6 +3,8 @@ import { io } from 'socket.io-client';
 import api, { API_BASE } from '../config';
 import { motion } from 'framer-motion';
 import { useDropzone } from 'react-dropzone';
+import ReactQuill from 'react-quill';
+import 'react-quill/dist/quill.snow.css';
 
 const S = {
   btn: { padding: '8px 16px', cursor: 'pointer', border: 'none', borderRadius: '4px', fontSize: '0.85rem' },
@@ -69,6 +71,15 @@ function ProgramEditor({ program, token, onSaved }) {
   };
   return (
     <div>
+      <div style={{ ...S.card, background: '#fefcbf', border: '1px solid #ecc94b', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div>
+          <h4 style={{ marginBottom: '6px', color: '#744210' }}>PDF Eulogy Burner</h4>
+          <p style={{ color: '#975a16', fontSize: '0.88rem', margin: 0 }}>Review and download the final Program & Eulogy PDF document.</p>
+        </div>
+        <button style={{ ...S.btn, ...S.btnBlack, fontSize: '1.05rem', padding: '12px 24px', background: '#d4af37', color: '#111', border: 'none' }} onClick={() => window.open('/print-program', '_blank')}>
+          🖨️ Download Program Burner
+        </button>
+      </div>
       <div style={S.card}>
         <h4 style={{ marginBottom: '14px' }}>Event Details</h4>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginBottom: '12px' }}>
@@ -83,6 +94,20 @@ function ProgramEditor({ program, token, onSaved }) {
         </div>
         <button style={{ ...S.btn, ...S.btnBlack }} onClick={save} disabled={saving}>{saving ? 'Saving...' : 'Save Details'}</button>
         {alertMsg && <span style={{ marginLeft: '10px', color: '#276749', fontSize: '0.85rem' }}>{alertMsg}</span>}
+        <div style={{ marginTop: '20px', borderTop: '1px solid #eee', paddingTop: '16px' }}>
+          <h4 style={{ marginBottom: '14px' }}>Hymnals</h4>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginBottom: '12px' }}>
+            <div>
+              <label style={S.label}>Hymnal 1</label>
+              <textarea style={{ ...S.input, minHeight: '180px', resize: 'vertical' }} value={form.hymnal_1 || ''} onChange={e => setForm({ ...form, hymnal_1: e.target.value })} />
+            </div>
+            <div>
+              <label style={S.label}>Hymnal 2</label>
+              <textarea style={{ ...S.input, minHeight: '180px', resize: 'vertical' }} value={form.hymnal_2 || ''} onChange={e => setForm({ ...form, hymnal_2: e.target.value })} />
+            </div>
+          </div>
+          <button style={{ ...S.btn, ...S.btnBlack }} onClick={save} disabled={saving}>{saving ? 'Saving...' : 'Save Hymnals'}</button>
+        </div>
       </div>
       <div style={S.card}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
@@ -220,7 +245,26 @@ function GrandpaEditor({ grandpa, token, onSaved }) {
       </div>
       <div style={{ marginBottom: '12px' }}>
         <label style={S.label}>Life Story</label>
-        <textarea style={{ ...S.input, minHeight: '140px', resize: 'vertical' }} value={form.life_story || ''} onChange={e => setForm({ ...form, life_story: e.target.value })} />
+        <ReactQuill theme="snow" value={form.life_story || ''} onChange={val => setForm({ ...form, life_story: val })} style={{ background: '#fff' }} />
+      </div>
+      <div style={{ marginTop: '20px', borderTop: '1px solid #eee', paddingTop: '16px', marginBottom: '12px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
+          <h4>Activities / Timeline ({form.activities?.length || 0} items)</h4>
+          <button style={{ ...S.btn, ...S.btnGreen }} onClick={() => setForm({ ...form, activities: [...(form.activities || []), { year: '', event: '' }] })}>+ Add Activity</button>
+        </div>
+        {(form.activities || []).map((act, i) => (
+          <div key={i} style={{ display: 'grid', gridTemplateColumns: '80px 1fr 36px', gap: '8px', marginBottom: '8px', alignItems: 'center' }}>
+            <input style={S.input} placeholder="Year" value={act.year} onChange={e => {
+              const a = [...form.activities]; a[i].year = e.target.value; setForm({ ...form, activities: a });
+            }} />
+            <input style={S.input} placeholder="Activity / Event" value={act.event} onChange={e => {
+              const a = [...form.activities]; a[i].event = e.target.value; setForm({ ...form, activities: a });
+            }} />
+            <button onClick={() => {
+              setForm({ ...form, activities: form.activities.filter((_, idx) => idx !== i) });
+            }} style={{ ...S.btn, ...S.btnRed, padding: '8px' }}>x</button>
+          </div>
+        ))}
       </div>
       <button style={{ ...S.btn, ...S.btnBlack }} onClick={save} disabled={saving}>{saving ? 'Saving...' : 'Save Changes'}</button>
       {alertMsg && <span style={{ marginLeft: '10px', color: '#276749', fontSize: '0.85rem' }}>{alertMsg}</span>}

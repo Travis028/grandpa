@@ -79,6 +79,26 @@ export default function Program() {
       <section className="section program-section">
         <div className="container-narrow">
           <div className="program-details reveal visible">
+            
+            {/* PDF Burner Banner */}
+            <div style={{ background: '#111', padding: '25px', borderRadius: '8px', border: '1px solid var(--gold, #d4af37)', marginBottom: '30px', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', boxShadow: '0 8px 30px rgba(0,0,0,0.15)' }}>
+              <h3 style={{ color: 'var(--gold, #d4af37)', fontFamily: '"Playfair Display", serif', marginBottom: '10px', fontSize: '1.6rem' }}>Eulogy & Program Booklet</h3>
+              <p style={{ color: '#eee', marginBottom: '20px', fontSize: '0.95rem', maxWidth: '600px', lineHeight: 1.5 }}>
+                Download the beautifully formatted memorial booklet containing the full order of service, life story, family tributes, hymnals, and photo gallery.
+              </p>
+              <div style={{ display: 'flex', gap: '15px', flexWrap: 'wrap', justifyContent: 'center' }}>
+                <button onClick={() => window.open('/print-program', '_blank')} style={{ background: 'linear-gradient(135deg, #d4af37 0%, #b89025 100%)', color: '#111', padding: '12px 24px', border: 'none', borderRadius: '4px', fontWeight: 'bold', fontSize: '1rem', cursor: 'pointer', display: 'flex', alignItems: 'center', boxShadow: '0 4px 15px rgba(212, 175, 55, 0.4)' }}>
+                  🖨️ Download Program PDF
+                </button>
+                <Link to="/admin" style={{ background: '#333', color: '#fff', padding: '12px 24px', border: '1px solid #555', borderRadius: '4px', fontWeight: 'bold', fontSize: '1rem', cursor: 'pointer', textDecoration: 'none', display: 'flex', alignItems: 'center' }}>
+                  ⚙️ Edit Details
+                </Link>
+              </div>
+              <p style={{ color: '#aaa', fontSize: '0.8rem', marginTop: '15px', fontStyle: 'italic' }}>
+                * Editing the program, hymnals, and timeline requires Admin access. All updates instantly sync to the PDF.
+              </p>
+            </div>
+
             <div className="program-info-box">
               {[['Date', program.date], ['Time', `${program.time_start} - ${program.time_end}`],
                 ['Venue', program.venue], ['Venue Address', program.venue_address],

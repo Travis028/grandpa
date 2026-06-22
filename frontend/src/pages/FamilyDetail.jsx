@@ -138,26 +138,27 @@ export default function FamilyDetail() {
               return (
                 <motion.div 
                   key={i}
-                  whileHover={{ scale: 1.03, y: -5 }}
+                  whileHover={{ scale: 1.02, y: -5, rotate: i % 2 === 0 ? 1 : -1 }}
                   onClick={() => openLightbox(i)}
                   style={{
                     background: '#fff',
-                    borderRadius: '12px',
-                    overflow: 'hidden',
-                    boxShadow: '0 10px 20px rgba(0,0,0,0.08)',
+                    padding: '14px 14px 24px 14px',
+                    borderRadius: '4px',
+                    boxShadow: '0 10px 25px rgba(0,0,0,0.1), 0 4px 10px rgba(0,0,0,0.05)',
                     cursor: 'pointer',
                     display: 'flex',
-                    flexDirection: 'column'
+                    flexDirection: 'column',
+                    border: '1px solid #f0f0f0'
                   }}
                 >
                   <img 
                     src={`${API_BASE}/api/static/images/children/${path}`} 
                     alt="Gallery image"
-                    style={{ width: '100%', height: '200px', objectFit: 'cover' }}
+                    style={{ width: '100%', height: '240px', objectFit: 'cover', borderRadius: '2px', background: '#eee' }}
                   />
                   {comment && (
-                    <div style={{ padding: '12px', background: '#fff' }}>
-                      <p style={{ margin: 0, fontSize: '0.9rem', color: '#555', textAlign: 'center' }}>{comment}</p>
+                    <div style={{ paddingTop: '16px', background: '#fff' }}>
+                      <p style={{ margin: 0, fontSize: '1rem', color: '#333', textAlign: 'center', fontFamily: '"Playfair Display", serif', fontStyle: 'italic', letterSpacing: '0.5px' }}>{comment}</p>
                     </div>
                   )}
                 </motion.div>

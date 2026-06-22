@@ -77,7 +77,8 @@ DEFAULT_GRANDPA = {
     "final_words": "God was good to me.",
     "life_story": "APOLLO J. FIZVALENTINE OWINO. was born in [FILL IN] to [FILL IN PARENTS' NAMES]. He grew up knowing the value of hard work and faith. Throughout his life, he was known for his quiet strength, his generous spirit, and his deep love for his family.\n\nHe worked as a [FILL IN OCCUPATION] and provided for his family with dignity and pride. Even in difficult times, he never complained. Instead, he taught his children that every challenge is an opportunity to grow stronger.\n\nHis faith was the foundation of his life. He believed in [FILL IN FAITH/CHURCH] and prayed for his family every single day.\n\nIn his final months, he faced [FILL IN ILLNESS] with remarkable courage. Even when his body grew weak, his spirit remained strong. His last words to his family were, \"God was good to me.\"",
     "firstborn_name": "Nabi Owino",
-    "firstborn_note": "Firstborn of APOLLO J. FIZVALENTINE OWINO. Preceded his father in death. Forever remembered. Forever loved."
+    "firstborn_note": "Firstborn of APOLLO J. FIZVALENTINE OWINO. Preceded his father in death. Forever remembered. Forever loved.",
+    "activities": []
 }
 
 DB_FILE = os.path.join(DATA_DIR, 'database.db')
@@ -163,6 +164,8 @@ DEFAULT_PROGRAM = {
     "venue":"[FILL IN CHURCH/HALL NAME AND LOCATION]","venue_address":"[FILL IN FULL ADDRESS]",
     "time_start":"[FILL IN START TIME]","time_end":"[FILL IN END TIME]",
     "dress_code":"[FILL IN DRESS CODE]","burial_location":"[FILL IN BURIAL LOCATION]",
+    "hymnal_1":"[FILL IN HYMNAL 1 LYRICS\\nVerse 1...]",
+    "hymnal_2":"[FILL IN HYMNAL 2 LYRICS\\nVerse 1...]",
     "order":[
         {"time":"10:00 AM","item":"Opening Prayer","leader":"[FILL IN NAME]"},
         {"time":"10:10 AM","item":"Hymn / Worship","leader":"Family"},
@@ -807,7 +810,7 @@ def upload_grandchild_photo(idx, gidx):
 def update_grandpa():
     g = load_grandpa()
     body = request.json or {}
-    for f in ['name', 'birth_year', 'death_year', 'birth_place', 'wife_name', 'final_words', 'life_story', 'firstborn_name', 'firstborn_note']:
+    for f in ['name', 'birth_year', 'death_year', 'birth_place', 'wife_name', 'final_words', 'life_story', 'firstborn_name', 'firstborn_note', 'activities']:
         if f in body:
             g[f] = body[f]
     save_grandpa(g)
@@ -839,7 +842,7 @@ PROGRAM_FILE = os.path.join(DATA_DIR, 'program.json')
 def update_program():
     prog = _load(PROGRAM_FILE, DEFAULT_PROGRAM.copy())
     body = request.json or {}
-    for f in ['event_name','date','venue','venue_address','time_start','time_end','dress_code','burial_location']:
+    for f in ['event_name','date','venue','venue_address','time_start','time_end','dress_code','burial_location','hymnal_1','hymnal_2']:
         if f in body:
             prog[f] = body[f]
     if 'order' in body:
