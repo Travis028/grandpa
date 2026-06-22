@@ -238,15 +238,15 @@ export default function Home() {
                       {child.spouse_portrait && (
                         <div style={{
                           position: 'absolute',
-                          bottom: '-15px',
-                          right: '-10px',
-                          width: '90px',
-                          height: '90px',
+                          bottom: '-25px',
+                          right: '20px',
+                          width: '80px',
+                          height: '80px',
                           borderRadius: '50%',
                           border: '4px solid #fff',
                           overflow: 'hidden',
                           boxShadow: '0 6px 15px rgba(0,0,0,0.15)',
-                          zIndex: 2,
+                          zIndex: 3,
                           background: '#fff'
                         }}>
                           <img src={`${API_BASE}/api/static/images/children/${child.spouse_portrait}`} alt={child.spouse} style={{ width: '100%', height: '100%', objectFit: 'cover' }} onError={(e) => { e.target.style.display = 'none'; e.target.parentElement.style.display = 'none'; }} />

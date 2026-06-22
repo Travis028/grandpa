@@ -565,7 +565,7 @@ img {
     box-shadow: 0 10px 30px rgba(0,0,0,0.05);
     transition: transform var(--transition-normal), box-shadow var(--transition-normal);
     border: 1px solid var(--border);
-    margin-top: 60px;
+    margin-top: 0;
     text-align: center;
 }
 
@@ -575,14 +575,15 @@ img {
 }
 
 .family-photo-wrap {
-    width: 150px;
-    height: 150px;
-    margin: -75px auto 1rem;
+    width: 100%;
+    height: 300px;
+    margin: 0;
     position: relative;
-    border-radius: 50%;
-    background-color: var(--secondary);
-    border: 5px solid var(--white);
-    box-shadow: 0 10px 20px rgba(0,0,0,0.1), 0 0 0 3px var(--gold);
+    border-radius: 19px 19px 0 0;
+    background-color: var(--charcoal);
+    border: none;
+    border-bottom: 4px solid var(--gold);
+    box-shadow: none;
     overflow: hidden;
     z-index: 2;
 }
@@ -590,12 +591,12 @@ img {
 .family-photo-wrap img {
     width: 100%;
     height: 100%;
-    object-fit: cover;
+    object-fit: contain;
     transition: transform var(--transition-slow);
 }
 
 .family-card:hover .family-photo-wrap img {
-    transform: scale(1.1) rotate(2deg);
+    transform: scale(1.05);
 }
 
 .family-photo-placeholder {
