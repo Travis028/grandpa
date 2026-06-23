@@ -1,24 +1,21 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import html2pdf from 'html2pdf.js';
 import api, { API_BASE } from '../config';
 
 export default function ProgramPDF() {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [paperSize, setPaperSize] = useState('A4');
-  const pdfRef = useRef();
+  const [qrUploading, setQrUploading] = useState(false);
 
   useEffect(() => {
     Promise.all([
       api.get('/api/grandpa'),
-      api.get('/api/program'),
       api.get('/api/family'),
       api.get('/api/life_photos')
-    ]).then(([resGrandpa, resProgram, resFamily, resLife]) => {
+    ]).then(([resGrandpa, resFamily, resLife]) => {
       setData({
         grandpa: resGrandpa.data,
-        program: resProgram.data,
         family: resFamily.data.family,
         lifePhotos: resLife.data
       });
@@ -30,44 +27,49 @@ export default function ProgramPDF() {
   }, []);
 
   if (loading) {
-    return <div style={{ padding: '50px', textAlign: 'center', fontFamily: '"Playfair Display", serif', fontSize: '1.5rem', color: '#d4af37' }}>Preparing Booklet...</div>;
+    return <div style={{ padding: '50px', textAlign: 'center', fontFamily: '"Playfair Display", serif', fontSize: '1.5rem', color: '#d4af37' }}>Preparing 4-Page Booklet...</div>;
   }
 
   if (!data || !data.grandpa) {
     return <div style={{ padding: '50px', textAlign: 'center' }}>Error loading data.</div>;
   }
 
-  const { grandpa, program, family, lifePhotos } = data;
+  const { grandpa, family, lifePhotos } = data;
 
-  // Gather all photos for the Gallery page (Joyce Owino/Life photos + Family portraits)
-  const allGalleryPhotos = [];
-  if (lifePhotos) {
-    lifePhotos.forEach(p => allGalleryPhotos.push(`${API_BASE}/api/static/images/life_photos/${p}`));
-  }
-  family.forEach(member => {
-    if (member.portrait) allGalleryPhotos.push(`${API_BASE}/api/static/images/children/${member.portrait}`);
-    if (member.grandchildren) {
-      member.grandchildren.forEach(g => {
-        if (g.portrait) allGalleryPhotos.push(`${API_BASE}/api/static/images/children/${g.portrait}`);
+  const handlePrint = () => {
+    window.print();
+  };
+
+  const handleQrUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    setQrUploading(true);
+    const formData = new FormData();
+    formData.append('file', file);
+    try {
+      await api.post('/api/upload_qr', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
       });
+      alert('QR Code successfully uploaded! Please refresh the page to see changes.');
+    } catch (err) {
+      alert('Error uploading QR Code.');
+    } finally {
+      setQrUploading(false);
     }
-  });
+  };
 
-  const shuffledGallery = [...allGalleryPhotos].sort(() => 0.5 - Math.random()).slice(0, 12);
-
-  const handleDownload = () => {
-    const element = pdfRef.current;
-    const opt = {
-      margin:       0,
-      filename:     `Memorial_Program_${grandpa.name.replace(/ /g, '_')}.pdf`,
-      image:        { type: 'jpeg', quality: 0.98 },
-      html2canvas:  { scale: 2, useCORS: true },
-      jsPDF:        { unit: 'mm', format: paperSize === 'A3' ? 'a3' : 'a4', orientation: paperSize === 'A3' ? 'landscape' : 'portrait' }
-    };
-    html2pdf().set(opt).from(element).save();
+  // Helper to truncate tributes safely
+  const truncateTribute = (text) => {
+    if (!text) return "";
+    if (text.length > 200) {
+      return text.substring(0, 197) + '...';
+    }
+    return text;
   };
 
   // --- PAGE COMPONENTS ---
+
+  // Page 1: Cover
   const PageCover = () => (
     <div className="pdf-page-content pdf-page-center pdf-cover">
       <div className="pdf-cover-ornament">✦ In Loving Memory ✦</div>
@@ -90,68 +92,56 @@ export default function ProgramPDF() {
     </div>
   );
 
+  // Page 2: Order of Service (Static Text as requested)
   const PageProgram = () => (
     <div className="pdf-page-content">
       <div className="pdf-watermark" style={{ backgroundImage: `url('${API_BASE}/api/static/images/grandpa/main_photo.jpg')` }}></div>
       <div className="pdf-content-relative">
-        <h2 className="pdf-section-title">Order of Service</h2>
-        <div className="pdf-event-details">
-          <p><strong>{program.event_name}</strong></p>
-          <p><strong>Date:</strong> {program.date}</p>
-          <p><strong>Time:</strong> {program.time_start} - {program.time_end}</p>
-          <p><strong>Venue:</strong> {program.venue}, {program.venue_address}</p>
-          <p><strong>Interment:</strong> {program.burial_location}</p>
-        </div>
+        <h2 className="pdf-section-title" style={{ fontSize: '1.8rem', marginBottom: '15px' }}>Order of Service</h2>
         
-        <table className="pdf-program-table">
-          <tbody>
-            {(program.order || []).map((item, idx) => (
-              <tr key={idx}>
-                <td className="pdf-td-time">{item.time}</td>
-                <td className="pdf-td-item">{item.item}</td>
-                <td className="pdf-td-leader">{item.leader}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-
-        {/* Include hymns if there is space */}
-        {program.hymnal_1 && (
-            <div className="pdf-hymnals-container" style={{ marginTop: '20px', borderTop: '1px solid #ccc', paddingTop: '10px' }}>
-              <div className="pdf-hymnal" style={{ fontSize: '0.85rem' }}>
-                <strong>Hymn:</strong>
-                <div className="pdf-hymnal-lyrics" style={{ marginTop: '5px' }}>{program.hymnal_1}</div>
-              </div>
-            </div>
-        )}
-      </div>
-    </div>
-  );
-
-  const PageStory = () => (
-    <div className="pdf-page-content">
-      <div className="pdf-watermark" style={{ backgroundImage: `url('${API_BASE}/api/static/images/grandpa/main_photo.jpg')` }}></div>
-      <div className="pdf-content-relative">
-        <h2 className="pdf-section-title">His Story</h2>
-        <div className="pdf-story-text" dangerouslySetInnerHTML={{ __html: grandpa.life_story }} />
-
-        {grandpa.activities && grandpa.activities.length > 0 && (
-          <div className="pdf-activities-section" style={{ marginTop: '15px' }}>
-            <h3 className="pdf-subsection-title" style={{ fontSize: '1.2rem', marginBottom: '8px' }}>Life Milestones</h3>
-            <ul className="pdf-activities-timeline" style={{ fontSize: '0.9rem' }}>
-              {grandpa.activities.map((act, i) => (
-                <li key={i} className="pdf-activity-item" style={{ marginBottom: '4px' }}>
-                  <span className="pdf-activity-year" style={{ fontWeight: 'bold', marginRight: '10px', color: 'var(--gold)' }}>{act.year}</span>
-                  <span className="pdf-activity-event">{act.event}</span>
-                </li>
-              ))}
-            </ul>
+        <div style={{ fontSize: '0.85rem', lineHeight: '1.4', paddingRight: '15px' }}>
+          <div style={{ marginBottom: '12px' }}>
+            <h3 style={{ fontSize: '1.0rem', margin: '0 0 4px 0', color: 'var(--primary)' }}>1. The Prelude</h3>
+            <p style={{ margin: '0 0 2px 0' }}><strong>Music:</strong> Soft, reflective background music is played as guests arrive and take their seats.</p>
+            <p style={{ margin: '0' }}><strong>Seating of the Family:</strong> Close family members are escorted to their designated seating just before the service begins.</p>
           </div>
-        )}
+
+          <div style={{ marginBottom: '12px' }}>
+            <h3 style={{ fontSize: '1.0rem', margin: '0 0 4px 0', color: 'var(--primary)' }}>2. The Opening</h3>
+            <p style={{ margin: '0 0 2px 0' }}><strong>Welcome / Words of Comfort:</strong> The officiant, clergy, or host welcomes guests, shares a brief opening statement, and acknowledges the purpose of the gathering.</p>
+            <p style={{ margin: '0' }}><strong>Opening Prayer or Reading:</strong> A short prayer, scriptural reading, or non-religious poem to set a peaceful tone.</p>
+          </div>
+
+          <div style={{ marginBottom: '12px' }}>
+            <h3 style={{ fontSize: '1.0rem', margin: '0 0 4px 0', color: 'var(--primary)' }}>3. The Tributes</h3>
+            <p style={{ margin: '0 0 2px 0' }}><strong>Reading of the Obituary:</strong> A brief summary of the deceased’s life, achievements, and surviving family members.</p>
+            <p style={{ margin: '0 0 2px 0' }}><strong>Eulogy:</strong> A personal, heartfelt speech that highlights the character, legacy, and fond memories of the departed.</p>
+            <p style={{ margin: '0' }}><strong>Tributes / Reflections:</strong> Open time for pre-selected friends or family members to share short, personal memories.</p>
+          </div>
+
+          <div style={{ marginBottom: '12px' }}>
+            <h3 style={{ fontSize: '1.0rem', margin: '0 0 4px 0', color: 'var(--primary)' }}>4. Musical Interlude & Special Tributes</h3>
+            <p style={{ margin: '0 0 2px 0' }}><strong>Special Music:</strong> A live or recorded musical performance, hymn, or playing of the deceased's favorite song.</p>
+            <p style={{ margin: '0' }}><strong>Photo Slideshow or Video:</strong> A visual montage of the deceased's life set to music.</p>
+          </div>
+
+          <div style={{ marginBottom: '12px' }}>
+            <h3 style={{ fontSize: '1.0rem', margin: '0 0 4px 0', color: 'var(--primary)' }}>5. The Closing</h3>
+            <p style={{ margin: '0 0 2px 0' }}><strong>Final Commendation / Prayer:</strong> A final prayer or blessing, particularly important if the service is directly followed by a burial.</p>
+            <p style={{ margin: '0' }}><strong>Acknowledgments:</strong> Thank you messages to the guests, pallbearers, and those who sent flowers or condolences.</p>
+          </div>
+
+          <div style={{ marginBottom: '0' }}>
+            <h3 style={{ fontSize: '1.0rem', margin: '0 0 4px 0', color: 'var(--primary)' }}>6. The Recessional</h3>
+            <p style={{ margin: '0 0 2px 0' }}><strong>Closing Music:</strong> Upbeat or triumphant music plays as the family exits the venue, followed by the rest of the attendees.</p>
+            <p style={{ margin: '0' }}><strong>Dismissal:</strong> Ushers or family members provide instructions regarding the repast or procession to the gravesite.</p>
+          </div>
+        </div>
       </div>
     </div>
   );
 
+  // Page 3: Tributes (Summarized, No Portraits)
   const PageTributes = () => {
     return (
       <div className="pdf-page-content">
@@ -162,25 +152,27 @@ export default function ProgramPDF() {
             {family.map((child, idx) => {
               if (!child.tribute && !child.spouse_tribute && (!child.grandchildren || child.grandchildren.length === 0)) return null;
               return (
-                <div key={idx} className="pdf-family-tribute" style={{ marginBottom: '15px', paddingBottom: '10px', borderBottom: '1px solid #eee' }}>
-                  <div className="pdf-tribute-header" style={{ display: 'flex', alignItems: 'center', marginBottom: '5px' }}>
-                    <h3 className="pdf-tribute-name" style={{ fontSize: '1.1rem', margin: 0 }}>{child.name}</h3>
-                    {child.spouse && <span className="pdf-tribute-spouse" style={{ marginLeft: '8px', fontSize: '0.9rem', color: '#666' }}>& {child.spouse}</span>}
+                <div key={idx} className="pdf-family-tribute" style={{ marginBottom: '10px', paddingBottom: '8px', borderBottom: '1px solid #eee' }}>
+                  <div className="pdf-tribute-header" style={{ marginBottom: '4px' }}>
+                    <h3 className="pdf-tribute-name" style={{ fontSize: '1.0rem', margin: 0, color: 'var(--primary)' }}>{child.name}</h3>
+                    {child.spouse && <span className="pdf-tribute-spouse" style={{ marginLeft: '8px', fontSize: '0.85rem', color: '#666' }}>& {child.spouse}</span>}
                   </div>
+                  
                   {child.tribute && (
-                    <p className="pdf-tribute-text" style={{ fontSize: '0.95rem', margin: '0 0 5px 0' }}>"{child.tribute}"</p>
+                    <p className="pdf-tribute-text" style={{ fontSize: '0.85rem', margin: '0 0 4px 0', fontStyle: 'italic' }}>"{truncateTribute(child.tribute)}"</p>
                   )}
                   {child.spouse_tribute && (
-                    <p className="pdf-tribute-text" style={{ fontSize: '0.9rem', color: '#555', margin: '0 0 5px 0' }}>"{child.spouse_tribute}" <span style={{fontStyle:'italic'}}>— {child.spouse}</span></p>
+                    <p className="pdf-tribute-text" style={{ fontSize: '0.8rem', color: '#555', margin: '0 0 4px 0', fontStyle: 'italic' }}>"{truncateTribute(child.spouse_tribute)}" — {child.spouse}</p>
                   )}
+
                   {child.grandchildren && child.grandchildren.length > 0 && (
-                    <div className="pdf-grandchildren-tributes" style={{ marginTop: '5px', paddingLeft: '15px', borderLeft: '2px solid #f0f0f0' }}>
+                    <div className="pdf-grandchildren-tributes" style={{ marginTop: '4px', paddingLeft: '10px', borderLeft: '2px solid #f0f0f0' }}>
                       {child.grandchildren.map((gc, gIdx) => {
                         if (!gc.tribute) return null;
                         return (
-                          <div key={gIdx} className="pdf-gc-tribute" style={{ marginBottom: '4px' }}>
-                            <span className="pdf-gc-text" style={{ fontSize: '0.85rem' }}>"{gc.tribute}"</span>
-                            <span className="pdf-gc-name" style={{ fontSize: '0.8rem', color: '#777', marginLeft: '5px' }}>— {gc.name}</span>
+                          <div key={gIdx} className="pdf-gc-tribute" style={{ marginBottom: '2px' }}>
+                            <span className="pdf-gc-text" style={{ fontSize: '0.75rem', fontStyle: 'italic' }}>"{truncateTribute(gc.tribute)}"</span>
+                            <span className="pdf-gc-name" style={{ fontSize: '0.75rem', color: '#777', marginLeft: '5px', fontWeight: 'bold' }}>— {gc.name}</span>
                           </div>
                         );
                       })}
@@ -195,63 +187,58 @@ export default function ProgramPDF() {
     );
   };
 
-  const PageGallery = () => {
+  // Page 4: Joyce Owino Gallery & QR Code edge
+  const PageGalleryAndBack = () => {
+    // ONLY use lifePhotos (Joyce Owino Gallery)
+    const galleryPhotos = lifePhotos ? [...lifePhotos].sort(() => 0.5 - Math.random()).slice(0, 9) : [];
+
     return (
-      <div className="pdf-page-content pdf-page-center">
+      <div className="pdf-page-content pdf-page-center" style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
         <div className="pdf-watermark" style={{ backgroundImage: `url('${API_BASE}/api/static/images/grandpa/main_photo.jpg')` }}></div>
-        <div className="pdf-content-relative" style={{ width: '100%', display: 'flex', flexDirection: 'column', height: '100%' }}>
-          <h2 className="pdf-section-title">Precious Memories</h2>
+        <div className="pdf-content-relative" style={{ width: '100%', flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
+          <h2 className="pdf-section-title" style={{ fontSize: '1.8rem', marginBottom: '15px' }}>Precious Memories</h2>
+          
           <div className="pdf-gallery-grid" style={{ flexGrow: 1, display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '10px' }}>
-            {shuffledGallery.map((photo, idx) => (
-              <div key={idx} className="pdf-gallery-item" style={{ height: '150px', background: '#f5f5f5', border: '3px solid #fff', boxShadow: '0 4px 8px rgba(0,0,0,0.1)' }}>
-                <img src={photo} alt="Memory" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+            {galleryPhotos.map((photo, idx) => (
+              <div key={idx} className="pdf-gallery-item" style={{ height: '140px', background: '#f5f5f5', border: '3px solid #fff', boxShadow: '0 4px 8px rgba(0,0,0,0.1)' }}>
+                <img src={`${API_BASE}/api/static/images/life_photos/${photo}`} alt="Memory" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
               </div>
             ))}
           </div>
-          <div style={{ marginTop: '30px' }}>
-             <p className="pdf-gallery-footer" style={{ fontFamily: '"Playfair Display", serif', fontStyle: 'italic', fontSize: '1.2rem', color: 'var(--primary)' }}>Forever in our hearts.</p>
+
+          <div style={{ marginTop: 'auto', borderTop: '2px solid var(--gold)', paddingTop: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
+            <div style={{ textAlign: 'left' }}>
+              <h2 className="pdf-title" style={{ fontSize: '1.4rem', margin: '0 0 5px 0' }}>{grandpa.name}</h2>
+              <p style={{ margin: '0', fontSize: '0.9rem', color: '#555', fontStyle: 'italic' }}>Thank you for your love, support, and prayers.</p>
+              <p style={{ margin: '5px 0 0 0', fontSize: '0.9rem', color: '#888', fontWeight: 'bold' }}>{grandpa.birth_year} — {grandpa.death_year}</p>
+            </div>
+            <div style={{ textAlign: 'right' }}>
+              <img src={`${API_BASE}/api/static/images/grandpa/qr_code.jpg?t=${Date.now()}`} alt="QR Code" style={{ width: '100px', height: '100px', border: '2px solid var(--gold)', padding: '5px', background: '#fff' }} onError={(e) => { e.target.style.display = 'none'; }} />
+              <p style={{ margin: '5px 0 0 0', fontSize: '0.75rem', fontWeight: 'bold', color: 'var(--primary)' }}>Scan Memorial Website</p>
+            </div>
           </div>
         </div>
       </div>
     );
   };
 
-  const PageBack = () => (
-    <div className="pdf-page-content pdf-page-center pdf-cover">
-      <div className="pdf-cover-ornament">✦ In Loving Memory ✦</div>
-      <h2 className="pdf-title" style={{ fontSize: '2rem', marginTop: '30px' }}>{grandpa.name}</h2>
-      <p style={{ marginTop: '20px', fontSize: '1.2rem', color: '#555', fontStyle: 'italic' }}>Thank you for your love, support, and prayers.</p>
-      
-      <div style={{ marginTop: '50px', border: '4px solid var(--gold)', padding: '20px', background: '#fff', borderRadius: '8px' }}>
-        <img src={`${API_BASE}/api/static/images/grandpa/qr_code.jpg`} alt="Memorial QR Code" style={{ width: '160px', height: '160px', display: 'block', margin: '0 auto' }} onError={(e) => { e.target.style.display = 'none'; }} />
-        <p style={{ marginTop: '15px', fontWeight: 'bold', color: 'var(--primary)', fontSize: '1.1rem' }}>Scan to View Memorial Website</p>
-      </div>
-      
-      <p style={{ marginTop: 'auto', fontSize: '1.2rem', color: '#888', fontWeight: 'bold' }}>{grandpa.birth_year} — {grandpa.death_year}</p>
-    </div>
-  );
-
-  // Exact 6 pages defined
+  // Exact 4 pages defined
   const pagesRaw = [
-    <PageCover />,     // Page 1
-    <PageProgram />,   // Page 2
-    <PageStory />,     // Page 3
-    <PageTributes />,  // Page 4
-    <PageGallery />,   // Page 5
-    <PageBack />       // Page 6
+    <PageCover />,          // Page 1
+    <PageProgram />,        // Page 2
+    <PageTributes />,       // Page 3
+    <PageGalleryAndBack />  // Page 4
   ];
 
   // Layout Engine
   const renderedPages = [];
   if (paperSize === 'A3') {
-    // 6-Page Folded Booklet Layout on A3 (2 pages per sheet)
-    // Sheet 1 Front: [Page 6, Page 1] (Back cover, Front cover)
-    // Sheet 1 Back: [Page 2, Page 5] (Inside front, Inside back)
-    // Sheet 2 Front: [Page 4, Page 3] (Centerfold inside left, Centerfold right)
+    // 4-Page Folded Booklet Layout on A3 (2 pages per sheet)
+    // Sheet 1 Front: [Page 4, Page 1] (Back cover, Front cover)
+    // Sheet 1 Back: [Page 2, Page 3] (Inside front, Inside back)
     const a3Layout = [
-      [pagesRaw[5], pagesRaw[0]],
-      [pagesRaw[1], pagesRaw[4]],
-      [pagesRaw[3], pagesRaw[2]]
+      [pagesRaw[3], pagesRaw[0]],
+      [pagesRaw[1], pagesRaw[2]]
     ];
 
     a3Layout.forEach((pair, i) => {
@@ -280,31 +267,39 @@ export default function ProgramPDF() {
         <div className="pdf-burner-header">
           <div>
             <h1 style={{ margin: '0 0 10px 0', fontFamily: '"Playfair Display", serif', color: '#111', fontSize: '2.2rem' }}>Program & Eulogy Generator</h1>
-            <p style={{ margin: 0, color: '#555', fontSize: '1.1rem' }}>Review the layout below. Click download to generate the PDF booklet directly to your device.</p>
+            <p style={{ margin: 0, color: '#555', fontSize: '1.1rem' }}>4-Page Book Layout. Click "Print / Save as PDF" below.</p>
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', alignItems: 'flex-end' }}>
-            <button onClick={handleDownload} className="pdf-burner-btn-main">
+            <button onClick={handlePrint} className="pdf-burner-btn-main">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '8px' }}>
-                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                <polyline points="7 10 12 15 17 10"></polyline>
-                <line x1="12" y1="15" x2="12" y2="3"></line>
+                <polyline points="6 9 6 2 18 2 18 9"></polyline>
+                <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+                <rect x="6" y="14" width="12" height="8"></rect>
               </svg>
-              Download PDF
+              Print / Save as PDF
             </button>
+            
             <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
               <label style={{ fontSize: '0.9rem', color: '#666', fontWeight: 'bold' }}>Paper Layout:</label>
               <select value={paperSize} onChange={e => setPaperSize(e.target.value)} style={{ padding: '6px 12px', borderRadius: '4px', border: '1px solid #ccc', cursor: 'pointer' }}>
-                <option value="A4">A4 (Portrait / Sequential)</option>
-                <option value="A3">A3 (Landscape / Folded Booklet)</option>
+                <option value="A4">A4 (Sequential - 4 Pages)</option>
+                <option value="A3">A3 (Folded Booklet - 2 Sheets)</option>
               </select>
             </div>
+
+            <div style={{ display: 'flex', gap: '10px', alignItems: 'center', background: '#f5f5f5', padding: '6px 12px', borderRadius: '4px', border: '1px solid #ddd' }}>
+              <label style={{ fontSize: '0.9rem', color: '#444', fontWeight: 'bold' }}>Upload QR Code:</label>
+              <input type="file" accept="image/*" onChange={handleQrUpload} disabled={qrUploading} style={{ fontSize: '0.85rem', width: '180px' }} />
+              {qrUploading && <span style={{ fontSize: '0.8rem', color: '#d4af37' }}>Uploading...</span>}
+            </div>
+
             <Link to="/admin" style={{ color: '#888', fontSize: '0.9rem', textDecoration: 'none' }}>← Back to Admin</Link>
           </div>
         </div>
       </div>
 
       {/* ── PRINTABLE PDF DOCUMENT ── */}
-      <div className="pdf-document" ref={pdfRef}>
+      <div className="pdf-document">
         {renderedPages}
       </div>
     </div>
