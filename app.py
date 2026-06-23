@@ -461,6 +461,56 @@ def api_tributes():
         return jsonify({"success": True, "tribute": tribute})
     return jsonify(_load(TRIBUTES_FILE))
 
+@app.route('/api/upload_qr', methods=['POST'])
+def upload_qr():
+    if 'file' not in request.files:
+        return jsonify({"error": "No file part"}), 400
+    file = request.files['file']
+    if file.filename == '':
+        return jsonify({"error": "No selected file"}), 400
+    if file and file.filename.lower().endswith(('.png', '.jpg', '.jpeg', '.webp')):
+        d = os.path.join('static', 'images', 'grandpa')
+        os.makedirs(d, exist_ok=True)
+        path = os.path.join(d, 'qr_code.jpg')
+        file.save(path)
+        sync_file_bg(path)
+        return jsonify({"success": True})
+    return jsonify({"error": "Invalid file type"}), 400
+
+@app.route('/api/upload_program_cover', methods=['POST'])
+def upload_program_cover():
+    if 'file' not in request.files:
+        return jsonify({"error": "No file part"}), 400
+    file = request.files['file']
+    if file and file.filename.lower().endswith(('.png', '.jpg', '.jpeg', '.webp')):
+        d = os.path.join('static', 'images', 'grandpa')
+        os.makedirs(d, exist_ok=True)
+        path = os.path.join(d, 'program_cover.jpg')
+        file.save(path)
+        sync_file_bg(path)
+        return jsonify({"success": True})
+    return jsonify({"error": "Invalid file type"}), 400
+
+@app.route('/api/upload_program_photos', methods=['POST'])
+def upload_program_photos():
+    files = request.files.getlist('files')
+    if not files: return jsonify({"error": "No files"}), 400
+    d = os.path.join('static', 'images', 'program_photos')
+    import shutil
+    if os.path.exists(d):
+        shutil.rmtree(d)
+    os.makedirs(d, exist_ok=True)
+    for f in files:
+        if f.filename:
+            f.save(os.path.join(d, f.filename))
+    return jsonify({"success": True})
+
+@app.route('/api/program_photos', methods=['GET'])
+def get_program_photos():
+    d = os.path.join('static', 'images', 'program_photos')
+    if not os.path.exists(d): return jsonify([])
+    return jsonify([f for f in os.listdir(d) if f.lower().endswith(('.jpg', '.jpeg', '.png', '.webp'))])
+
 @app.route('/api/static/<path:filename>')
 def serve_static(filename):
     return send_from_directory(app.static_folder, filename)
