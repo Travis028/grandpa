@@ -1466,6 +1466,9 @@ img {
 .life-full-section {
     background-color: var(--white);
     padding: 6rem 0;
+    width: 100%;
+    box-sizing: border-box;
+    overflow-x: hidden;
 }
 
 .life-basic-info {
@@ -1473,11 +1476,13 @@ img {
     justify-content: space-around;
     flex-wrap: wrap;
     background: var(--bg-warm);
-    padding: 2rem;
+    padding: 2rem 1rem;
     border-radius: 12px;
     margin-bottom: 3rem;
     border: 1px solid var(--border);
     box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .life-basic-info p {
@@ -1501,7 +1506,12 @@ img {
     line-height: 1.9;
     color: var(--text-dark);
     max-width: 850px;
+    width: 100%;
     margin: 0 auto 4rem auto;
+    padding: 0 15px;
+    box-sizing: border-box;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
 }
 
 .life-story-full p {
@@ -1512,6 +1522,8 @@ img {
     font-family: var(--font-serif);
     color: var(--primary);
     margin: 2.5rem 0 1rem 0;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
 }
 
 .life-story-full strong {
