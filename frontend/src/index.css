@@ -1459,3 +1459,112 @@ img {
     opacity: 0;
   }
 }
+
+/* ============================================
+   LIFE STORY PAGE STYLES
+   ============================================ */
+.life-full-section {
+    background-color: var(--white);
+    padding: 6rem 0;
+}
+
+.life-basic-info {
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+    background: var(--bg-warm);
+    padding: 2rem;
+    border-radius: 12px;
+    margin-bottom: 3rem;
+    border: 1px solid var(--border);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+}
+
+.life-basic-info p {
+    font-size: 1.1rem;
+    color: var(--primary);
+    margin: 0.5rem 1rem;
+}
+
+.life-basic-info strong {
+    color: var(--gold2);
+    text-transform: uppercase;
+    font-size: 0.9rem;
+    letter-spacing: 1px;
+    display: block;
+    margin-bottom: 4px;
+}
+
+.life-story-full {
+    font-family: var(--font-serif);
+    font-size: 1.25rem;
+    line-height: 1.9;
+    color: var(--text-dark);
+    max-width: 850px;
+    margin: 0 auto 4rem auto;
+}
+
+.life-story-full p {
+    margin-bottom: 1.5rem;
+}
+
+.life-story-full h1, .life-story-full h2, .life-story-full h3 {
+    font-family: var(--font-serif);
+    color: var(--primary);
+    margin: 2.5rem 0 1rem 0;
+}
+
+.life-story-full strong {
+    color: var(--primary);
+    font-weight: 700;
+}
+
+/* Life Photos Gallery (Joyce Owino Gallery) */
+.life-photos {
+    margin-top: 5rem;
+    padding-top: 4rem;
+    border-top: 1px solid var(--border);
+}
+
+.life-photos-title {
+    text-align: center;
+    font-family: var(--font-serif);
+    font-size: 2.2rem;
+    color: var(--primary);
+    margin-bottom: 3rem;
+}
+
+.life-photos-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 20px;
+}
+
+.life-photo-item {
+    background: #fff;
+    padding: 12px 12px 40px 12px;
+    border-radius: 4px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    border: 1px solid #eaeaea;
+    transition: transform var(--transition-normal);
+}
+
+.life-photo-item:nth-child(even) {
+    transform: rotate(2deg);
+}
+.life-photo-item:nth-child(odd) {
+    transform: rotate(-2deg);
+}
+
+.life-photo-item:hover {
+    transform: scale(1.05) rotate(0deg);
+    z-index: 10;
+    position: relative;
+}
+
+.life-photo-item img {
+    width: 100%;
+    height: 250px;
+    object-fit: contain;
+    background: #1a1a1a;
+}

@@ -173,7 +173,7 @@ export default function Home() {
           </Reveal>
           <Reveal>
             <div className="preview-content">
-              <p className="preview-text">{grandpa.life_story.substring(0, 500)}...</p>
+              <p className="preview-text">A distinguished educator, devoted patriarch, and humble servant of God, Apollo Josiah Fizvalentine Owino Awidhi lived a life of profound purpose and unwavering integrity. From his formative years as a village schoolboy to his distinguished three-decade career as a teacher and headmaster, he dedicated his life to shaping minds, strengthening families, and building a legacy that transcends generations. Married for 51 years to his beloved Joyce, he was a pillar of strength to his nine children and 27 grandchildren, imparting wisdom, love, and faith at every turn. His story is one of resilience, service, and enduring impact—a journey worth remembering and celebrating.</p>
               <Link to="/life" className="btn-readmore">Read Full Story →</Link>
             </div>
           </Reveal>
