@@ -3,8 +3,8 @@ import { io } from 'socket.io-client';
 import api, { API_BASE } from '../config';
 import { motion } from 'framer-motion';
 import { useDropzone } from 'react-dropzone';
-import ReactQuill from 'react-quill';
-import 'react-quill/dist/quill.snow.css';
+import ReactQuill from 'react-quill-new';
+import 'react-quill-new/dist/quill.snow.css';
 
 const S = {
   btn: { padding: '8px 16px', cursor: 'pointer', border: 'none', borderRadius: '4px', fontSize: '0.85rem' },
@@ -490,7 +490,7 @@ function GalleryManager({ idx, gallery, token, onSaved }) {
 
 // ── Family Editor ─────────────────────────────────────────────────────────────
 function FamilyEditor({ member, idx, token, onSaved }) {
-  const [form, setForm] = useState({ name: member.name, spouse: member.spouse || '', note: member.note || '', tribute: member.tribute || '' });
+  const [form, setForm] = useState({ name: member.name, spouse: member.spouse || '', note: member.note || '', tribute: member.tribute || '', spouse_tribute: member.spouse_tribute || '' });
   const [saving, setSaving] = useState(false);
   const [alertMsg, setAlertMsg] = useState('');
   const [portraitFile, setPortraitFile] = useState(null);
@@ -596,6 +596,10 @@ function FamilyEditor({ member, idx, token, onSaved }) {
           <div style={{ marginBottom: '12px' }}>
             <label style={S.label}>Tribute to Dad</label>
             <textarea style={{ ...S.input, minHeight: '80px', resize: 'vertical' }} value={form.tribute} onChange={e => setForm({ ...form, tribute: e.target.value })} />
+          </div>
+          <div style={{ marginBottom: '12px' }}>
+            <label style={S.label}>Spouse Tribute to Dad</label>
+            <textarea style={{ ...S.input, minHeight: '80px', resize: 'vertical' }} value={form.spouse_tribute} onChange={e => setForm({ ...form, spouse_tribute: e.target.value })} />
           </div>
           <div style={{ display: 'flex', gap: '8px', alignItems: 'flex-end', marginBottom: '12px', flexWrap: 'wrap' }}>
             <div style={{ flex: 1, minWidth: '200px' }}><label style={S.label}>Portrait Photo</label><input type="file" accept="image/*" onChange={e => setPortraitFile(e.target.files[0])} style={{ fontSize: '0.82rem' }} /></div>

@@ -418,6 +418,39 @@
 
 
 /* ─────────────────────────────────────────────────────────────
+   RESPONSIVE SCREEN STYLES
+───────────────────────────────────────────────────────────── */
+@media screen and (max-width: 850px) {
+  .pdf-sheet-a4-portrait {
+    width: 100%;
+    min-height: auto;
+  }
+  .pdf-sheet-a3-landscape {
+    width: 100%;
+    flex-direction: column;
+    min-height: auto;
+  }
+  .pdf-a4-panel {
+    width: 100%;
+    min-height: auto;
+  }
+  .pdf-page-content {
+    padding: 20px;
+  }
+  .pdf-gallery-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .pdf-burner-dashboard {
+    padding: 20px;
+  }
+  .pdf-burner-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 20px;
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────
    PRINT MEDIA QUERIES
 ───────────────────────────────────────────────────────────── */
 @media print {

@@ -150,7 +150,7 @@ export default function Home() {
           <div className="quick-nav-buttons">
             <Link to="/life" className="quick-nav-btn">His Life Story</Link>
             <Link to="/program" className="quick-nav-btn">Funeral Program</Link>
-            <a href="/print-program" target="_blank" rel="noreferrer" className="quick-nav-btn" style={{ background: '#d4af37', color: '#111', fontWeight: 'bold', fontSize: '0.85rem', padding: '6px 14px', borderRadius: '20px', display: 'flex', alignItems: 'center', gap: '4px' }}>🖨️ Download Program</a>
+            <Link to="/print-program" className="quick-nav-btn" style={{ background: '#d4af37', color: '#111', fontWeight: 'bold', fontSize: '0.85rem', padding: '6px 14px', borderRadius: '20px', display: 'flex', alignItems: 'center', gap: '4px' }}>🖨️ Download Program</Link>
             <a href="#family" className="quick-nav-btn">Our Family</a>
             <Link to="/tributes" className="quick-nav-btn">Leave a Tribute</Link>
             <Link to="/program#feedback" className="quick-nav-btn">Leave Feedback</Link>
@@ -229,29 +229,31 @@ export default function Home() {
                   transition={{ duration: 0.3 }}
                 >
                   <Link to={`/family/${idx}`} style={{ textDecoration: 'none', color: 'inherit' }}>
-                    <div style={{ position: 'relative', marginBottom: '20px' }}>
-                      <div className="family-photo-wrap" style={{ margin: 0 }}>
-                        <img src={`${API_BASE}/api/static/images/children/${child.portrait}`} alt={child.name} loading="lazy" onError={(e) => { e.target.onerror = null; e.target.src = `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23eee'/%3E%3Ccircle cx='50' cy='40' r='20' fill='%23ccc'/%3E%3Cpath d='M20 100c0-20 15-35 30-35s30 15 30 35' fill='%23ccc'/%3E%3C/svg%3E`; }} />
-                        <div className="family-photo-overlay"></div>
-                      </div>
-                      
-                      {child.spouse_portrait && (
-                        <div style={{
-                          position: 'absolute',
-                          bottom: '-25px',
-                          right: '20px',
-                          width: '80px',
-                          height: '80px',
-                          borderRadius: '50%',
-                          border: '4px solid #fff',
-                          overflow: 'hidden',
-                          boxShadow: '0 6px 15px rgba(0,0,0,0.15)',
-                          zIndex: 3,
-                          background: '#fff'
-                        }}>
-                          <img src={`${API_BASE}/api/static/images/children/${child.spouse_portrait}`} alt={child.spouse} style={{ width: '100%', height: '100%', objectFit: 'cover' }} onError={(e) => { e.target.style.display = 'none'; e.target.parentElement.style.display = 'none'; }} />
+                    <div style={{ position: 'relative', display: 'flex', justifyContent: 'center', marginBottom: '20px' }}>
+                      <div style={{ position: 'relative', width: '220px' }}>
+                        <div className="family-photo-wrap" style={{ margin: '-40px auto 0 auto' }}>
+                          <img src={`${API_BASE}/api/static/images/children/${child.portrait}`} alt={child.name} loading="lazy" onError={(e) => { e.target.onerror = null; e.target.src = `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23eee'/%3E%3Ccircle cx='50' cy='40' r='20' fill='%23ccc'/%3E%3Cpath d='M20 100c0-20 15-35 30-35s30 15 30 35' fill='%23ccc'/%3E%3C/svg%3E`; }} />
+                          <div className="family-photo-overlay"></div>
                         </div>
-                      )}
+                        
+                        {child.spouse_portrait && (
+                          <div style={{
+                            position: 'absolute',
+                            bottom: '10px',
+                            right: '-10px',
+                            width: '110px',
+                            height: '110px',
+                            borderRadius: '50%',
+                            border: '4px solid #fff',
+                            overflow: 'hidden',
+                            boxShadow: '0 6px 15px rgba(0,0,0,0.15)',
+                            zIndex: 3,
+                            background: '#fff'
+                          }}>
+                            <img src={`${API_BASE}/api/static/images/children/${child.spouse_portrait}`} alt={child.spouse} style={{ width: '100%', height: '100%', objectFit: 'cover' }} onError={(e) => { e.target.style.display = 'none'; e.target.parentElement.style.display = 'none'; }} />
+                          </div>
+                        )}
+                      </div>
                     </div>
                     <div className="family-body" style={{ textAlign: 'center' }}>
                       <h3 className="family-name">{child.name}</h3>

@@ -565,7 +565,7 @@ img {
     box-shadow: 0 10px 30px rgba(0,0,0,0.05);
     transition: transform var(--transition-normal), box-shadow var(--transition-normal);
     border: 1px solid var(--border);
-    margin-top: 0;
+    margin-top: 40px;
     text-align: center;
 }
 
@@ -575,15 +575,14 @@ img {
 }
 
 .family-photo-wrap {
-    width: 100%;
-    height: 300px;
-    margin: 0;
+    width: 220px;
+    height: 220px;
+    margin: -40px auto 0 auto;
     position: relative;
-    border-radius: 19px 19px 0 0;
+    border-radius: 50%;
     background-color: var(--charcoal);
-    border: none;
-    border-bottom: 4px solid var(--gold);
-    box-shadow: none;
+    border: 6px solid var(--white);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
     overflow: hidden;
     z-index: 2;
 }
@@ -591,7 +590,7 @@ img {
 .family-photo-wrap img {
     width: 100%;
     height: 100%;
-    object-fit: contain;
+    object-fit: cover;
     transition: transform var(--transition-slow);
 }
 

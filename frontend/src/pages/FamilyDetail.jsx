@@ -104,6 +104,13 @@ export default function FamilyDetail() {
         </div>
       )}
 
+      {member.spouse_tribute && (
+        <div style={{ background: '#f9f9f9', padding: '30px', borderRadius: '12px', borderLeft: '4px solid var(--gold)', marginBottom: '40px' }}>
+          <h3 style={{ marginTop: 0, fontSize: '1.2rem', color: '#333' }}>Tribute to Dad from {member.spouse || 'Spouse'}</h3>
+          <p style={{ fontStyle: 'italic', fontSize: '1.1rem', lineHeight: 1.6, color: '#555', margin: 0 }}>"{member.spouse_tribute}"</p>
+        </div>
+      )}
+
       {member.grandchildren && member.grandchildren.length > 0 && (
         <div style={{ marginBottom: '50px' }}>
           <h3 style={{ fontFamily: '"Playfair Display", serif', fontSize: '1.8rem', borderBottom: '1px solid #eee', paddingBottom: '10px', marginBottom: '20px' }}>Grandchildren</h3>

@@ -96,8 +96,13 @@ def init_db():
         name TEXT,
         spouse TEXT,
         note TEXT,
-        tribute TEXT
+        tribute TEXT,
+        spouse_tribute TEXT
     )''')
+    try:
+        c.execute('ALTER TABLE family_members ADD COLUMN spouse_tribute TEXT')
+    except sqlite3.OperationalError:
+        pass # Column likely already exists
     c.execute('''CREATE TABLE IF NOT EXISTS photos (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         member_id INTEGER,
@@ -224,8 +229,8 @@ def migrate_json_to_db():
     if c.fetchone()['count'] == 0:
         fam_json = _load(FAMILY_FILE, DEFAULT_FAMILY)
         for member in fam_json:
-            c.execute('''INSERT INTO family_members (name, spouse, note, tribute)
-                         VALUES (?, ?, ?, ?)''', (member.get('name', ''), member.get('spouse', ''), member.get('note', ''), member.get('tribute', '')))
+            c.execute('''INSERT INTO family_members (name, spouse, note, tribute, spouse_tribute)
+                         VALUES (?, ?, ?, ?, ?)''', (member.get('name', ''), member.get('spouse', ''), member.get('note', ''), member.get('tribute', ''), member.get('spouse_tribute', '')))
             member_id = c.lastrowid
             
             if member.get('portrait'):
@@ -294,8 +299,8 @@ def save_family(data):
     c.execute('DELETE FROM family_members')
     
     for member in data:
-        c.execute('''INSERT INTO family_members (name, spouse, note, tribute)
-                     VALUES (?, ?, ?, ?)''', (member.get('name', ''), member.get('spouse', ''), member.get('note', ''), member.get('tribute', '')))
+        c.execute('''INSERT INTO family_members (name, spouse, note, tribute, spouse_tribute)
+                     VALUES (?, ?, ?, ?, ?)''', (member.get('name', ''), member.get('spouse', ''), member.get('note', ''), member.get('tribute', ''), member.get('spouse_tribute', '')))
         member_id = c.lastrowid
         
         if member.get('portrait'):
@@ -579,6 +584,7 @@ def add_family_member():
         "portrait": "",
         "spouse_portrait": "",
         "tribute": "",
+        "spouse_tribute": "",
         "gallery": [],
         "grandchildren": []
     }
@@ -605,7 +611,7 @@ def update_family_member(idx):
     if not (0 <= idx < len(family)):
         return jsonify({'error': 'Not found'}), 404
     body = request.json or {}
-    for f in ['name', 'spouse', 'note', 'tribute']:
+    for f in ['name', 'spouse', 'note', 'tribute', 'spouse_tribute']:
         if f in body:
             family[idx][f] = body[f]
     save_family(family)

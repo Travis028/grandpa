@@ -135,7 +135,7 @@ export default function ProgramPDF() {
 
   const PageTributes = () => {
     let hasTributes = false;
-    family.forEach(c => { if(c.tribute || (c.grandchildren && c.grandchildren.some(g=>g.tribute))) hasTributes=true; });
+    family.forEach(c => { if(c.tribute || c.spouse_tribute || (c.grandchildren && c.grandchildren.some(g=>g.tribute))) hasTributes=true; });
     if (!hasTributes) return null;
 
     return (
@@ -145,7 +145,7 @@ export default function ProgramPDF() {
           <h2 className="pdf-section-title">Family Tributes</h2>
           <div className="pdf-tributes-list">
             {family.map((child, idx) => {
-              if (!child.tribute && (!child.grandchildren || child.grandchildren.length === 0)) return null;
+              if (!child.tribute && !child.spouse_tribute && (!child.grandchildren || child.grandchildren.length === 0)) return null;
               return (
                 <div key={idx} className="pdf-family-tribute">
                   <div className="pdf-tribute-header">
@@ -156,7 +156,15 @@ export default function ProgramPDF() {
                     </div>
                   </div>
                   {child.tribute && (
-                    <p className="pdf-tribute-text">"{child.tribute}"</p>
+                    <div style={{ marginBottom: '10px' }}>
+                      <p className="pdf-tribute-text">"{child.tribute}"</p>
+                    </div>
+                  )}
+                  {child.spouse_tribute && (
+                    <div style={{ marginBottom: '10px' }}>
+                      <p className="pdf-tribute-text" style={{ fontSize: '0.9rem', color: '#555' }}>"{child.spouse_tribute}"</p>
+                      <p style={{ margin: '4px 0 0 20px', fontSize: '0.85rem', color: '#777', fontStyle: 'italic' }}>— {child.spouse || 'Spouse'}</p>
+                    </div>
                   )}
                   
                   {child.grandchildren && child.grandchildren.length > 0 && (
