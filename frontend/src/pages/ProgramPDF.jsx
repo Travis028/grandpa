@@ -66,7 +66,8 @@ export default function ProgramPDF() {
     formData.append('file', file);
     try {
       await api.post('/api/upload_qr', formData, { headers: { 'Content-Type': 'multipart/form-data' } });
-      alert('QR Code successfully uploaded! Please refresh.');
+      alert('QR Code successfully uploaded!');
+      window.location.reload();
     } catch (err) {
       alert('Error uploading QR Code.');
     } finally {
@@ -82,7 +83,8 @@ export default function ProgramPDF() {
     formData.append('file', file);
     try {
       await api.post('/api/upload_program_cover', formData, { headers: { 'Content-Type': 'multipart/form-data' } });
-      alert('Program Cover successfully uploaded! Please refresh.');
+      alert('Program Cover successfully uploaded!');
+      window.location.reload();
     } catch (err) {
       alert('Error uploading Program Cover.');
     } finally {
@@ -100,7 +102,8 @@ export default function ProgramPDF() {
     }
     try {
       await api.post('/api/upload_program_photos', formData, { headers: { 'Content-Type': 'multipart/form-data' } });
-      alert('Program Gallery Photos successfully uploaded! Please refresh.');
+      alert('Program Gallery Photos successfully uploaded!');
+      window.location.reload();
     } catch (err) {
       alert('Error uploading Program Gallery.');
     } finally {
@@ -391,7 +394,7 @@ export default function ProgramPDF() {
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '5px', background: '#f9f9f9', padding: '8px 12px', borderRadius: '4px', border: '1px solid #ddd', flex: '1 1 200px' }}>
-            <label style={{ fontSize: '0.8rem', color: '#444', fontWeight: 'bold' }}>Upload 30 Photos:</label>
+            <label style={{ fontSize: '0.8rem', color: '#444', fontWeight: 'bold' }}>Upload Photos:</label>
             <input type="file" accept="image/*" multiple onChange={handleGalleryUpload} disabled={galleryUploading} style={{ fontSize: '0.8rem', width: '100%' }} />
             {galleryUploading && <span style={{ fontSize: '0.75rem', color: '#d4af37' }}>Uploading...</span>}
           </div>
