@@ -42,9 +42,16 @@ export default function ProgramPDF() {
   const { grandpa, lifePhotos, programPhotos } = data;
 
   const handleDownload = () => {
-    // Native print is 100% reliable for generating PDFs from complex layouts.
-    // When the dialog opens, simply select "Save as PDF" as the destination.
-    window.print();
+    const element = pdfRef.current;
+    const opt = {
+      margin:       0,
+      filename:     `Memorial_Program_${grandpa.name.replace(/ /g, '_')}.pdf`,
+      image:        { type: 'jpeg', quality: 0.95 },
+      html2canvas:  { scale: 1.5, useCORS: true }, // lower scale slightly to prevent Out-Of-Memory errors on 30 huge photos
+      jsPDF:        { unit: 'mm', format: paperSize === 'A3' ? 'a3' : 'a4', orientation: paperSize === 'A3' ? 'landscape' : 'portrait' },
+      pagebreak:    { mode: 'css', avoid: '.pdf-a4-panel' }
+    };
+    html2pdf().set(opt).from(element).save();
   };
 
   const handleQrUpload = async (e) => {
@@ -230,7 +237,8 @@ export default function ProgramPDF() {
   // Gallery Preparation
   const photosToUse = programPhotos && programPhotos.length > 0 ? programPhotos : lifePhotos;
   const isProgramSource = programPhotos && programPhotos.length > 0;
-  const galleryPhotos = photosToUse ? [...photosToUse].sort(() => 0.5 - Math.random()).slice(0, 30) : [];
+  // Keep original sorting (alphabetical / upload order) instead of randomizing
+  const galleryPhotos = photosToUse ? [...photosToUse].slice(0, 30) : [];
   
   // Distribute across 3 pages: 12, 12, 6
   const p1Photos = galleryPhotos.slice(0, 12);
@@ -356,11 +364,11 @@ export default function ProgramPDF() {
             
             <button onClick={handleDownload} className="pdf-burner-btn-main" style={{ marginBottom: '5px' }}>
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '8px' }}>
-                <polyline points="6 9 6 2 18 2 18 9"></polyline>
-                <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
-                <rect x="6" y="14" width="12" height="8"></rect>
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="7 10 12 15 17 10"></polyline>
+                <line x1="12" y1="15" x2="12" y2="3"></line>
               </svg>
-              Print / Save as PDF
+              Download PDF
             </button>
             
             <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
