@@ -4,9 +4,9 @@
 ───────────────────────────────────────────────────────────── */
 
 .pdf-wrapper {
-  background: #eef5f5; /* Light greenish-blue background for the wrapper */
+  background: #eef7f2; /* Light greenish-blue background for the wrapper */
   min-height: 100vh;
-  color: #0B393C;
+  color: #000000;
   font-family: 'Inter', sans-serif;
   font-size: 12pt; 
   line-height: 1.5;
@@ -14,14 +14,14 @@
 
 /* BURNER DASHBOARD */
 .pdf-burner-dashboard {
-  background: #ffffff;
+  background: #eef7f2;
   border-bottom: 1px solid #cce0e0;
   padding: 20px 40px;
-  box-shadow: 0 4px 20px rgba(11,57,60,0.05);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.05);
   position: sticky;
   top: 0;
   z-index: 100;
-  color: #0B393C;
+  color: #000000;
 }
 
 .pdf-burner-header {
@@ -43,12 +43,12 @@
   cursor: pointer;
   display: flex;
   align-items: center;
-  box-shadow: 0 4px 15px rgba(24, 90, 94, 0.3);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
   transition: transform 0.2s, box-shadow 0.2s;
 }
 .pdf-burner-btn-main:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(24, 90, 94, 0.4);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
 }
 
 /* ─────────────────────────────────────────────────────────────
@@ -64,8 +64,8 @@
 
 /* The physical paper sheet */
 .pdf-sheet {
-  background: #ffffff;
-  box-shadow: 0 15px 50px rgba(11,57,60,0.15);
+  background: #eef7f2;
+  box-shadow: 0 15px 50px rgba(0,0,0,0.15);
   position: relative;
   page-break-after: always;
   box-sizing: border-box;
@@ -106,9 +106,9 @@
   position: relative;
   display: flex;
   flex-direction: column;
-  border: 4px double rgba(24, 90, 94, 0.4);
-  background: #ffffff;
-  color: #0B393C;
+  border: 4px double rgba(0, 0, 0, 0.4);
+  background: #eef7f2;
+  color: #000000;
 }
 
 .pdf-page-center {
@@ -132,8 +132,8 @@
   filter: grayscale(100%);
   z-index: 1;
   pointer-events: none;
-  mask-image: radial-gradient(ellipse, #0A3235 30%, transparent 70%);
-  -webkit-mask-image: radial-gradient(ellipse, #0A3235 30%, transparent 70%);
+  mask-image: radial-gradient(ellipse, #000000 30%, transparent 70%);
+  -webkit-mask-image: radial-gradient(ellipse, #000000 30%, transparent 70%);
 }
 
 .pdf-content-relative {
@@ -156,7 +156,7 @@
   height: 260px;
   border-radius: 50%;
   border: 4px solid #185a5e;
-  box-shadow: 0 0 20px rgba(24, 90, 94, 0.15);
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
   margin-bottom: 30px;
   overflow: hidden;
   z-index: 2;
@@ -171,7 +171,7 @@
   font-family: "Playfair Display", serif;
   font-size: 2.8rem;
   margin: 0 0 10px 0;
-  color: #0B393C;
+  color: #000000;
   text-transform: uppercase;
   font-weight: bold;
 }
@@ -199,7 +199,7 @@
   font-size: 0.8rem;
   text-transform: uppercase;
   letter-spacing: 3px;
-  color: #228A91;
+  color: #000;
   margin-bottom: 5px;
   font-weight: bold;
 }
@@ -212,7 +212,7 @@
 .pdf-date-divider {
   width: 1px;
   height: 50px;
-  background: rgba(24, 90, 94, 0.4);
+  background: rgba(0, 0, 0, 0.4);
 }
 
 /* TYPOGRAPHY */
@@ -233,7 +233,7 @@
 .pdf-event-details {
   margin-bottom: 30px;
   font-size: 12pt;
-  color: #0E4A4E;
+  color: #000;
 }
 .pdf-event-details p { margin: 6px 0; }
 .pdf-program-table {
@@ -242,10 +242,10 @@
 }
 .pdf-program-table td {
   padding: 12px 8px;
-  border-bottom: 1px solid rgba(11,57,60,0.1);
+  border-bottom: 1px solid rgba(0,0,0,0.1);
   vertical-align: top;
   font-size: 11pt;
-  color: #0B393C;
+  color: #000000;
 }
 .pdf-td-time {
   width: 100px;
@@ -256,7 +256,7 @@
   font-weight: bold;
 }
 .pdf-td-leader {
-  color: #1B767D;
+  color: #000;
   font-style: italic;
   text-align: right;
 }
@@ -267,12 +267,12 @@
   font-size: 11.5pt;
   line-height: 1.7;
   text-align: justify;
-  color: #0B393C;
+  color: #000000;
 }
 .pdf-activities-section {
   margin-top: 30px;
   padding-top: 20px;
-  border-top: 1px dashed rgba(24, 90, 94, 0.4);
+  border-top: 1px dashed rgba(0, 0, 0, 0.4);
 }
 .pdf-subsection-title {
   font-family: "Playfair Display", serif;
@@ -302,7 +302,7 @@
 }
 .pdf-activity-event {
   font-size: 11pt;
-  color: #0B393C;
+  color: #000000;
   font-weight: 500;
 }
 
@@ -315,7 +315,7 @@
 .pdf-family-tribute {
   page-break-inside: avoid;
   padding-bottom: 20px;
-  border-bottom: 1px solid rgba(11,57,60,0.05);
+  border-bottom: 1px solid rgba(0,0,0,0.05);
 }
 .pdf-tribute-header {
   display: flex;
@@ -334,12 +334,12 @@
   margin: 0;
   font-family: "Playfair Display", serif;
   font-size: 1.2rem;
-  color: #0B393C;
+  color: #000000;
   font-weight: bold;
 }
 .pdf-tribute-spouse {
   margin: 0;
-  color: #1B767D;
+  color: #000;
   font-style: italic;
   font-size: 0.9rem;
 }
@@ -347,14 +347,14 @@
   font-size: 11pt;
   line-height: 1.6;
   font-style: italic;
-  color: #0E4A4E;
+  color: #000;
   margin: 0;
   padding-left: 65px;
 }
 .pdf-grandchildren-tributes {
   margin-top: 15px;
   padding-left: 65px;
-  border-left: 2px solid rgba(24, 90, 94, 0.5);
+  border-left: 2px solid rgba(0, 0, 0, 0.5);
   margin-left: 25px;
 }
 .pdf-gc-tribute {
@@ -365,7 +365,7 @@
   margin: 0 0 5px 0;
   font-size: 10pt;
   font-style: italic;
-  color: #115C60;
+  color: #000;
 }
 .pdf-gc-name {
   margin: 0;
@@ -387,7 +387,7 @@
 .pdf-hymnal-lyrics {
   white-space: pre-wrap;
   line-height: 1.6;
-  color: #0B393C;
+  color: #000000;
   font-weight: 500;
 }
 
