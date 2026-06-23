@@ -75,25 +75,25 @@
 /* A4 Portrait Sheet */
 .pdf-sheet-a4-portrait {
   width: 210mm;
-  min-height: 297mm;
-  height: auto;
+  height: 297mm;
+  overflow: hidden;
 }
 
 /* A3 Landscape Sheet */
 .pdf-sheet-a3-landscape {
   width: 420mm;
-  min-height: 297mm;
-  height: auto;
+  height: 297mm;
   display: flex;
+  overflow: hidden;
 }
 
 /* The A4 Panel inside the sheet */
 .pdf-a4-panel {
   width: 210mm;
-  min-height: 297mm;
-  height: auto;
+  height: 297mm;
   box-sizing: border-box;
   position: relative;
+  overflow: hidden;
 }
 
 /* ─────────────────────────────────────────────────────────────
