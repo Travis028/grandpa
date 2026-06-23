@@ -6,7 +6,7 @@
 .pdf-wrapper {
   background: #eef5f5; /* Light greenish-blue background for the wrapper */
   min-height: 100vh;
-  color: #111;
+  color: #0B393C;
   font-family: 'Inter', sans-serif;
   font-size: 12pt; 
   line-height: 1.5;
@@ -17,11 +17,11 @@
   background: #ffffff;
   border-bottom: 1px solid #cce0e0;
   padding: 20px 40px;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+  box-shadow: 0 4px 20px rgba(11,57,60,0.05);
   position: sticky;
   top: 0;
   z-index: 100;
-  color: #111;
+  color: #0B393C;
 }
 
 .pdf-burner-header {
@@ -65,7 +65,7 @@
 /* The physical paper sheet */
 .pdf-sheet {
   background: #ffffff;
-  box-shadow: 0 15px 50px rgba(0,0,0,0.15);
+  box-shadow: 0 15px 50px rgba(11,57,60,0.15);
   position: relative;
   page-break-after: always;
   box-sizing: border-box;
@@ -108,7 +108,7 @@
   flex-direction: column;
   border: 4px double rgba(24, 90, 94, 0.4);
   background: #ffffff;
-  color: #111;
+  color: #0B393C;
 }
 
 .pdf-page-center {
@@ -132,8 +132,8 @@
   filter: grayscale(100%);
   z-index: 1;
   pointer-events: none;
-  mask-image: radial-gradient(ellipse, black 30%, transparent 70%);
-  -webkit-mask-image: radial-gradient(ellipse, black 30%, transparent 70%);
+  mask-image: radial-gradient(ellipse, #0A3235 30%, transparent 70%);
+  -webkit-mask-image: radial-gradient(ellipse, #0A3235 30%, transparent 70%);
 }
 
 .pdf-content-relative {
@@ -171,7 +171,7 @@
   font-family: "Playfair Display", serif;
   font-size: 2.8rem;
   margin: 0 0 10px 0;
-  color: #111;
+  color: #0B393C;
   text-transform: uppercase;
   font-weight: bold;
 }
@@ -199,7 +199,7 @@
   font-size: 0.8rem;
   text-transform: uppercase;
   letter-spacing: 3px;
-  color: #666;
+  color: #228A91;
   margin-bottom: 5px;
   font-weight: bold;
 }
@@ -233,7 +233,7 @@
 .pdf-event-details {
   margin-bottom: 30px;
   font-size: 12pt;
-  color: #222;
+  color: #0E4A4E;
 }
 .pdf-event-details p { margin: 6px 0; }
 .pdf-program-table {
@@ -242,10 +242,10 @@
 }
 .pdf-program-table td {
   padding: 12px 8px;
-  border-bottom: 1px solid rgba(0,0,0,0.1);
+  border-bottom: 1px solid rgba(11,57,60,0.1);
   vertical-align: top;
   font-size: 11pt;
-  color: #111;
+  color: #0B393C;
 }
 .pdf-td-time {
   width: 100px;
@@ -256,7 +256,7 @@
   font-weight: bold;
 }
 .pdf-td-leader {
-  color: #555;
+  color: #1B767D;
   font-style: italic;
   text-align: right;
 }
@@ -267,7 +267,7 @@
   font-size: 11.5pt;
   line-height: 1.7;
   text-align: justify;
-  color: #111;
+  color: #0B393C;
 }
 .pdf-activities-section {
   margin-top: 30px;
@@ -302,7 +302,7 @@
 }
 .pdf-activity-event {
   font-size: 11pt;
-  color: #111;
+  color: #0B393C;
   font-weight: 500;
 }
 
@@ -315,7 +315,7 @@
 .pdf-family-tribute {
   page-break-inside: avoid;
   padding-bottom: 20px;
-  border-bottom: 1px solid rgba(0,0,0,0.05);
+  border-bottom: 1px solid rgba(11,57,60,0.05);
 }
 .pdf-tribute-header {
   display: flex;
@@ -334,12 +334,12 @@
   margin: 0;
   font-family: "Playfair Display", serif;
   font-size: 1.2rem;
-  color: #111;
+  color: #0B393C;
   font-weight: bold;
 }
 .pdf-tribute-spouse {
   margin: 0;
-  color: #555;
+  color: #1B767D;
   font-style: italic;
   font-size: 0.9rem;
 }
@@ -347,7 +347,7 @@
   font-size: 11pt;
   line-height: 1.6;
   font-style: italic;
-  color: #222;
+  color: #0E4A4E;
   margin: 0;
   padding-left: 65px;
 }
@@ -365,7 +365,7 @@
   margin: 0 0 5px 0;
   font-size: 10pt;
   font-style: italic;
-  color: #333;
+  color: #115C60;
 }
 .pdf-gc-name {
   margin: 0;
@@ -387,7 +387,7 @@
 .pdf-hymnal-lyrics {
   white-space: pre-wrap;
   line-height: 1.6;
-  color: #111;
+  color: #0B393C;
   font-weight: 500;
 }
 

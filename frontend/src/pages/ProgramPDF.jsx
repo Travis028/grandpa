@@ -32,7 +32,7 @@ export default function ProgramPDF() {
   }, []);
 
   if (loading) {
-    return <div style={{ padding: '50px', textAlign: 'center', fontFamily: '"Playfair Display", serif', fontSize: '1.5rem', color: '#111' }}>Preparing Floral 8-Page Booklet...</div>;
+    return <div style={{ padding: '50px', textAlign: 'center', fontFamily: '"Playfair Display", serif', fontSize: '1.5rem', color: '#0B393C' }}>Preparing Floral 8-Page Booklet...</div>;
   }
 
   if (!data || !data.grandpa) {
@@ -114,11 +114,11 @@ export default function ProgramPDF() {
     backgroundSize: 'cover',
     backgroundPosition: 'center',
     backgroundRepeat: 'no-repeat',
-    color: '#000' // Ensure everything is highly visible (black)
+    color: '#0A3235' // Ensure everything is highly visible (#0A3235)
   };
 
-  const textColor = '#111'; // High visibility
-  const headingColor = '#0d2b5c'; // Dark floral blue for headings to complement the black text
+  const textColor = '#0B393C'; // High visibility
+  const headingColor = '#0d2b5c'; // Dark floral blue for headings to complement the green-blue text
 
   // --- PAGE COMPONENTS ---
 
@@ -126,7 +126,7 @@ export default function ProgramPDF() {
   const PageCover = () => (
     <div className="pdf-page-content pdf-page-center pdf-cover" style={floralBg}>
       <div className="pdf-cover-ornament" style={{ color: headingColor }}>✦ In Loving Memory ✦</div>
-      <div className="pdf-cover-photo-wrapper" style={{ border: `4px solid ${headingColor}`, boxShadow: '0 8px 20px rgba(0,0,0,0.2)', background: '#fff', padding: '5px' }}>
+      <div className="pdf-cover-photo-wrapper" style={{ border: `4px solid ${headingColor}`, boxShadow: '0 8px 20px rgba(11,57,60,0.2)', background: '#fff', padding: '5px' }}>
         <img 
           src={`${API_BASE}/api/static/images/grandpa/program_cover.jpg?t=${Date.now()}`} 
           alt={grandpa.name} 
@@ -376,10 +376,10 @@ export default function ProgramPDF() {
   return (
     <div className="pdf-wrapper">
       {/* ── BURNER DASHBOARD (HIDDEN ON PRINT) ── */}
-      <div className="pdf-burner-dashboard no-print" style={{ display: 'flex', flexWrap: 'wrap', gap: '20px', justifyContent: 'space-between', alignItems: 'center', background: '#fff', padding: '20px', borderBottom: '2px solid var(--gold)', boxShadow: '0 4px 6px rgba(0,0,0,0.1)' }}>
+      <div className="pdf-burner-dashboard no-print" style={{ display: 'flex', flexWrap: 'wrap', gap: '20px', justifyContent: 'space-between', alignItems: 'center', background: '#fff', padding: '20px', borderBottom: '2px solid var(--gold)', boxShadow: '0 4px 6px rgba(11,57,60,0.1)' }}>
         <div style={{ flex: '1 1 300px' }}>
-          <h1 style={{ margin: '0 0 5px 0', fontFamily: '"Playfair Display", serif', color: '#111', fontSize: '1.8rem' }}>Program Generator</h1>
-          <p style={{ margin: 0, color: '#555', fontSize: '0.95rem' }}>Floral 8-Page Booklet. Click "Download PDF" below.</p>
+          <h1 style={{ margin: '0 0 5px 0', fontFamily: '"Playfair Display", serif', color: '#0B393C', fontSize: '1.8rem' }}>Program Generator</h1>
+          <p style={{ margin: 0, color: '#1B767D', fontSize: '0.95rem' }}>Floral 8-Page Booklet. Click "Download PDF" below.</p>
         </div>
         
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '15px', alignItems: 'center', flex: '2 1 500px' }}>
@@ -413,7 +413,7 @@ export default function ProgramPDF() {
           </button>
           
           <div style={{ display: 'flex', gap: '10px', alignItems: 'center', width: '100%', justifyContent: 'flex-end' }}>
-            <label style={{ fontSize: '0.85rem', color: '#666', fontWeight: 'bold' }}>Format:</label>
+            <label style={{ fontSize: '0.85rem', color: '#228A91', fontWeight: 'bold' }}>Format:</label>
             <select value={paperSize} onChange={e => setPaperSize(e.target.value)} style={{ padding: '6px 10px', borderRadius: '4px', border: '1px solid #ccc', cursor: 'pointer', fontSize: '0.85rem' }}>
               <option value="A4">A4 (8 Pages)</option>
               <option value="A3">A3 (Booklet)</option>
