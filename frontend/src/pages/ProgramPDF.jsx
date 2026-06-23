@@ -48,7 +48,8 @@ export default function ProgramPDF() {
       filename:     `Memorial_Program_${grandpa.name.replace(/ /g, '_')}.pdf`,
       image:        { type: 'jpeg', quality: 0.98 },
       html2canvas:  { scale: 2, useCORS: true },
-      jsPDF:        { unit: 'mm', format: paperSize === 'A3' ? 'a3' : 'a4', orientation: paperSize === 'A3' ? 'landscape' : 'portrait' }
+      jsPDF:        { unit: 'mm', format: paperSize === 'A3' ? 'a3' : 'a4', orientation: paperSize === 'A3' ? 'landscape' : 'portrait' },
+      pagebreak:    { mode: ['css', 'legacy'] }
     };
     html2pdf().set(opt).from(element).save();
   };
