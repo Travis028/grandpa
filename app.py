@@ -496,10 +496,15 @@ def upload_program_photos():
     files = request.files.getlist('files')
     if not files: return jsonify({"error": "No files"}), 400
     d = os.path.join('static', 'images', 'program_photos')
-    import shutil
-    if os.path.exists(d):
-        shutil.rmtree(d)
     os.makedirs(d, exist_ok=True)
+    # Safely remove existing files instead of rmtree
+    for filename in os.listdir(d):
+        file_path = os.path.join(d, filename)
+        try:
+            if os.path.isfile(file_path):
+                os.remove(file_path)
+        except Exception:
+            pass
     for f in files:
         if f.filename:
             f.save(os.path.join(d, f.filename))
@@ -509,7 +514,9 @@ def upload_program_photos():
 def get_program_photos():
     d = os.path.join('static', 'images', 'program_photos')
     if not os.path.exists(d): return jsonify([])
-    return jsonify([f for f in os.listdir(d) if f.lower().endswith(('.jpg', '.jpeg', '.png', '.webp'))])
+    files = [f for f in os.listdir(d) if f.lower().endswith(('.jpg', '.jpeg', '.png', '.webp'))]
+    files.sort()  # Ensure they appear in the order they are named
+    return jsonify(files)
 
 @app.route('/api/static/<path:filename>')
 def serve_static(filename):
