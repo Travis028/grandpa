@@ -2,19 +2,19 @@
    VARIABLES & FONTS
    ============================================ */
    :root {
-    /* Colors - Royal Navy & Gold Theme (Light Mode) */
-    --primary: #0A192F;
-    --secondary: #F0F4F8;
-    --charcoal: #112240;
-    --text-dark: #0F172A;
-    --text-light: #E2E8F0;
-    --text-muted: #64748B;
-    --gold: #D4AF37;
-    --gold2: #B08D57;
+    /* Colors - Green-Blue Theme (Light Mode) */
+    --primary: #185a5e;
+    --secondary: #eef5f5;
+    --charcoal: #124548;
+    --text-dark: #111111;
+    --text-light: #f8fafa;
+    --text-muted: #555555;
+    --gold: #207b80;
+    --gold2: #1e6b6f;
     --bg-light: #FFFFFF;
-    --bg-warm: #F8FAFC;
+    --bg-warm: #f4fafc;
     --white: #FFFFFF;
-    --border: #E2E8F0;
+    --border: #cce0e0;
     
     /* Typography */
     --font-serif: 'Cormorant Garamond', serif;
@@ -27,19 +27,19 @@
 }
 
 [data-theme="dark"] {
-    /* Colors - Royal Navy & Gold Theme (Dark Mode) */
-    --primary: #07101E;
-    --secondary: #112240;
-    --charcoal: #0B1120;
-    --text-dark: #F8FAFC;
-    --text-light: #F8FAFC;
-    --text-muted: #94A3B8;
-    --gold: #FCD34D;
-    --gold2: #F59E0B;
-    --bg-light: #1E293B;
-    --bg-warm: #0F172A;
-    --white: #1E293B;
-    --border: #334155;
+    /* Colors - Green-Blue Theme (Dark Mode) */
+    --primary: #0e3538;
+    --secondary: #124548;
+    --charcoal: #0a2528;
+    --text-dark: #f8fafa;
+    --text-light: #f8fafa;
+    --text-muted: #a0b2b2;
+    --gold: #2eb2ba;
+    --gold2: #26969c;
+    --bg-light: #15292a;
+    --bg-warm: #0a1f20;
+    --white: #15292a;
+    --border: #1e4547;
     --font-serif: 'Cormorant Garamond', serif;
     --font-sans: 'Inter', sans-serif;
     
@@ -239,7 +239,7 @@ img {
     left: 0;
     width: 100%;
     height: 100%;
-    background: linear-gradient(to bottom, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.7) 100%);
+    background: linear-gradient(to bottom, rgba(18,69,72,0.3) 0%, rgba(18,69,72,0.7) 100%);
     z-index: -1;
 }
 
@@ -741,7 +741,7 @@ img {
     width: 100%;
     height: 100%;
     object-fit: contain;
-    background-color: #1a1a1a;
+    background-color: var(--bg-warm);
     transition: transform var(--transition-normal), filter var(--transition-normal);
     filter: brightness(0.9);
 }
@@ -757,7 +757,7 @@ img {
     left: 0;
     width: 100%;
     padding: 2rem 1.5rem 1.5rem;
-    background: linear-gradient(to top, rgba(0,0,0,0.9), transparent);
+    background: linear-gradient(to top, rgba(18,69,72,0.9), transparent);
     transform: translateY(20px);
     opacity: 0;
     transition: all var(--transition-normal);

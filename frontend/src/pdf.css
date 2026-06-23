@@ -4,9 +4,9 @@
 ───────────────────────────────────────────────────────────── */
 
 .pdf-wrapper {
-  background: #2a2a2a;
+  background: #eef5f5; /* Light greenish-blue background for the wrapper */
   min-height: 100vh;
-  color: #eee;
+  color: #111;
   font-family: 'Inter', sans-serif;
   font-size: 12pt; 
   line-height: 1.5;
@@ -14,10 +14,10 @@
 
 /* BURNER DASHBOARD */
 .pdf-burner-dashboard {
-  background: #fdfdfd;
-  border-bottom: 1px solid #ddd;
+  background: #ffffff;
+  border-bottom: 1px solid #cce0e0;
   padding: 20px 40px;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.05);
   position: sticky;
   top: 0;
   z-index: 100;
@@ -33,8 +33,8 @@
 }
 
 .pdf-burner-btn-main {
-  background: linear-gradient(135deg, #d4af37 0%, #b89025 100%);
-  color: #111;
+  background: linear-gradient(135deg, #185a5e 0%, #124548 100%);
+  color: #ffffff;
   border: none;
   border-radius: 6px;
   padding: 14px 28px;
@@ -43,12 +43,12 @@
   cursor: pointer;
   display: flex;
   align-items: center;
-  box-shadow: 0 4px 15px rgba(212, 175, 55, 0.4);
+  box-shadow: 0 4px 15px rgba(24, 90, 94, 0.3);
   transition: transform 0.2s, box-shadow 0.2s;
 }
 .pdf-burner-btn-main:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(212, 175, 55, 0.6);
+  box-shadow: 0 6px 20px rgba(24, 90, 94, 0.4);
 }
 
 /* ─────────────────────────────────────────────────────────────
@@ -64,11 +64,10 @@
 
 /* The physical paper sheet */
 .pdf-sheet {
-  background: #111;
-  box-shadow: 0 15px 50px rgba(0,0,0,0.5);
+  background: #ffffff;
+  box-shadow: 0 15px 50px rgba(0,0,0,0.15);
   position: relative;
   page-break-after: always;
-  /* overflow: hidden removed to allow printing flow */
   box-sizing: border-box;
 }
 
@@ -97,7 +96,7 @@
 }
 
 /* ─────────────────────────────────────────────────────────────
-   PAGE CONTENT & THEME (THE CRAZY DESIGN)
+   PAGE CONTENT & THEME
 ───────────────────────────────────────────────────────────── */
 .pdf-page-content {
   width: 100%;
@@ -107,10 +106,9 @@
   position: relative;
   display: flex;
   flex-direction: column;
-  /* Crazy border styling */
-  border: 4px double rgba(212, 175, 55, 0.3);
-  background: #111; /* True Dark Mode */
-  color: #fff;
+  border: 4px double rgba(24, 90, 94, 0.4);
+  background: #ffffff;
+  color: #111;
 }
 
 .pdf-page-center {
@@ -130,8 +128,8 @@
   background-size: contain;
   background-position: center;
   background-repeat: no-repeat;
-  opacity: 0.15; /* Brighter for dark mode */
-  filter: brightness(0.7) contrast(1.2) sepia(1) hue-rotate(5deg) saturate(2); /* Crazy vintage gold glow */
+  opacity: 0.05;
+  filter: grayscale(100%);
   z-index: 1;
   pointer-events: none;
   mask-image: radial-gradient(ellipse, black 30%, transparent 70%);
@@ -149,41 +147,41 @@
   font-family: "Playfair Display", serif;
   font-size: 1.2rem;
   letter-spacing: 6px;
-  color: #d4af37;
+  color: #185a5e;
   margin-bottom: 40px;
-  text-shadow: 0 0 10px rgba(212,175,55,0.4);
+  font-weight: bold;
 }
 .pdf-cover-photo-wrapper {
   width: 260px;
   height: 260px;
   border-radius: 50%;
-  border: 4px solid #d4af37;
-  box-shadow: 0 0 40px rgba(212, 175, 55, 0.4);
+  border: 4px solid #185a5e;
+  box-shadow: 0 0 20px rgba(24, 90, 94, 0.15);
   margin-bottom: 30px;
   overflow: hidden;
   z-index: 2;
+  background: #fff;
 }
 .pdf-cover-photo {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  filter: contrast(1.1);
 }
 .pdf-title {
   font-family: "Playfair Display", serif;
   font-size: 2.8rem;
   margin: 0 0 10px 0;
-  color: #fff;
+  color: #111;
   text-transform: uppercase;
-  text-shadow: 0 0 20px rgba(255,255,255,0.3);
+  font-weight: bold;
 }
 
 .pdf-subtitle {
   font-family: "Playfair Display", serif;
   font-style: italic;
   font-size: 1.6rem;
-  color: #d4af37;
-  font-weight: 400;
+  color: #185a5e;
+  font-weight: bold;
   margin-bottom: 50px;
 }
 .pdf-dates {
@@ -201,40 +199,41 @@
   font-size: 0.8rem;
   text-transform: uppercase;
   letter-spacing: 3px;
-  color: #aaa;
+  color: #666;
   margin-bottom: 5px;
+  font-weight: bold;
 }
 .pdf-date-val {
   font-family: "Playfair Display", serif;
   font-size: 1.8rem;
   font-weight: bold;
-  color: #d4af37;
+  color: #185a5e;
 }
 .pdf-date-divider {
   width: 1px;
   height: 50px;
-  background: rgba(212, 175, 55, 0.4);
+  background: rgba(24, 90, 94, 0.4);
 }
 
 /* TYPOGRAPHY */
 .pdf-section-title {
   font-family: "Playfair Display", serif;
   font-size: 2.2rem;
-  border-bottom: 2px solid #d4af37;
+  border-bottom: 2px solid #185a5e;
   padding-bottom: 10px;
   margin-top: 0;
   margin-bottom: 25px;
   text-transform: uppercase;
   letter-spacing: 2px;
-  color: #d4af37;
-  text-shadow: 0 0 15px rgba(212,175,55,0.3);
+  color: #185a5e;
+  font-weight: bold;
 }
 
 /* PROGRAM TABLE */
 .pdf-event-details {
   margin-bottom: 30px;
   font-size: 12pt;
-  color: #ddd;
+  color: #222;
 }
 .pdf-event-details p { margin: 6px 0; }
 .pdf-program-table {
@@ -243,21 +242,21 @@
 }
 .pdf-program-table td {
   padding: 12px 8px;
-  border-bottom: 1px solid rgba(255,255,255,0.1);
+  border-bottom: 1px solid rgba(0,0,0,0.1);
   vertical-align: top;
   font-size: 11pt;
-  color: #eee;
+  color: #111;
 }
 .pdf-td-time {
   width: 100px;
   font-weight: bold;
-  color: #d4af37;
+  color: #185a5e;
 }
 .pdf-td-item {
-  font-weight: 500;
+  font-weight: bold;
 }
 .pdf-td-leader {
-  color: #aaa;
+  color: #555;
   font-style: italic;
   text-align: right;
 }
@@ -268,20 +267,21 @@
   font-size: 11.5pt;
   line-height: 1.7;
   text-align: justify;
-  color: #ddd;
+  color: #111;
 }
 .pdf-activities-section {
   margin-top: 30px;
   padding-top: 20px;
-  border-top: 1px dashed rgba(212,175,55,0.4);
+  border-top: 1px dashed rgba(24, 90, 94, 0.4);
 }
 .pdf-subsection-title {
   font-family: "Playfair Display", serif;
   font-size: 1.5rem;
-  color: #d4af37;
+  color: #185a5e;
   margin-bottom: 20px;
   text-transform: uppercase;
   letter-spacing: 1px;
+  font-weight: bold;
 }
 .pdf-activities-timeline {
   list-style: none;
@@ -295,14 +295,15 @@
 }
 .pdf-activity-year {
   font-weight: bold;
-  color: #d4af37;
+  color: #185a5e;
   width: 65px;
   flex-shrink: 0;
   font-size: 11pt;
 }
 .pdf-activity-event {
   font-size: 11pt;
-  color: #ddd;
+  color: #111;
+  font-weight: 500;
 }
 
 /* TRIBUTES */
@@ -314,7 +315,7 @@
 .pdf-family-tribute {
   page-break-inside: avoid;
   padding-bottom: 20px;
-  border-bottom: 1px solid rgba(255,255,255,0.05);
+  border-bottom: 1px solid rgba(0,0,0,0.05);
 }
 .pdf-tribute-header {
   display: flex;
@@ -326,18 +327,19 @@
   height: 50px;
   border-radius: 50%;
   object-fit: cover;
-  border: 2px solid #d4af37;
-  box-shadow: 0 0 10px rgba(212,175,55,0.3);
+  border: 2px solid #185a5e;
+  background: #fff;
 }
 .pdf-tribute-name {
   margin: 0;
   font-family: "Playfair Display", serif;
   font-size: 1.2rem;
-  color: #fff;
+  color: #111;
+  font-weight: bold;
 }
 .pdf-tribute-spouse {
   margin: 0;
-  color: #aaa;
+  color: #555;
   font-style: italic;
   font-size: 0.9rem;
 }
@@ -345,14 +347,14 @@
   font-size: 11pt;
   line-height: 1.6;
   font-style: italic;
-  color: #ccc;
+  color: #222;
   margin: 0;
   padding-left: 65px;
 }
 .pdf-grandchildren-tributes {
   margin-top: 15px;
   padding-left: 65px;
-  border-left: 2px solid rgba(212, 175, 55, 0.5);
+  border-left: 2px solid rgba(24, 90, 94, 0.5);
   margin-left: 25px;
 }
 .pdf-gc-tribute {
@@ -363,13 +365,13 @@
   margin: 0 0 5px 0;
   font-size: 10pt;
   font-style: italic;
-  color: #bbb;
+  color: #333;
 }
 .pdf-gc-name {
   margin: 0;
   font-size: 9.5pt;
   font-weight: bold;
-  color: #d4af37;
+  color: #185a5e;
 }
 
 /* HYMNALS */
@@ -385,7 +387,8 @@
 .pdf-hymnal-lyrics {
   white-space: pre-wrap;
   line-height: 1.6;
-  color: #ddd;
+  color: #111;
+  font-weight: 500;
 }
 
 /* GALLERY GRID */
@@ -397,9 +400,8 @@
 }
 .pdf-gallery-item {
   aspect-ratio: 1;
-  background: #222;
-  border: 2px solid #d4af37;
-  box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+  background: #f0f0f0;
+  border: 2px solid #185a5e;
   overflow: hidden;
   border-radius: 4px;
 }
@@ -407,13 +409,13 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
-  filter: grayscale(20%) contrast(1.1);
 }
 .pdf-gallery-footer {
   font-family: "Playfair Display", serif;
   font-size: 1.6rem;
-  color: #d4af37;
+  color: #185a5e;
   font-style: italic;
+  font-weight: bold;
 }
 
 
@@ -459,7 +461,7 @@
   }
   
   body {
-    background: #111 !important; /* Force true black for printing */
+    background: #ffffff !important;
     margin: 0;
     padding: 0;
     -webkit-print-color-adjust: exact !important;
