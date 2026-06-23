@@ -1,5 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
+import html2pdf from 'html2pdf.js';
 import api, { API_BASE } from '../config';
 
 export default function ProgramPDF() {
@@ -9,6 +10,8 @@ export default function ProgramPDF() {
   const [qrUploading, setQrUploading] = useState(false);
   const [coverUploading, setCoverUploading] = useState(false);
   const [galleryUploading, setGalleryUploading] = useState(false);
+  
+  const pdfRef = useRef();
 
   useEffect(() => {
     Promise.all([
@@ -29,7 +32,7 @@ export default function ProgramPDF() {
   }, []);
 
   if (loading) {
-    return <div style={{ padding: '50px', textAlign: 'center', fontFamily: '"Playfair Display", serif', fontSize: '1.5rem', color: '#d4af37' }}>Preparing 4-Page Booklet...</div>;
+    return <div style={{ padding: '50px', textAlign: 'center', fontFamily: '"Playfair Display", serif', fontSize: '1.5rem', color: '#d4af37' }}>Preparing 6-Page Booklet...</div>;
   }
 
   if (!data || !data.grandpa) {
@@ -38,8 +41,16 @@ export default function ProgramPDF() {
 
   const { grandpa, lifePhotos, programPhotos } = data;
 
-  const handlePrint = () => {
-    window.print();
+  const handleDownload = () => {
+    const element = pdfRef.current;
+    const opt = {
+      margin:       0,
+      filename:     `Memorial_Program_${grandpa.name.replace(/ /g, '_')}.pdf`,
+      image:        { type: 'jpeg', quality: 0.98 },
+      html2canvas:  { scale: 2, useCORS: true },
+      jsPDF:        { unit: 'mm', format: paperSize === 'A3' ? 'a3' : 'a4', orientation: paperSize === 'A3' ? 'landscape' : 'portrait' }
+    };
+    html2pdf().set(opt).from(element).save();
   };
 
   const handleQrUpload = async (e) => {
@@ -104,7 +115,6 @@ export default function ProgramPDF() {
           alt={grandpa.name} 
           style={{ width: '250px', height: '250px', objectFit: 'cover', borderRadius: '50%', border: 'none', boxShadow: 'none' }} 
           onError={(e) => { 
-            // Fallback to main_photo if program_cover doesn't exist
             if (!e.target.dataset.fallback) {
                 e.target.dataset.fallback = 'true';
                 e.target.src = `${API_BASE}/api/static/images/grandpa/main_photo.jpg`;
@@ -186,7 +196,6 @@ export default function ProgramPDF() {
       <div className="pdf-content-relative">
         <h2 className="pdf-section-title" style={{ fontSize: '1.6rem', marginBottom: '10px' }}>His Story</h2>
         
-        {/* Two column layout to fit the large text on one page */}
         <div style={{ fontSize: '0.70rem', lineHeight: '1.25', columnCount: 2, columnGap: '20px', textAlign: 'justify' }}>
           <p style={{ margin: '0 0 6px 0', fontWeight: 'bold' }}>A Celebration of the Life of Apollo Josiah Fizvalentine Owino Awidhi</p>
           
@@ -224,83 +233,101 @@ export default function ProgramPDF() {
     </div>
   );
 
-  // Page 4: Squeezed Gallery (Up to 30 photos without frames) & QR Code edge
-  const PageGalleryAndBack = () => {
-    // If programPhotos exist, use those. Otherwise fallback to lifePhotos.
-    const photosToUse = programPhotos && programPhotos.length > 0 ? programPhotos : lifePhotos;
-    const isProgramSource = programPhotos && programPhotos.length > 0;
-    
-    // Shuffle and pick up to 30 photos
-    const galleryPhotos = photosToUse ? [...photosToUse].sort(() => 0.5 - Math.random()).slice(0, 30) : [];
-    
-    // Determine dynamic grid size to fit 30 photos beautifully
-    // 5 columns, 6 rows max.
-    const photoCount = galleryPhotos.length;
-    let cols = 5;
-    let itemHeight = '90px'; // Very squished to fit many
+  // Gallery Preparation
+  const photosToUse = programPhotos && programPhotos.length > 0 ? programPhotos : lifePhotos;
+  const isProgramSource = programPhotos && programPhotos.length > 0;
+  const galleryPhotos = photosToUse ? [...photosToUse].sort(() => 0.5 - Math.random()).slice(0, 30) : [];
+  
+  // Distribute across 3 pages: 12, 12, 6
+  const p1Photos = galleryPhotos.slice(0, 12);
+  const p2Photos = galleryPhotos.slice(12, 24);
+  const p3Photos = galleryPhotos.slice(24, 30);
 
-    if (photoCount <= 9) {
-      cols = 3;
-      itemHeight = '160px';
-    } else if (photoCount <= 16) {
-      cols = 4;
-      itemHeight = '120px';
-    } else {
-      cols = 5;
-      itemHeight = '95px';
-    }
+  // Page 4: Gallery Page 1 (Up to 12 large photos)
+  const PageGallery1 = () => (
+    <div className="pdf-page-content pdf-page-center" style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+      <div className="pdf-watermark" style={{ backgroundImage: `url('${API_BASE}/api/static/images/grandpa/main_photo.jpg')` }}></div>
+      <div className="pdf-content-relative" style={{ width: '100%', flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
+        <h2 className="pdf-section-title" style={{ fontSize: '1.8rem', marginBottom: '15px' }}>Precious Memories</h2>
+        <div className="pdf-gallery-grid" style={{ flexGrow: 1, display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '4px', alignContent: 'start' }}>
+          {p1Photos.map((photo, idx) => (
+            <div key={idx} className="pdf-gallery-item" style={{ height: '180px', background: '#f5f5f5' }}>
+              <img src={`${API_BASE}/api/static/images/${isProgramSource ? 'program_photos' : 'life_photos'}/${photo}`} alt="Memory" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
 
-    return (
-      <div className="pdf-page-content pdf-page-center" style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-        <div className="pdf-watermark" style={{ backgroundImage: `url('${API_BASE}/api/static/images/grandpa/main_photo.jpg')` }}></div>
-        <div className="pdf-content-relative" style={{ width: '100%', flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
-          <h2 className="pdf-section-title" style={{ fontSize: '1.8rem', marginBottom: '10px' }}>Precious Memories</h2>
-          
-          <div className="pdf-gallery-grid" style={{ flexGrow: 1, display: 'grid', gridTemplateColumns: `repeat(${cols}, 1fr)`, gap: '2px', alignContent: 'start' }}>
-            {galleryPhotos.map((photo, idx) => (
-              <div key={idx} className="pdf-gallery-item" style={{ height: itemHeight, background: '#000' }}>
-                <img 
-                  src={`${API_BASE}/api/static/images/${isProgramSource ? 'program_photos' : 'life_photos'}/${photo}`} 
-                  alt="Memory" 
-                  style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
-                />
-              </div>
-            ))}
+  // Page 5: Gallery Page 2 (Up to 12 large photos)
+  const PageGallery2 = () => (
+    <div className="pdf-page-content pdf-page-center" style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+      <div className="pdf-watermark" style={{ backgroundImage: `url('${API_BASE}/api/static/images/grandpa/main_photo.jpg')` }}></div>
+      <div className="pdf-content-relative" style={{ width: '100%', flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
+        <h2 className="pdf-section-title" style={{ fontSize: '1.8rem', marginBottom: '15px', color: 'transparent' }}>...</h2>
+        <div className="pdf-gallery-grid" style={{ flexGrow: 1, display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '4px', alignContent: 'start' }}>
+          {p2Photos.map((photo, idx) => (
+            <div key={idx} className="pdf-gallery-item" style={{ height: '180px', background: '#f5f5f5' }}>
+              <img src={`${API_BASE}/api/static/images/${isProgramSource ? 'program_photos' : 'life_photos'}/${photo}`} alt="Memory" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+
+  // Page 6: Gallery Page 3 (Up to 6 large photos) + QR Code & Back Edge
+  const PageGallery3AndBack = () => (
+    <div className="pdf-page-content pdf-page-center" style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+      <div className="pdf-watermark" style={{ backgroundImage: `url('${API_BASE}/api/static/images/grandpa/main_photo.jpg')` }}></div>
+      <div className="pdf-content-relative" style={{ width: '100%', flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
+        <h2 className="pdf-section-title" style={{ fontSize: '1.8rem', marginBottom: '15px', color: 'transparent' }}>...</h2>
+        
+        <div className="pdf-gallery-grid" style={{ flexGrow: 1, display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '4px', alignContent: 'start' }}>
+          {p3Photos.map((photo, idx) => (
+            <div key={idx} className="pdf-gallery-item" style={{ height: '180px', background: '#f5f5f5' }}>
+              <img src={`${API_BASE}/api/static/images/${isProgramSource ? 'program_photos' : 'life_photos'}/${photo}`} alt="Memory" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+            </div>
+          ))}
+        </div>
+
+        <div style={{ marginTop: 'auto', borderTop: '2px solid var(--gold)', paddingTop: '15px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
+          <div style={{ textAlign: 'left' }}>
+            <h2 className="pdf-title" style={{ fontSize: '1.4rem', margin: '0 0 5px 0' }}>{grandpa.name}</h2>
+            <p style={{ margin: '0', fontSize: '0.9rem', color: '#555', fontStyle: 'italic' }}>Thank you for your love, support, and prayers.</p>
+            <p style={{ margin: '5px 0 0 0', fontSize: '0.9rem', color: '#888', fontWeight: 'bold' }}>{grandpa.birth_year} — {grandpa.death_year}</p>
           </div>
-
-          <div style={{ marginTop: 'auto', borderTop: '2px solid var(--gold)', paddingTop: '15px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
-            <div style={{ textAlign: 'left' }}>
-              <h2 className="pdf-title" style={{ fontSize: '1.4rem', margin: '0 0 5px 0' }}>{grandpa.name}</h2>
-              <p style={{ margin: '0', fontSize: '0.9rem', color: '#555', fontStyle: 'italic' }}>Thank you for your love, support, and prayers.</p>
-              <p style={{ margin: '5px 0 0 0', fontSize: '0.9rem', color: '#888', fontWeight: 'bold' }}>{grandpa.birth_year} — {grandpa.death_year}</p>
-            </div>
-            <div style={{ textAlign: 'right' }}>
-              <img src={`${API_BASE}/api/static/images/grandpa/qr_code.jpg?t=${Date.now()}`} alt="QR Code" style={{ width: '100px', height: '100px', border: '2px solid var(--gold)', padding: '5px', background: '#fff' }} onError={(e) => { e.target.style.display = 'none'; }} />
-              <p style={{ margin: '5px 0 0 0', fontSize: '0.75rem', fontWeight: 'bold', color: 'var(--primary)' }}>Scan Memorial Website</p>
-            </div>
+          <div style={{ textAlign: 'right' }}>
+            <img src={`${API_BASE}/api/static/images/grandpa/qr_code.jpg?t=${Date.now()}`} alt="QR Code" style={{ width: '100px', height: '100px', border: '2px solid var(--gold)', padding: '5px', background: '#fff' }} onError={(e) => { e.target.style.display = 'none'; }} />
+            <p style={{ margin: '5px 0 0 0', fontSize: '0.75rem', fontWeight: 'bold', color: 'var(--primary)' }}>Scan Memorial Website</p>
           </div>
         </div>
       </div>
-    );
-  };
+    </div>
+  );
 
-  // Exact 4 pages defined
+  // Exact 6 pages defined
   const pagesRaw = [
-    <PageCover />,          // Page 1
-    <PageProgram />,        // Page 2
-    <PageStory />,          // Page 3
-    <PageGalleryAndBack />  // Page 4
+    <PageCover />,            // Page 1
+    <PageProgram />,          // Page 2
+    <PageStory />,            // Page 3
+    <PageGallery1 />,         // Page 4
+    <PageGallery2 />,         // Page 5
+    <PageGallery3AndBack />   // Page 6
   ];
 
   // Layout Engine
   const renderedPages = [];
   if (paperSize === 'A3') {
-    // 4-Page Folded Booklet Layout on A3 (2 pages per sheet)
-    // Sheet 1 Front: [Page 4, Page 1] (Back cover, Front cover)
-    // Sheet 1 Back: [Page 2, Page 3] (Inside front, Inside back)
+    // 6-Page Folded Booklet Layout on A3 (2 pages per sheet)
+    // Sheet 1 Front: [Page 6, Page 1] 
+    // Sheet 1 Back: [Page 2, Page 5]
+    // Sheet 2 Front: [Page 4, Page 3] 
     const a3Layout = [
-      [pagesRaw[3], pagesRaw[0]],
-      [pagesRaw[1], pagesRaw[2]]
+      [pagesRaw[5], pagesRaw[0]],
+      [pagesRaw[1], pagesRaw[4]],
+      [pagesRaw[3], pagesRaw[2]]
     ];
 
     a3Layout.forEach((pair, i) => {
@@ -329,23 +356,24 @@ export default function ProgramPDF() {
         <div className="pdf-burner-header">
           <div>
             <h1 style={{ margin: '0 0 10px 0', fontFamily: '"Playfair Display", serif', color: '#111', fontSize: '2.2rem' }}>Program & Eulogy Generator</h1>
-            <p style={{ margin: 0, color: '#555', fontSize: '1.1rem' }}>4-Page Book Layout. Upload photos below.</p>
+            <p style={{ margin: 0, color: '#555', fontSize: '1.1rem' }}>6-Page Book Layout. Click "Download PDF" below.</p>
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', alignItems: 'flex-end' }}>
-            <button onClick={handlePrint} className="pdf-burner-btn-main" style={{ marginBottom: '5px' }}>
+            
+            <button onClick={handleDownload} className="pdf-burner-btn-main" style={{ marginBottom: '5px' }}>
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '8px' }}>
-                <polyline points="6 9 6 2 18 2 18 9"></polyline>
-                <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
-                <rect x="6" y="14" width="12" height="8"></rect>
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="7 10 12 15 17 10"></polyline>
+                <line x1="12" y1="15" x2="12" y2="3"></line>
               </svg>
-              Print / Save as PDF
+              Download PDF
             </button>
             
             <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
               <label style={{ fontSize: '0.85rem', color: '#666', fontWeight: 'bold' }}>Paper Layout:</label>
               <select value={paperSize} onChange={e => setPaperSize(e.target.value)} style={{ padding: '4px 8px', borderRadius: '4px', border: '1px solid #ccc', cursor: 'pointer', fontSize: '0.85rem' }}>
-                <option value="A4">A4 (Sequential - 4 Pages)</option>
-                <option value="A3">A3 (Folded Booklet - 2 Sheets)</option>
+                <option value="A4">A4 (Sequential - 6 Pages)</option>
+                <option value="A3">A3 (Folded Booklet - 3 Sheets)</option>
               </select>
             </div>
 
@@ -373,7 +401,7 @@ export default function ProgramPDF() {
       </div>
 
       {/* ── PRINTABLE PDF DOCUMENT ── */}
-      <div className="pdf-document">
+      <div className="pdf-document" ref={pdfRef}>
         {renderedPages}
       </div>
     </div>
