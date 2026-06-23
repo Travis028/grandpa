@@ -7,15 +7,19 @@ export default function ProgramPDF() {
   const [loading, setLoading] = useState(true);
   const [paperSize, setPaperSize] = useState('A4');
   const [qrUploading, setQrUploading] = useState(false);
+  const [coverUploading, setCoverUploading] = useState(false);
+  const [galleryUploading, setGalleryUploading] = useState(false);
 
   useEffect(() => {
     Promise.all([
       api.get('/api/grandpa'),
-      api.get('/api/life_photos')
-    ]).then(([resGrandpa, resLife]) => {
+      api.get('/api/life_photos'),
+      api.get('/api/program_photos')
+    ]).then(([resGrandpa, resLife, resProgramPhotos]) => {
       setData({
         grandpa: resGrandpa.data,
-        lifePhotos: resLife.data
+        lifePhotos: resLife.data,
+        programPhotos: resProgramPhotos.data || []
       });
       setLoading(false);
     }).catch(err => {
@@ -32,7 +36,7 @@ export default function ProgramPDF() {
     return <div style={{ padding: '50px', textAlign: 'center' }}>Error loading data.</div>;
   }
 
-  const { grandpa, lifePhotos } = data;
+  const { grandpa, lifePhotos, programPhotos } = data;
 
   const handlePrint = () => {
     window.print();
@@ -45,10 +49,8 @@ export default function ProgramPDF() {
     const formData = new FormData();
     formData.append('file', file);
     try {
-      await api.post('/api/upload_qr', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' }
-      });
-      alert('QR Code successfully uploaded! Please refresh the page to see changes.');
+      await api.post('/api/upload_qr', formData, { headers: { 'Content-Type': 'multipart/form-data' } });
+      alert('QR Code successfully uploaded! Please refresh.');
     } catch (err) {
       alert('Error uploading QR Code.');
     } finally {
@@ -56,14 +58,61 @@ export default function ProgramPDF() {
     }
   };
 
+  const handleCoverUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    setCoverUploading(true);
+    const formData = new FormData();
+    formData.append('file', file);
+    try {
+      await api.post('/api/upload_program_cover', formData, { headers: { 'Content-Type': 'multipart/form-data' } });
+      alert('Program Cover successfully uploaded! Please refresh.');
+    } catch (err) {
+      alert('Error uploading Program Cover.');
+    } finally {
+      setCoverUploading(false);
+    }
+  };
+
+  const handleGalleryUpload = async (e) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+    setGalleryUploading(true);
+    const formData = new FormData();
+    for (let i = 0; i < files.length; i++) {
+      formData.append('files', files[i]);
+    }
+    try {
+      await api.post('/api/upload_program_photos', formData, { headers: { 'Content-Type': 'multipart/form-data' } });
+      alert('Program Gallery Photos successfully uploaded! Please refresh.');
+    } catch (err) {
+      alert('Error uploading Program Gallery.');
+    } finally {
+      setGalleryUploading(false);
+    }
+  };
+
   // --- PAGE COMPONENTS ---
 
-  // Page 1: Cover (Frameless Photo)
+  // Page 1: Cover (Frameless Photo using program_cover.jpg with fallback)
   const PageCover = () => (
     <div className="pdf-page-content pdf-page-center pdf-cover">
       <div className="pdf-cover-ornament">✦ In Loving Memory ✦</div>
       <div className="pdf-cover-photo-wrapper" style={{ border: 'none', boxShadow: 'none', background: 'transparent' }}>
-        <img src={`${API_BASE}/api/static/images/grandpa/main_photo.jpg`} alt={grandpa.name} style={{ width: '250px', height: '250px', objectFit: 'cover', borderRadius: '50%', border: 'none', boxShadow: 'none' }} onError={(e) => { e.target.src = '/assets/floating_photo.jpg' }} />
+        <img 
+          src={`${API_BASE}/api/static/images/grandpa/program_cover.jpg?t=${Date.now()}`} 
+          alt={grandpa.name} 
+          style={{ width: '250px', height: '250px', objectFit: 'cover', borderRadius: '50%', border: 'none', boxShadow: 'none' }} 
+          onError={(e) => { 
+            // Fallback to main_photo if program_cover doesn't exist
+            if (!e.target.dataset.fallback) {
+                e.target.dataset.fallback = 'true';
+                e.target.src = `${API_BASE}/api/static/images/grandpa/main_photo.jpg`;
+            } else {
+                e.target.src = '/assets/floating_photo.jpg';
+            }
+          }} 
+        />
       </div>
       <h1 className="pdf-title">{grandpa.name}</h1>
       <h2 className="pdf-subtitle">A Life Well Lived</h2>
@@ -175,26 +224,51 @@ export default function ProgramPDF() {
     </div>
   );
 
-  // Page 4: Joyce Owino Gallery & QR Code edge
+  // Page 4: Squeezed Gallery (Up to 30 photos without frames) & QR Code edge
   const PageGalleryAndBack = () => {
-    // ONLY use lifePhotos (Joyce Owino Gallery)
-    const galleryPhotos = lifePhotos ? [...lifePhotos].sort(() => 0.5 - Math.random()).slice(0, 9) : [];
+    // If programPhotos exist, use those. Otherwise fallback to lifePhotos.
+    const photosToUse = programPhotos && programPhotos.length > 0 ? programPhotos : lifePhotos;
+    const isProgramSource = programPhotos && programPhotos.length > 0;
+    
+    // Shuffle and pick up to 30 photos
+    const galleryPhotos = photosToUse ? [...photosToUse].sort(() => 0.5 - Math.random()).slice(0, 30) : [];
+    
+    // Determine dynamic grid size to fit 30 photos beautifully
+    // 5 columns, 6 rows max.
+    const photoCount = galleryPhotos.length;
+    let cols = 5;
+    let itemHeight = '90px'; // Very squished to fit many
+
+    if (photoCount <= 9) {
+      cols = 3;
+      itemHeight = '160px';
+    } else if (photoCount <= 16) {
+      cols = 4;
+      itemHeight = '120px';
+    } else {
+      cols = 5;
+      itemHeight = '95px';
+    }
 
     return (
       <div className="pdf-page-content pdf-page-center" style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
         <div className="pdf-watermark" style={{ backgroundImage: `url('${API_BASE}/api/static/images/grandpa/main_photo.jpg')` }}></div>
         <div className="pdf-content-relative" style={{ width: '100%', flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
-          <h2 className="pdf-section-title" style={{ fontSize: '1.8rem', marginBottom: '15px' }}>Precious Memories</h2>
+          <h2 className="pdf-section-title" style={{ fontSize: '1.8rem', marginBottom: '10px' }}>Precious Memories</h2>
           
-          <div className="pdf-gallery-grid" style={{ flexGrow: 1, display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '10px' }}>
+          <div className="pdf-gallery-grid" style={{ flexGrow: 1, display: 'grid', gridTemplateColumns: `repeat(${cols}, 1fr)`, gap: '2px', alignContent: 'start' }}>
             {galleryPhotos.map((photo, idx) => (
-              <div key={idx} className="pdf-gallery-item" style={{ height: '160px', background: '#f5f5f5', border: '3px solid #fff', boxShadow: '0 4px 8px rgba(0,0,0,0.1)' }}>
-                <img src={`${API_BASE}/api/static/images/life_photos/${photo}`} alt="Memory" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              <div key={idx} className="pdf-gallery-item" style={{ height: itemHeight, background: '#000' }}>
+                <img 
+                  src={`${API_BASE}/api/static/images/${isProgramSource ? 'program_photos' : 'life_photos'}/${photo}`} 
+                  alt="Memory" 
+                  style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
+                />
               </div>
             ))}
           </div>
 
-          <div style={{ marginTop: 'auto', borderTop: '2px solid var(--gold)', paddingTop: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
+          <div style={{ marginTop: 'auto', borderTop: '2px solid var(--gold)', paddingTop: '15px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
             <div style={{ textAlign: 'left' }}>
               <h2 className="pdf-title" style={{ fontSize: '1.4rem', margin: '0 0 5px 0' }}>{grandpa.name}</h2>
               <p style={{ margin: '0', fontSize: '0.9rem', color: '#555', fontStyle: 'italic' }}>Thank you for your love, support, and prayers.</p>
@@ -255,10 +329,10 @@ export default function ProgramPDF() {
         <div className="pdf-burner-header">
           <div>
             <h1 style={{ margin: '0 0 10px 0', fontFamily: '"Playfair Display", serif', color: '#111', fontSize: '2.2rem' }}>Program & Eulogy Generator</h1>
-            <p style={{ margin: 0, color: '#555', fontSize: '1.1rem' }}>4-Page Book Layout. Click "Print / Save as PDF" below.</p>
+            <p style={{ margin: 0, color: '#555', fontSize: '1.1rem' }}>4-Page Book Layout. Upload photos below.</p>
           </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', alignItems: 'flex-end' }}>
-            <button onClick={handlePrint} className="pdf-burner-btn-main">
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', alignItems: 'flex-end' }}>
+            <button onClick={handlePrint} className="pdf-burner-btn-main" style={{ marginBottom: '5px' }}>
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '8px' }}>
                 <polyline points="6 9 6 2 18 2 18 9"></polyline>
                 <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
@@ -268,20 +342,32 @@ export default function ProgramPDF() {
             </button>
             
             <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
-              <label style={{ fontSize: '0.9rem', color: '#666', fontWeight: 'bold' }}>Paper Layout:</label>
-              <select value={paperSize} onChange={e => setPaperSize(e.target.value)} style={{ padding: '6px 12px', borderRadius: '4px', border: '1px solid #ccc', cursor: 'pointer' }}>
+              <label style={{ fontSize: '0.85rem', color: '#666', fontWeight: 'bold' }}>Paper Layout:</label>
+              <select value={paperSize} onChange={e => setPaperSize(e.target.value)} style={{ padding: '4px 8px', borderRadius: '4px', border: '1px solid #ccc', cursor: 'pointer', fontSize: '0.85rem' }}>
                 <option value="A4">A4 (Sequential - 4 Pages)</option>
                 <option value="A3">A3 (Folded Booklet - 2 Sheets)</option>
               </select>
             </div>
 
-            <div style={{ display: 'flex', gap: '10px', alignItems: 'center', background: '#f5f5f5', padding: '6px 12px', borderRadius: '4px', border: '1px solid #ddd' }}>
-              <label style={{ fontSize: '0.9rem', color: '#444', fontWeight: 'bold' }}>Upload QR Code:</label>
-              <input type="file" accept="image/*" onChange={handleQrUpload} disabled={qrUploading} style={{ fontSize: '0.85rem', width: '180px' }} />
-              {qrUploading && <span style={{ fontSize: '0.8rem', color: '#d4af37' }}>Uploading...</span>}
+            <div style={{ display: 'flex', gap: '10px', alignItems: 'center', background: '#f9f9f9', padding: '4px 10px', borderRadius: '4px', border: '1px solid #ddd' }}>
+              <label style={{ fontSize: '0.8rem', color: '#444', fontWeight: 'bold', width: '130px' }}>Upload Cover Photo:</label>
+              <input type="file" accept="image/*" onChange={handleCoverUpload} disabled={coverUploading} style={{ fontSize: '0.8rem', width: '160px' }} />
+              {coverUploading && <span style={{ fontSize: '0.75rem', color: '#d4af37' }}>Uploading...</span>}
             </div>
 
-            <Link to="/admin" style={{ color: '#888', fontSize: '0.9rem', textDecoration: 'none' }}>← Back to Admin</Link>
+            <div style={{ display: 'flex', gap: '10px', alignItems: 'center', background: '#f9f9f9', padding: '4px 10px', borderRadius: '4px', border: '1px solid #ddd' }}>
+              <label style={{ fontSize: '0.8rem', color: '#444', fontWeight: 'bold', width: '130px' }}>Upload 30 Gallery Photos:</label>
+              <input type="file" accept="image/*" multiple onChange={handleGalleryUpload} disabled={galleryUploading} style={{ fontSize: '0.8rem', width: '160px' }} />
+              {galleryUploading && <span style={{ fontSize: '0.75rem', color: '#d4af37' }}>Uploading...</span>}
+            </div>
+
+            <div style={{ display: 'flex', gap: '10px', alignItems: 'center', background: '#f9f9f9', padding: '4px 10px', borderRadius: '4px', border: '1px solid #ddd' }}>
+              <label style={{ fontSize: '0.8rem', color: '#444', fontWeight: 'bold', width: '130px' }}>Upload QR Code:</label>
+              <input type="file" accept="image/*" onChange={handleQrUpload} disabled={qrUploading} style={{ fontSize: '0.8rem', width: '160px' }} />
+              {qrUploading && <span style={{ fontSize: '0.75rem', color: '#d4af37' }}>Uploading...</span>}
+            </div>
+
+            <Link to="/admin" style={{ color: '#888', fontSize: '0.85rem', textDecoration: 'none', marginTop: '5px' }}>← Back to Admin</Link>
           </div>
         </div>
       </div>
