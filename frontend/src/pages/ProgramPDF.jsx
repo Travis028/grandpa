@@ -16,11 +16,13 @@ export default function ProgramPDF() {
   useEffect(() => {
     Promise.all([
       api.get('/api/grandpa'),
+      api.get('/api/program'),
       api.get('/api/life_photos'),
       api.get('/api/program_photos')
-    ]).then(([resGrandpa, resLife, resProgramPhotos]) => {
+    ]).then(([resGrandpa, resProgram, resLife, resProgramPhotos]) => {
       setData({
         grandpa: resGrandpa.data,
+        program: resProgram.data,
         lifePhotos: resLife.data,
         programPhotos: resProgramPhotos.data || []
       });
@@ -39,7 +41,7 @@ export default function ProgramPDF() {
     return <div style={{ padding: '50px', textAlign: 'center' }}>Error loading data.</div>;
   }
 
-  const { grandpa, lifePhotos, programPhotos } = data;
+  const { grandpa, program, lifePhotos, programPhotos } = data;
 
   const handleDownload = () => {
     const element = pdfRef.current;
@@ -165,45 +167,21 @@ export default function ProgramPDF() {
   const PageProgram = () => (
     <div className="pdf-page-content" style={floralBg}>
       <div className="pdf-content-relative">
-        <h2 className="pdf-section-title" style={{ fontSize: '1.8rem', marginBottom: '20px', color: headingColor }}>Order of Service</h2>
+        <h2 className="pdf-section-title" style={{ fontSize: '1.8rem', marginBottom: '10px', color: headingColor }}>Order of Service</h2>
+        <div style={{ marginBottom: '15px', color: textColor, fontStyle: 'italic', fontSize: '0.95rem' }}>
+          <strong>Date:</strong> {program.date} <br/>
+          <strong>Venue:</strong> {program.venue} <br/>
+          <strong>Time:</strong> {program.time_start} {program.time_end ? `- ${program.time_end}` : ''}
+        </div>
         
         <div style={{ fontSize: '1rem', lineHeight: '1.5', paddingRight: '15px', color: textColor }}>
-          <div style={{ marginBottom: '18px' }}>
-            <h3 style={{ fontSize: '1.2rem', margin: '0 0 6px 0', color: headingColor }}>1. The Prelude</h3>
-            <p style={{ margin: '0 0 4px 0' }}><strong>Music:</strong> Soft, reflective background music is played as guests arrive and take their seats.</p>
-            <p style={{ margin: '0' }}><strong>Seating of the Family:</strong> Close family members are escorted to their designated seating just before the service begins.</p>
-          </div>
-
-          <div style={{ marginBottom: '18px' }}>
-            <h3 style={{ fontSize: '1.2rem', margin: '0 0 6px 0', color: headingColor }}>2. The Opening</h3>
-            <p style={{ margin: '0 0 4px 0' }}><strong>Welcome / Words of Comfort:</strong> The officiant, clergy, or host welcomes guests, shares a brief opening statement, and acknowledges the purpose of the gathering.</p>
-            <p style={{ margin: '0' }}><strong>Opening Prayer or Reading:</strong> A short prayer, scriptural reading, or non-religious poem to set a peaceful tone.</p>
-          </div>
-
-          <div style={{ marginBottom: '18px' }}>
-            <h3 style={{ fontSize: '1.2rem', margin: '0 0 6px 0', color: headingColor }}>3. The Tributes</h3>
-            <p style={{ margin: '0 0 4px 0' }}><strong>Reading of the Obituary:</strong> A brief summary of the deceased’s life, achievements, and surviving family members.</p>
-            <p style={{ margin: '0 0 4px 0' }}><strong>Eulogy:</strong> A personal, heartfelt speech that highlights the character, legacy, and fond memories of the departed.</p>
-            <p style={{ margin: '0' }}><strong>Tributes / Reflections:</strong> Open time for pre-selected friends or family members to share short, personal memories.</p>
-          </div>
-
-          <div style={{ marginBottom: '18px' }}>
-            <h3 style={{ fontSize: '1.2rem', margin: '0 0 6px 0', color: headingColor }}>4. Musical Interlude & Special Tributes</h3>
-            <p style={{ margin: '0 0 4px 0' }}><strong>Special Music:</strong> A live or recorded musical performance, hymn, or playing of the deceased's favorite song.</p>
-            <p style={{ margin: '0' }}><strong>Photo Slideshow or Video:</strong> A visual montage of the deceased's life set to music.</p>
-          </div>
-
-          <div style={{ marginBottom: '18px' }}>
-            <h3 style={{ fontSize: '1.2rem', margin: '0 0 6px 0', color: headingColor }}>5. The Closing</h3>
-            <p style={{ margin: '0 0 4px 0' }}><strong>Final Commendation / Prayer:</strong> A final prayer or blessing, particularly important if the service is directly followed by a burial.</p>
-            <p style={{ margin: '0' }}><strong>Acknowledgments:</strong> Thank you messages to the guests, pallbearers, and those who sent flowers or condolences.</p>
-          </div>
-
-          <div style={{ marginBottom: '0' }}>
-            <h3 style={{ fontSize: '1.2rem', margin: '0 0 6px 0', color: headingColor }}>6. The Recessional</h3>
-            <p style={{ margin: '0 0 4px 0' }}><strong>Closing Music:</strong> Upbeat or triumphant music plays as the family exits the venue, followed by the rest of the attendees.</p>
-            <p style={{ margin: '0' }}><strong>Dismissal:</strong> Ushers or family members provide instructions regarding the repast or procession to the gravesite.</p>
-          </div>
+          {program.order.map((item, idx) => (
+            <div key={idx} style={{ marginBottom: '15px' }}>
+              <h3 style={{ fontSize: '1.1rem', margin: '0 0 4px 0', color: headingColor }}>
+                {item.time} - {item.item}
+              </h3>
+            </div>
+          ))}
         </div>
       </div>
     </div>

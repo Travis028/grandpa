@@ -76,7 +76,7 @@ export default function Program() {
         </div>
       </section>
 
-      <section className="section program-section">
+      <section className="section program-section" style={{ backgroundImage: "url('/api/static/images/floral_bg.png')", backgroundSize: 'cover', backgroundPosition: 'center' }}>
         <div className="container-narrow">
           <div className="program-details reveal visible">
             
