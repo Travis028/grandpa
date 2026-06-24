@@ -1,64 +1,38 @@
 {
   "event_name": "Memorial & Funeral Service",
-  "date": "[FILL IN DATE]",
-  "venue": "[FILL IN CHURCH/HALL NAME AND LOCATION]",
-  "venue_address": "[FILL IN FULL ADDRESS]",
-  "time_start": "[FILL IN START TIME]",
-  "time_end": "[FILL IN END TIME]",
-  "dress_code": "[FILL IN DRESS CODE]",
-  "burial_location": "[FILL IN BURIAL LOCATION]",
+  "date": "24th June 2026",
+  "venue": "Kolenya at his home",
+  "venue_address": "Kolenya",
+  "time_start": "Morning hrs",
+  "time_end": "",
+  "dress_code": "Green and Blue Theme",
+  "burial_location": "His Home at Kolenya",
   "hymnal_1": "[FILL IN HYMNAL 1 LYRICS\\nVerse 1...]",
   "hymnal_2": "[FILL IN HYMNAL 2 LYRICS\\nVerse 1...]",
   "order": [
     {
-      "time": "10:00 AM",
-      "item": "Opening Prayer",
-      "leader": "[FILL IN NAME]"
+      "time": "8:00 hrs",
+      "item": "Cortege leaving Tabaka Hospital to his home at Kolenya"
     },
     {
-      "time": "10:10 AM",
-      "item": "Hymn / Worship",
-      "leader": "Family"
+      "time": "15:00 hrs (3:00 PM)",
+      "item": "Cortege arrives at his home in Kolenya"
     },
     {
-      "time": "10:20 AM",
-      "item": "Scripture Reading",
-      "leader": "[FILL IN NAME]"
+      "time": "9:00 hrs",
+      "item": "Speeches"
     },
     {
-      "time": "10:30 AM",
-      "item": "Eulogy Reading",
-      "leader": "Family"
+      "time": "10:00 hrs",
+      "item": "Service, Prayer and Scripture Reading"
     },
     {
-      "time": "11:00 AM",
-      "item": "Tributes from Children",
-      "leader": "Each child speaks"
+      "time": "11:00 hrs",
+      "item": "Tributes & Acknowledgements"
     },
     {
-      "time": "11:45 AM",
-      "item": "Special Song",
-      "leader": "[FILL IN NAME]"
-    },
-    {
-      "time": "12:00 PM",
-      "item": "Message / Sermon",
-      "leader": "[FILL IN PASTOR/MINISTER]"
-    },
-    {
-      "time": "12:30 PM",
-      "item": "Final Prayer & Blessing",
-      "leader": "[FILL IN NAME]"
-    },
-    {
-      "time": "1:00 PM",
-      "item": "Burial / Committal",
-      "leader": "At the graveside"
-    },
-    {
-      "time": "2:00 PM",
-      "item": "Lunch & Fellowship",
-      "leader": "All are invited"
+      "time": "12:00 hrs",
+      "item": "Final Viewing & Recessional"
     }
   ]
 }
