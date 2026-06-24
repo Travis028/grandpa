@@ -163,26 +163,53 @@ export default function ProgramPDF() {
     </div>
   );
 
-  // Page 2: Order of Service
+  // Page 2: Order of Service & Hymnals
   const PageProgram = () => (
     <div className="pdf-page-content" style={floralBg}>
-      <div className="pdf-content-relative">
-        <h2 className="pdf-section-title" style={{ fontSize: '1.8rem', marginBottom: '10px', color: headingColor }}>Order of Service</h2>
-        <div style={{ marginBottom: '15px', color: textColor, fontStyle: 'italic', fontSize: '0.95rem' }}>
-          <strong>Date:</strong> {program.date} <br/>
-          <strong>Venue:</strong> {program.venue} <br/>
-          <strong>Time:</strong> {program.time_start} {program.time_end ? `- ${program.time_end}` : ''}
-        </div>
+      <div className="pdf-content-relative" style={{ display: 'flex', gap: '20px', height: '100%' }}>
         
-        <div style={{ fontSize: '1rem', lineHeight: '1.5', paddingRight: '15px', color: textColor }}>
-          {program.order.map((item, idx) => (
-            <div key={idx} style={{ marginBottom: '15px' }}>
-              <h3 style={{ fontSize: '1.1rem', margin: '0 0 4px 0', color: headingColor }}>
-                {item.time} - {item.item}
-              </h3>
-            </div>
-          ))}
+        {/* Left Column: Order of Service */}
+        <div style={{ flex: '1', borderRight: `1px dashed ${headingColor}`, paddingRight: '15px' }}>
+          <h2 className="pdf-section-title" style={{ fontSize: '1.6rem', marginBottom: '10px', color: headingColor }}>Order of Service</h2>
+          <div style={{ marginBottom: '15px', color: textColor, fontStyle: 'italic', fontSize: '0.9rem' }}>
+            <strong>Date:</strong> {program.date} <br/>
+            <strong>Venue:</strong> {program.venue} <br/>
+            <strong>Time:</strong> {program.time_start} {program.time_end ? `- ${program.time_end}` : ''}
+          </div>
+          
+          <div style={{ fontSize: '0.95rem', lineHeight: '1.4', color: textColor }}>
+            {program.order.map((item, idx) => (
+              <div key={idx} style={{ marginBottom: '15px' }}>
+                <h3 style={{ fontSize: '1.05rem', margin: '0 0 4px 0', color: headingColor }}>
+                  {item.time} - {item.item}
+                </h3>
+              </div>
+            ))}
+          </div>
         </div>
+
+        {/* Right Column: Hymnals */}
+        <div style={{ flex: '1', paddingLeft: '5px', fontSize: '0.8rem', lineHeight: '1.4', color: textColor }}>
+          <h2 className="pdf-section-title" style={{ fontSize: '1.6rem', marginBottom: '10px', color: headingColor }}>Hymnals</h2>
+          
+          <div style={{ marginBottom: '15px' }}>
+            <h4 style={{ margin: '0 0 5px 0', fontSize: '0.95rem', color: headingColor }}>258. ANANE WANG' YESU KRISTO</h4>
+            <p style={{ margin: '0 0 4px 0' }}><strong>1.</strong> Anane wang' Yesu Kristo, Kobir' eboche polo; Nabedi mamor moloyo Ka Yesu owir' e piny.</p>
+            <p style={{ margin: '0 0 4px 0', fontStyle: 'italic' }}><strong>Chorus:</strong> Anane wang' Yesu Kristo, Yesu Ruoth ma Jawarwa; Ka ageno Yesu pile, To chieng' moro nowara.</p>
+            <p style={{ margin: '0 0 4px 0' }}><strong>2.</strong> An to pok aneno Yesu, To ayiee gi chunya; Chieng' kofwenyore e polo, Ananene kak' obet.</p>
+            <p style={{ margin: '0 0 4px 0' }}><strong>3.</strong> Pinyni orachna moloyo, nikech tho gi tuo nitie; Anamor kaneno Yesu, Ok nane chandruok kendo.</p>
+            <p style={{ margin: '0' }}><strong>4.</strong> Yesu Kristo en Jang'wono, Nosetho ni ji duto; Mondo ng'a moseyie kuome Kik olal ma nyaka chieng'.</p>
+          </div>
+
+          <div>
+            <h4 style={{ margin: '0 0 5px 0', fontSize: '0.95rem', color: headingColor }}>263. JI NOYUD MOR KA TICH ORUMO</h4>
+            <p style={{ margin: '0 0 4px 0' }}><strong>1.</strong> Ji noyud mor ka tich orumo, ka jo keyo biro gi cham Ma gikelo ni Ruoth maduong', E Jerusalem Manyien.</p>
+            <p style={{ margin: '0 0 4px 0', fontStyle: 'italic' }}><strong>Chorus:</strong> Mor, mor, mor nobedi maduong', Mor, mor, ma ok enorum; Mor, mor, Ndalono chiegini Ma tich biro rumoe.</p>
+            <p style={{ margin: '0 0 4px 0' }}><strong>2.</strong> Wanawer wende mamit chieng'no, wanayud mor ngang' e chunywa, Kwadendo Ruodhwa nyaka chieng' E Jerusalem Manyien.</p>
+            <p style={{ margin: '0' }}><strong>3.</strong> Jo keyo noyudi mor maduong', kod kwonde bet ma nyaka chieng', Yesu Ruoth oseloso E Jerusalem Manyien</p>
+          </div>
+        </div>
+
       </div>
     </div>
   );
