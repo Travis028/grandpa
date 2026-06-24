@@ -1061,9 +1061,21 @@ def serve(path):
     dist_dir = os.path.join(os.path.dirname(__file__), 'frontend', 'dist')
     file_path = os.path.join(dist_dir, path)
     
+    # Provide a kill-switch for the old service worker to force browsers to update
+    if path == 'sw.js':
+        from flask import make_response
+        res = make_response("self.addEventListener('install', (e) => { self.skipWaiting(); }); self.addEventListener('activate', (e) => { self.registration.unregister().then(() => self.clients.matchAll()).then((clients) => { clients.forEach(client => client.navigate(client.url)) }); });")
+        res.headers['Content-Type'] = 'application/javascript'
+        res.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+        return res
+
     # If the file exists, serve it with correct MIME type
     if path != "" and os.path.exists(file_path) and os.path.isfile(file_path):
         return send_from_directory(dist_dir, path)
+    
+    # Do not serve index.html for static assets that are missing (like old workbox chunks)
+    if path.endswith('.js') or path.endswith('.css') or path.endswith('.png') or path.endswith('.jpg'):
+        return jsonify({'error': 'Not found'}), 404
     
     # For all other paths (including React routes), serve index.html
     return send_from_directory(dist_dir, 'index.html')
